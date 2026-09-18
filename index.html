@@ -103,22 +103,22 @@
     position:relative;z-index:2;
     max-width:1620px;
     margin:0 auto;
-    padding: calc(16px + env(safe-area-inset-top,0px)) clamp(16px,2.4vw,40px) calc(20px + env(safe-area-inset-bottom,0px));
+    padding: calc(12px + env(safe-area-inset-top,0px)) clamp(16px,2.4vw,40px) calc(14px + env(safe-area-inset-bottom,0px));
   }
 
-  /* ---------- header (centered) ---------- */
+  /* ---------- header: left id / right meta, 2 lines each ---------- */
   .masthead{
     display:flex;
-    flex-direction:column;
     align-items:center;
-    text-align:center;
-    gap:9px;
-    padding-bottom:14px;
-    margin-bottom:14px;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap:wrap;
+    padding-bottom:9px;
+    margin-bottom:8px;
     border-bottom:1px solid var(--line);
   }
-  .masthead .id{display:flex;align-items:center;gap:16px;}
-  .emblem{width:54px;height:54px;flex:none;}
+  .masthead .id{display:flex;align-items:center;gap:13px;}
+  .emblem{width:44px;height:44px;flex:none;}
   .emblem .ring-outer{transform-origin:32px 32px;animation:spinSlow 16s linear infinite;}
   .emblem .ring-inner{transform-origin:32px 32px;animation:spinSlow 22s linear infinite reverse;}
   .emblem .core{animation:pulseGlow 3s ease-in-out infinite;transform-origin:32px 32px;}
@@ -126,25 +126,31 @@
   @keyframes spinSlow{to{transform:rotate(360deg);}}
   @keyframes pulseGlow{0%,100%{opacity:.75;}50%{opacity:1;}}
 
-  .masthead h1{font-size:clamp(1.55rem,3vw,2.3rem);margin:0 0 3px;color:var(--ink);text-align:left;}
+  .masthead h1{font-size:clamp(1.3rem,2.3vw,1.7rem);margin:0 0 1px;color:var(--ink);text-align:left;}
   .masthead .sub{
-    color:var(--accent-bright);font-size:.92rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin:0;
+    color:var(--accent-bright);font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;font-weight:600;margin:0;
     font-family:'Chakra Petch',sans-serif;text-align:left;
   }
-  .masthead .who{color:var(--ink-soft);font-size:1rem;line-height:1.55;}
-  .masthead .who b{display:inline;color:var(--ink);font-size:1.08rem;font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.02em;}
+
+  .meta-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;max-width:520px;}
+  .masthead .who{color:var(--ink-soft);font-size:.82rem;line-height:1.4;text-align:right;}
+  .masthead .who b{color:var(--ink);font-size:.86rem;font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.02em;}
+  @media (max-width:700px){
+    .meta-right{align-items:flex-start;}
+    .masthead .who{text-align:left;}
+  }
 
   .clock-badge{
-    display:inline-flex;align-items:center;gap:9px;
-    padding:7px 20px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:7px;
+    padding:4px 14px;border-radius:999px;
     background:var(--surface-3);
     border:1px solid var(--line);
-    font-family:'Chakra Petch',sans-serif;font-size:1.02rem;font-weight:600;
+    font-family:'Chakra Petch',sans-serif;font-size:.84rem;font-weight:600;
     color:var(--accent-bright);letter-spacing:.02em;
     font-variant-numeric:tabular-nums;
   }
   .live-dot{
-    width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none;
+    width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none;
     animation:livePulse 1.6s ease-in-out infinite;
   }
   @keyframes livePulse{
@@ -153,8 +159,8 @@
   }
 
   /* ---------- EKG pulse divider ---------- */
-  .pulse-wrap{width:100%;max-width:1620px;margin:0 auto 14px;line-height:0;}
-  .pulse-wrap svg{width:100%;height:32px;display:block;}
+  .pulse-wrap{width:100%;max-width:1620px;margin:0 auto 8px;line-height:0;}
+  .pulse-wrap svg{width:100%;height:22px;display:block;}
   .pulse-line{
     stroke-dasharray:340;
     filter:drop-shadow(0 0 4px rgba(220,38,38,.45));
@@ -167,9 +173,9 @@
   }
 
   /* ---------- layout ---------- */
-  .layout{display:grid;grid-template-columns:0.86fr 1.14fr;gap:16px;align-items:start;}
+  .layout{display:grid;grid-template-columns:0.86fr 1.14fr;gap:13px;align-items:start;}
   @media (max-width:980px){.layout{grid-template-columns:1fr;}}
-  .col{display:flex;flex-direction:column;gap:16px;}
+  .col{display:flex;flex-direction:column;gap:13px;}
 
   .panel{
     position:relative;
@@ -177,8 +183,8 @@
     backdrop-filter:blur(18px) saturate(1.2);
     -webkit-backdrop-filter:blur(18px) saturate(1.2);
     border:1px solid var(--line);
-    border-radius:22px;
-    padding:18px 20px 20px;
+    border-radius:20px;
+    padding:14px 17px 16px;
     box-shadow:0 20px 46px -28px rgba(13,60,45,.22), inset 0 1px 0 rgba(255,255,255,.7);
     overflow:hidden;
   }
@@ -191,13 +197,13 @@
   }
   @keyframes shimmer{0%{background-position:0% 0;}100%{background-position:220% 0;}}
 
-  .panel-head{display:flex;align-items:center;gap:10px;margin-bottom:13px;}
-  .panel-head .bar{width:4px;height:20px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent-2));flex:none;}
-  .panel-head h2{font-size:1.18rem;margin:0;color:var(--ink);}
+  .panel-head{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+  .panel-head .bar{width:4px;height:18px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent-2));flex:none;}
+  .panel-head h2{font-size:1.1rem;margin:0;color:var(--ink);}
 
   .sub-head{
-    font-size:.96rem;font-weight:600;color:var(--accent-bright);
-    margin:14px 0 9px;display:flex;align-items:center;gap:8px;
+    font-size:.92rem;font-weight:600;color:var(--accent-bright);
+    margin:10px 0 7px;display:flex;align-items:center;gap:7px;
     font-family:'Chakra Petch',sans-serif;letter-spacing:.02em;
   }
   .sub-head:first-of-type{margin-top:0;}
@@ -322,9 +328,9 @@
 
   /* ---------- footer ---------- */
   .foot{
-    margin-top:14px;padding-top:10px;border-top:1px solid var(--line);
+    margin-top:9px;padding-top:7px;border-top:1px solid var(--line);
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
-    font-size:.82rem;color:var(--ink-faint);
+    font-size:.78rem;color:var(--ink-faint);
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -367,10 +373,11 @@
       </div>
     </div>
 
-    <span class="clock-badge"><span class="live-dot"></span><span id="liveClock">กำลังโหลดเวลา…</span></span>
-
-    <div class="who">
-      <b>อ้อมอารีย์ พุทธาวันดี</b> · หัวหน้าหน่วยไตเทียม · กลุ่มการพยาบาล · กรมควบคุมโรค กระทรวงสาธารณสุข
+    <div class="meta-right">
+      <span class="clock-badge"><span class="live-dot"></span><span id="liveClock">กำลังโหลดเวลา…</span></span>
+      <div class="who">
+        <b>อ้อมอารีย์ พุทธาวันดี</b> · หัวหน้าหน่วยไตเทียม · กลุ่มการพยาบาล · กรมควบคุมโรค กระทรวงสาธารณสุข
+      </div>
     </div>
   </header>
 
