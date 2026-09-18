@@ -6,47 +6,103 @@
 <title>Renal Care Strategic Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  *{margin:0;}
+
   :root{
-    --bg:#0a1f18;
-    --surface:#0f3428;
-    --surface-2:#123c2e;
-    --surface-3:#164636;
-    --ink:#f3ecd9;
-    --ink-soft:#b9cdbd;
-    --ink-faint:#7f9a8a;
-    --gold:#d9b95c;
-    --gold-bright:#f0d484;
-    --gold-dim:#8a7440;
-    --line:#2a5443;
-    --ok:#6fbf8b;
+    --bg:#04120d;
+    --grid-line: rgba(0,230,168,.08);
+    --surface: rgba(8,30,23,.4);
+    --surface-2: rgba(3,12,9,.34);
+    --surface-3: rgba(13,42,33,.46);
+    --ink:#eafff6;
+    --ink-soft:#a9d9c6;
+    --ink-faint:#5f8b78;
+    --accent:#00e6a8;
+    --accent-bright:#7dffd8;
+    --accent-2:#00b3a0;
+    --accent-2-bright:#5dd9c9;
+    --line: rgba(0,230,168,.3);
+    --line-strong: rgba(0,230,168,.55);
+    --ok:#00e6a8;
   }
 
   *{box-sizing:border-box;}
   html{height:100%;}
   body{
-    background:
-      radial-gradient(1200px 700px at 88% -10%, rgba(217,185,92,.09), transparent 60%),
-      radial-gradient(900px 600px at -8% 108%, rgba(111,191,139,.06), transparent 55%),
-      var(--bg);
+    background:var(--bg);
     color:var(--ink);
     font-family:'Sarabun',system-ui,sans-serif;
     min-height:100%;
-    margin:0;
+    position:relative;
+    overflow-x:hidden;
   }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:42px 42px;
+    -webkit-mask-image:radial-gradient(ellipse 85% 55% at 50% 0%, #000, transparent 72%);
+            mask-image:radial-gradient(ellipse 85% 55% at 50% 0%, #000, transparent 72%);
+    pointer-events:none;
+    z-index:0;
+    animation:gridFlow 26s linear infinite;
+  }
+  @keyframes gridFlow{from{background-position:0 0,0 0;}to{background-position:168px 84px,168px 84px;}}
+  body::after{
+    content:"";
+    position:fixed;inset:-15%;
+    background:
+      radial-gradient(560px 380px at 10% 6%, rgba(0,230,168,.18), transparent 62%),
+      radial-gradient(620px 460px at 94% 92%, rgba(0,179,160,.16), transparent 62%);
+    animation:drift 15s ease-in-out infinite alternate;
+    pointer-events:none;
+    z-index:0;
+  }
+  @keyframes drift{ from{transform:translate(0,0) scale(1);} to{transform:translate(-2.5%,2.5%) scale(1.06);} }
+
+  /* ---------- roaming digital light streaks ---------- */
+  .scan{
+    position:fixed;top:0;left:-32%;width:32%;height:1.4px;
+    background:linear-gradient(90deg,transparent,var(--accent-bright),transparent);
+    filter:blur(1.3px) drop-shadow(0 0 9px rgba(0,230,168,.95));
+    opacity:.65;pointer-events:none;z-index:1;
+    animation:sweep 11s ease-in-out infinite alternate;
+  }
+  .scan.s1{top:12%;}
+  .scan.s2{top:48%;width:24%;opacity:.5;animation-duration:15s;animation-delay:-4s;}
+  .scan.s3{top:82%;width:19%;opacity:.42;animation-duration:19s;animation-delay:-8s;}
+  .scan.v1{
+    top:0;left:9%;width:1.4px;height:34%;
+    background:linear-gradient(180deg,transparent,var(--accent-2-bright),transparent);
+    filter:blur(1.3px) drop-shadow(0 0 9px rgba(0,179,160,.9));
+    opacity:.4;animation:sweepY 13s ease-in-out infinite alternate;animation-delay:-2s;
+  }
+  .scan.v2{
+    top:0;left:87%;width:1.4px;height:28%;
+    background:linear-gradient(180deg,transparent,var(--accent-bright),transparent);
+    filter:blur(1.3px) drop-shadow(0 0 9px rgba(0,230,168,.9));
+    opacity:.35;animation:sweepY 17s ease-in-out infinite alternate;animation-delay:-6s;
+  }
+  @keyframes sweep{from{transform:translateX(0);}to{transform:translateX(340%);}}
+  @keyframes sweepY{from{transform:translateY(0);}to{transform:translateY(180%);}}
 
   h1,h2,h3,.display{
-    font-family:'Noto Serif Thai','Sarabun',serif;
+    font-family:'Chakra Petch','Sarabun',sans-serif;
     font-weight:700;
+    text-wrap:balance;
     letter-spacing:.01em;
   }
-  ::selection{background:var(--gold-dim);color:var(--ink);}
+  ::selection{background:var(--accent-2);color:#02120d;}
 
   .page{
+    position:relative;z-index:2;
     max-width:1580px;
     margin:0 auto;
-    padding: 20px clamp(16px,2.4vw,40px) 24px;
+    padding: calc(14px + env(safe-area-inset-top,0px)) clamp(16px,2.2vw,36px) calc(16px + env(safe-area-inset-bottom,0px));
   }
 
   /* ---------- header ---------- */
@@ -54,186 +110,213 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:20px;
+    gap:18px;
     flex-wrap:wrap;
-    padding-bottom:16px;
-    margin-bottom:18px;
+    padding-bottom:10px;
+    margin-bottom:12px;
     border-bottom:1px solid var(--line);
   }
-  .masthead .id{display:flex;align-items:center;gap:16px;}
-  .emblem{width:48px;height:48px;flex:none;}
-  .masthead h1{font-size:clamp(1.3rem,2.2vw,1.9rem);margin:0 0 2px;color:var(--ink);}
-  .masthead .sub{color:var(--gold-bright);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin:0;}
-  .masthead .who{
-    text-align:right;
-    color:var(--ink-soft);
-    font-size:.86rem;
-    line-height:1.6;
+  .masthead .id{display:flex;align-items:center;gap:14px;}
+  .emblem{width:44px;height:44px;flex:none;}
+  .emblem .ring-outer{transform-origin:32px 32px;animation:spinSlow 16s linear infinite;}
+  .emblem .ring-inner{transform-origin:32px 32px;animation:spinSlow 22s linear infinite reverse;}
+  .emblem .core{animation:pulseGlow 3s ease-in-out infinite;transform-origin:32px 32px;}
+  @keyframes spinSlow{to{transform:rotate(360deg);}}
+  @keyframes pulseGlow{0%,100%{opacity:.7;filter:drop-shadow(0 0 0 rgba(0,230,168,0));}50%{opacity:1;filter:drop-shadow(0 0 5px rgba(0,230,168,.85));}}
+
+  .masthead h1{font-size:clamp(1.2rem,2vw,1.7rem);margin:0 0 2px;color:var(--ink);}
+  .masthead .sub{
+    color:var(--accent-bright);font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin:0;
+    font-family:'Chakra Petch',sans-serif;
   }
-  .masthead .who b{display:block;color:var(--ink);font-size:1rem;font-family:'Noto Serif Thai',serif;font-weight:600;}
+  .masthead .who{text-align:right;color:var(--ink-soft);font-size:.82rem;line-height:1.55;}
+  .masthead .who b{display:block;color:var(--ink);font-size:.96rem;font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.02em;}
 
   /* ---------- layout ---------- */
-  .layout{
-    display:grid;
-    grid-template-columns: 0.86fr 1.14fr;
-    gap:18px;
-    align-items:start;
-  }
-  @media (max-width:980px){
-    .layout{grid-template-columns:1fr;}
-  }
-  .col{display:flex;flex-direction:column;gap:18px;}
+  .layout{display:grid;grid-template-columns:0.86fr 1.14fr;gap:14px;align-items:start;}
+  @media (max-width:980px){.layout{grid-template-columns:1fr;}}
+  .col{display:flex;flex-direction:column;gap:14px;}
 
   .panel{
-    background:linear-gradient(180deg,var(--surface),var(--surface-2));
+    position:relative;
+    background:linear-gradient(165deg,var(--surface),var(--surface-2));
+    backdrop-filter:blur(22px) saturate(1.3);
+    -webkit-backdrop-filter:blur(22px) saturate(1.3);
     border:1px solid var(--line);
-    border-radius:18px;
-    padding:20px 22px 22px;
+    border-radius:22px;
+    padding:15px 18px 17px;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.05);
+    overflow:hidden;
   }
-  .panel-head{
-    display:flex;align-items:center;gap:10px;
-    margin-bottom:16px;
+  .panel::before{
+    content:"";
+    position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),var(--accent-2),transparent);
+    background-size:220% 100%;
+    animation:shimmer 6s linear infinite;
   }
-  .panel-head .bar{width:4px;height:20px;border-radius:2px;background:var(--gold);flex:none;}
-  .panel-head h2{font-size:1.05rem;margin:0;color:var(--ink);}
+  @keyframes shimmer{0%{background-position:0% 0;}100%{background-position:220% 0;}}
+
+  .panel-head{display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+  .panel-head .bar{width:4px;height:18px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent-2));flex:none;box-shadow:0 0 8px rgba(0,230,168,.65);}
+  .panel-head h2{font-size:.98rem;margin:0;color:var(--ink);}
 
   .sub-head{
-    font-size:.86rem;
-    font-weight:600;
-    color:var(--gold-bright);
-    margin:18px 0 10px;
-    display:flex;align-items:center;gap:8px;
+    font-size:.8rem;font-weight:600;color:var(--accent-bright);
+    margin:12px 0 8px;display:flex;align-items:center;gap:7px;
+    font-family:'Chakra Petch',sans-serif;letter-spacing:.02em;
   }
   .sub-head:first-of-type{margin-top:0;}
-  .sub-head .num{
-    font-family:'Noto Serif Thai',serif;
-    color:var(--gold-dim);
-    font-size:.8rem;
+  .sub-head .num{color:var(--accent-2-bright);font-size:.75rem;}
+
+  /* ---------- icon badge (animated) ---------- */
+  .icon-badge{
+    width:26px;height:26px;border-radius:9px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(0,230,168,.1);
+    border:1px solid var(--line-strong);
+    color:var(--accent);
+    animation:pulseGlow 3.4s ease-in-out infinite;
   }
+  .icon-badge.v{background:rgba(0,179,160,.12);border-color:rgba(0,179,160,.45);color:var(--accent-2-bright);}
+  .icon-badge.v{animation:pulseGlowV 3.4s ease-in-out infinite;}
+  @keyframes pulseGlowV{0%,100%{opacity:.7;filter:drop-shadow(0 0 0 rgba(0,179,160,0));}50%{opacity:1;filter:drop-shadow(0 0 5px rgba(0,179,160,.85));}}
+  .icon-badge svg{width:14px;height:14px;}
+  .icon-badge .hand{transform-origin:12px 12px;animation:spinSlow 7s linear infinite;}
 
   /* ---------- table ---------- */
   .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;}
-  table{width:100%;border-collapse:collapse;min-width:440px;font-size:.82rem;}
+  table{width:100%;border-collapse:collapse;min-width:420px;font-size:.78rem;background:rgba(255,255,255,.02);}
   thead th{
-    text-align:left;font-weight:600;color:var(--gold-bright);
-    background:var(--surface-3);
-    padding:9px 12px;border-bottom:1px solid var(--line);
-    white-space:nowrap;
+    text-align:left;font-weight:600;color:var(--accent-bright);
+    background:rgba(0,230,168,.07);
+    padding:7px 10px;border-bottom:1px solid var(--line);
+    white-space:nowrap;font-family:'Chakra Petch',sans-serif;letter-spacing:.02em;
   }
-  tbody td{padding:9px 12px;border-bottom:1px solid var(--line);color:var(--ink-soft);vertical-align:top;}
+  tbody td{padding:7px 10px;border-bottom:1px solid var(--line);color:var(--ink-soft);vertical-align:top;}
   tbody tr:last-child td{border-bottom:none;}
   tbody td.strong{color:var(--ink);font-weight:600;}
-  tbody td .num{color:var(--gold-bright);font-weight:700;font-variant-numeric:tabular-nums;}
-  .cell-note{display:block;font-size:.76rem;color:var(--ink-faint);margin-top:1px;}
+  tbody td .num{color:var(--accent-bright);font-weight:700;font-variant-numeric:tabular-nums;}
+  .cell-note{display:block;font-size:.72rem;color:var(--ink-faint);margin-top:1px;}
 
   /* ---------- feature row ---------- */
-  .feat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+  .feat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:9px;}
   @media (max-width:560px){.feat-row{grid-template-columns:1fr;}}
   .feat{
-    background:var(--surface-3);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:12px 14px;
+    background:var(--surface-3);border:1px solid var(--line);border-radius:14px;
+    padding:9px 11px;display:flex;gap:9px;align-items:flex-start;
   }
-  .feat h4{
-    margin:0 0 4px;font-size:.84rem;color:var(--ink);
-    display:flex;align-items:center;gap:7px;font-weight:600;
-  }
-  .feat h4 .g{color:var(--gold);}
-  .feat p{margin:0;font-size:.78rem;color:var(--ink-soft);line-height:1.55;}
+  .feat .txt h4{margin:0 0 3px;font-size:.8rem;color:var(--ink);font-weight:600;font-family:'Chakra Petch',sans-serif;}
+  .feat .txt p{margin:0;font-size:.74rem;color:var(--ink-soft);line-height:1.45;}
 
   /* ---------- clinical card ---------- */
-  .clin-card{
-    background:var(--surface-3);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:14px 16px;
-  }
-  .clin-card h4{margin:0 0 6px;font-size:.86rem;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:8px;}
-  .clin-card p{margin:0;font-size:.8rem;color:var(--ink-soft);line-height:1.6;}
+  .clin-card{background:var(--surface-3);border:1px solid var(--line);border-radius:14px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start;}
+  .clin-card h4{margin:0 0 4px;font-size:.82rem;color:var(--ink);font-weight:600;font-family:'Chakra Petch',sans-serif;}
+  .clin-card p{margin:0;font-size:.76rem;color:var(--ink-soft);line-height:1.5;}
   .banner{
-    margin-top:14px;
-    display:inline-flex;align-items:center;gap:8px;
-    padding:9px 20px;border-radius:999px;
-    background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-dim));
-    color:#20180a;font-family:'Noto Serif Thai',serif;font-weight:600;font-size:.86rem;
+    margin-top:10px;display:inline-flex;align-items:center;gap:8px;
+    padding:7px 18px;border-radius:999px;
+    background:linear-gradient(90deg,var(--accent-2),var(--accent));
+    color:#00160f;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.02em;
+    box-shadow:0 8px 24px -8px rgba(0,230,168,.6);
   }
 
   /* ---------- kanban split ---------- */
-  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
   @media (max-width:620px){.split{grid-template-columns:1fr;}}
-  .kcol{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:13px 15px;}
-  .kcol-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);}
-  .kcol-head .dot{width:8px;height:8px;border-radius:50%;flex:none;}
-  .kcol-head.done .dot{background:var(--ok);}
-  .kcol-head.plan .dot{background:var(--gold);}
-  .kcol-head span{font-weight:600;font-size:.78rem;color:var(--ink);}
-  .item-list{list-style:none;margin:0;padding:0;display:grid;gap:8px;}
-  .item-list li{display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:.76rem;color:var(--ink-soft);line-height:1.5;}
-  .item-list li b{display:block;color:var(--ink);font-weight:600;font-size:.78rem;}
-  .item-list li .glyph{color:var(--gold);font-size:.9rem;line-height:1.35;}
+  .kcol{background:var(--surface-3);border:1px solid var(--line);border-radius:14px;padding:10px 12px;}
+  .kcol-head{display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line);}
+  .status-dot{width:8px;height:8px;border-radius:50%;flex:none;position:relative;}
+  .status-dot::after{
+    content:"";position:absolute;inset:-5px;border-radius:50%;
+    border:1px solid currentColor;opacity:.6;
+    animation:ringPulse 2.4s ease-out infinite;
+  }
+  .kcol-head.done .status-dot{background:var(--ok);color:var(--ok);}
+  .kcol-head.plan .status-dot{background:var(--accent-2);color:var(--accent-2);}
+  @keyframes ringPulse{0%{transform:scale(.6);opacity:.7;}100%{transform:scale(1.7);opacity:0;}}
+  .kcol-head span{font-weight:600;font-size:.74rem;color:var(--ink);font-family:'Chakra Petch',sans-serif;}
+  .item-list{list-style:none;margin:0;padding:0;display:grid;gap:7px;}
+  .item-list li{display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:.72rem;color:var(--ink-soft);line-height:1.42;align-items:start;}
+  .item-list li b{display:block;color:var(--ink);font-weight:600;font-size:.74rem;}
 
   /* ---------- role matrix ---------- */
-  .role-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:14px;}
+  .role-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:11px;}
   @media (max-width:620px){.role-grid{grid-template-columns:1fr;}}
-  .role-card{background:var(--surface-3);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .role-card{background:var(--surface-3);border:1px solid var(--line);border-radius:14px;padding:11px 13px;}
   .stat-value{
-    font-family:'Noto Serif Thai',serif;font-weight:700;
-    font-size:clamp(1.3rem,2vw,1.7rem);
-    color:var(--gold-bright);font-variant-numeric:tabular-nums;line-height:1;
+    font-family:'Chakra Petch',sans-serif;font-weight:700;
+    font-size:clamp(1.15rem,1.8vw,1.5rem);
+    color:var(--accent-bright);font-variant-numeric:tabular-nums;line-height:1;
+    text-shadow:0 0 14px rgba(0,230,168,.5);
   }
-  .stat-value small{font-size:.5em;color:var(--ink-soft);font-family:'Sarabun',sans-serif;font-weight:600;}
-  .stat-label{color:var(--ink-soft);font-size:.76rem;margin-top:5px;line-height:1.5;max-width:32ch;}
+  .stat-value small{font-size:.5em;color:var(--ink-soft);font-family:'Sarabun',sans-serif;font-weight:600;text-shadow:none;}
+  .stat-label{color:var(--ink-soft);font-size:.72rem;margin-top:4px;line-height:1.45;max-width:32ch;}
 
-  .stairs{display:flex;align-items:flex-end;gap:8px;padding-top:12px;}
-  .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
-  .step .bar{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--gold),var(--gold-dim));}
-  .step:nth-child(1) .bar{height:18px;}
-  .step:nth-child(2) .bar{height:34px;}
-  .step:nth-child(3) .bar{height:52px;}
-  .step .n{font-weight:700;color:var(--ink);font-size:.72rem;}
-  .step .y{color:var(--ink-faint);font-size:.66rem;}
+  .stairs{display:flex;align-items:flex-end;gap:7px;padding-top:9px;}
+  .step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+  .step .bar{
+    width:100%;border-radius:6px 6px 0 0;
+    background:linear-gradient(180deg,var(--accent),var(--accent-2));
+    box-shadow:0 0 12px -2px rgba(0,230,168,.8);
+    transform-origin:bottom;
+    animation:growBar .9s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes growBar{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+  .step:nth-child(1) .bar{height:15px;animation-delay:.05s;}
+  .step:nth-child(2) .bar{height:28px;animation-delay:.2s;}
+  .step:nth-child(3) .bar{height:44px;animation-delay:.35s;}
+  .step .n{font-weight:700;color:var(--ink);font-size:.68rem;}
+  .step .y{color:var(--ink-faint);font-size:.62rem;}
 
-  .role-card h4{margin:0 0 4px;font-size:.82rem;color:var(--ink);font-weight:600;}
-  .role-card .cap{margin:0 0 8px;font-size:.74rem;color:var(--ink-faint);}
+  .role-card h4{margin:0 0 3px;font-size:.78rem;color:var(--ink);font-weight:600;font-family:'Chakra Petch',sans-serif;}
+  .role-card .cap{margin:0 0 6px;font-size:.7rem;color:var(--ink-faint);}
   .branches{display:grid;gap:6px;margin-top:2px;}
-  .branches li{list-style:none;display:flex;align-items:center;gap:7px;font-size:.76rem;color:var(--ink-soft);}
-  .branches li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold-dim);flex:none;}
-
-  /* ---------- ecosystem flow ---------- */
-  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;}
-  .flow-step{
-    flex:1;min-width:140px;
-    background:var(--surface-3);border:1px solid var(--line);border-radius:12px;
-    padding:14px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px;
+  .branches li{list-style:none;display:flex;align-items:center;gap:7px;font-size:.72rem;color:var(--ink-soft);}
+  .branches li .spark{
+    width:6px;height:6px;flex:none;background:var(--accent-2);
+    clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);
   }
-  .flow-step .num{
-    width:26px;height:26px;border-radius:50%;background:var(--surface-2);color:var(--gold);
-    display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Noto Serif Thai',serif;font-size:.8rem;
-  }
-  .flow-step h4{margin:0;font-weight:600;color:var(--ink);font-size:.8rem;}
-  .flow-step p{margin:0;color:var(--ink-soft);font-size:.72rem;line-height:1.5;}
-  .flow-arrow{align-self:center;color:var(--gold-dim);font-size:1.2rem;flex:none;}
-  @media (max-width:560px){.flow-arrow{transform:rotate(90deg);}}
 
   /* ---------- footer ---------- */
   .foot{
-    margin-top:18px;padding-top:12px;border-top:1px solid var(--line);
+    margin-top:12px;padding-top:8px;border-top:1px solid var(--line);
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
-    font-size:.72rem;color:var(--ink-faint);
+    font-size:.68rem;color:var(--ink-faint);
   }
+
+  @media (prefers-reduced-motion:reduce){
+    body::before,body::after,.scan,.emblem .ring-outer,.emblem .ring-inner,.emblem .core,
+    .panel::before,.icon-badge,.status-dot::after,.step .bar,.icon-badge .hand{
+      animation:none !important;
+    }
+    .step .bar{transform:scaleY(1);}
+  }
+
 </style>
 </head>
 <body>
+<div class="scan s1"></div>
+<div class="scan s2"></div>
+<div class="scan s3"></div>
+<div class="scan v1"></div>
+<div class="scan v2"></div>
+
 <div class="page">
 
   <header class="masthead">
     <div class="id">
       <svg class="emblem" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="32" cy="32" r="30" stroke="#d9b95c" stroke-width="1.4"/>
-        <circle cx="32" cy="32" r="23" stroke="#8a7440" stroke-width="1"/>
-        <path d="M32 16c7 8 11 14 11 19a11 11 0 1 1-22 0c0-5 4-11 11-19Z" stroke="#d9b95c" stroke-width="1.6" stroke-linejoin="round"/>
-        <path d="M25 35a7 7 0 0 0 7 7" stroke="#f0d484" stroke-width="1.4" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="emGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#00e6a8"/>
+            <stop offset="1" stop-color="#00b3a0"/>
+          </linearGradient>
+        </defs>
+        <g class="ring-outer"><circle cx="32" cy="32" r="29" stroke="url(#emGrad)" stroke-width="1.3" stroke-dasharray="4 6"/></g>
+        <g class="ring-inner"><circle cx="32" cy="32" r="21" stroke="#7fb8a4" stroke-opacity=".5" stroke-width="1"/></g>
+        <path class="core" d="M32 17c6.5 7 10 12.5 10 17.2A10 10 0 0 1 22 34.2C22 29.5 25.5 24 32 17Z" stroke="url(#emGrad)" stroke-width="1.7" stroke-linejoin="round"/>
+        <circle class="core" cx="32" cy="32" r="2.4" fill="#7dffd8"/>
       </svg>
       <div>
         <p class="sub">หน่วยไตเทียม · สถาบันบำราศนราดูร</p>
@@ -280,12 +363,22 @@
 
         <div class="feat-row">
           <div class="feat">
-            <h4><span class="g">👥</span> Lean Staffing</h4>
-            <p>พยาบาลวิชาชีพจำกัดเพียง 2 คนต่อแผนก</p>
+            <span class="icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 19c0-3 2-5 5-5s5 2 5 5"/><circle cx="17" cy="9" r="2.3"/><path d="M14.6 19c.3-2 1.4-3.3 2.9-3.7"/></svg>
+            </span>
+            <div class="txt">
+              <h4>Lean Staffing</h4>
+              <p>พยาบาลวิชาชีพจำกัดเพียง 2 คนต่อแผนก</p>
+            </div>
           </div>
           <div class="feat">
-            <h4><span class="g">⏱</span> On Call 24 ชม. (16.30–08.30 น.)</h4>
-            <p>เป้าหมายทางคลินิก: รองรับเคสวิกฤต &amp; ลดอัตราการใส่ท่อช่วยหายใจ</p>
+            <span class="icon-badge v">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><g class="hand"><path d="M12 7.3v5l3.4 2"/></g></svg>
+            </span>
+            <div class="txt">
+              <h4>On Call 24 ชม. (16.30–08.30 น.)</h4>
+              <p>เป้าหมายทางคลินิก: รองรับเคสวิกฤต &amp; ลดอัตราการใส่ท่อช่วยหายใจ</p>
+            </div>
           </div>
         </div>
       </section>
@@ -293,8 +386,13 @@
       <section class="panel">
         <div class="panel-head"><span class="bar"></span><h2>จุดเด่นความเป็นเลิศทางคลินิก</h2></div>
         <div class="clin-card">
-          <h4><span style="color:var(--gold);">❤</span> ความเชี่ยวชาญพิเศษ</h4>
-          <p>การฟอกเลือดกลุ่มผู้ป่วยโรคติดต่ออุบัติใหม่ อุบัติซ้ำ และ HIV</p>
+          <span class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-9.3-8.8C1 8 2.5 5 6 5c2 0 3.3 1 4 2.3.7-1.3 2-2.3 4-2.3 3.5 0 5 3 3.3 6.2C19 15.6 12 20 12 20Z"/></svg>
+          </span>
+          <div>
+            <h4>ความเชี่ยวชาญพิเศษ</h4>
+            <p>การฟอกเลือดกลุ่มผู้ป่วยโรคติดต่ออุบัติใหม่ อุบัติซ้ำ และ HIV</p>
+          </div>
         </div>
         <div class="banner">ด้วยหัวใจความเป็นมนุษย์ (Humanized Care)</div>
       </section>
@@ -309,20 +407,41 @@
         <div class="sub-head"><span class="num">3.1</span> Innovation Kanban Board</div>
         <div class="split">
           <div class="kcol">
-            <div class="kcol-head done"><span class="dot"></span><span>นำไปปฏิบัติแล้ว</span></div>
+            <div class="kcol-head done"><span class="status-dot"></span><span>นำไปปฏิบัติแล้ว</span></div>
             <ul class="item-list">
-              <li><span class="glyph">📝</span><span><b>บทความวิชาการ</b>การป้องกันเชื้อ Mpox ในหน่วยไตเทียม</span></li>
-              <li><span class="glyph">🔬</span><span><b>วิจัยทางคลินิก</b>ภาวะแทรกซ้อนฟอกเลือดผู้ป่วย AKI ใน ICU</span></li>
-              <li><span class="glyph">📋</span><span><b>3 Standard WI/SOPs</b>ควบคุมเครือข่าย (คุณสุกัญญา 2 เรื่อง, คุณอ้อมอารีย์ 1 เรื่อง)</span></li>
+              <li>
+                <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+                <span><b>บทความวิชาการ</b>การป้องกันเชื้อ Mpox ในหน่วยไตเทียม</span>
+              </li>
+              <li>
+                <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 14h9"/></svg></span>
+                <span><b>วิจัยทางคลินิก</b>ภาวะแทรกซ้อนฟอกเลือดผู้ป่วย AKI ใน ICU</span>
+              </li>
+              <li>
+                <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.4" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg></span>
+                <span><b>3 Standard WI/SOPs</b>ควบคุมเครือข่าย (คุณสุกัญญา 2 เรื่อง, คุณอ้อมอารีย์ 1 เรื่อง)</span>
+              </li>
             </ul>
           </div>
           <div class="kcol">
-            <div class="kcol-head plan"><span class="dot"></span><span>แผนพัฒนาปี 2570</span></div>
+            <div class="kcol-head plan"><span class="status-dot"></span><span>แผนพัฒนาปี 2570</span></div>
             <ul class="item-list">
-              <li><span class="glyph">🤖</span><span><b>AI Scheduling</b>โปรแกรมจัดเวรลดภาระงาน</span></li>
-              <li><span class="glyph">📱</span><span><b>Smart WI</b>ดิจิทัลไกด์ไลน์ใช้งานแบบเรียลไทม์</span></li>
-              <li><span class="glyph">🎬</span><span><b>PR Health Media</b>สื่อวิดีโอเพื่อผู้ป่วย &amp; ส่งเสริมภาพลักษณ์สถาบันฯ</span></li>
-              <li><span class="glyph">🧬</span><span><b>Specialized HIV Research</b>วิจัยเชิงลึกการฟอกเลือด (HD) ในผู้ป่วย HIV</span></li>
+              <li>
+                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.6v10.8L12 22l-8-4.6V6.6Z"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></span>
+                <span><b>AI Scheduling</b>โปรแกรมจัดเวรลดภาระงาน</span>
+              </li>
+              <li>
+                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 19h2"/></svg></span>
+                <span><b>Smart WI</b>ดิจิทัลไกด์ไลน์ใช้งานแบบเรียลไทม์</span>
+              </li>
+              <li>
+                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.3l6 3.7-6 3.7z"/></svg></span>
+                <span><b>PR Health Media</b>สื่อวิดีโอเพื่อผู้ป่วย &amp; ส่งเสริมภาพลักษณ์สถาบันฯ</span>
+              </li>
+              <li>
+                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c0 5 10 5 10 10s-10 5-10 10M17 3c0 5-10 5-10 10s10 5 10 10"/><path d="M8 7h8M8 12h8M8 17h8"/></svg></span>
+                <span><b>Specialized HIV Research</b>วิจัยเชิงลึกการฟอกเลือด (HD) ในผู้ป่วย HIV</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -332,7 +451,7 @@
           <div class="role-card">
             <div class="stat-value">10,522,750 <small>THB</small></div>
             <div class="stat-label">ควบคุม ตรวจสอบเบิกจ่าย &amp; อุทธรณ์สิทธิ์ทุก Visit</div>
-            <h4 style="margin-top:12px;">Golden Staircase</h4>
+            <h4 style="margin-top:10px;">Golden Staircase</h4>
             <p class="cap">จำนวนเรื่องเชิงคุณภาพที่ผลักดันต่อปี</p>
             <div class="stairs">
               <div class="step"><div class="bar"></div><span class="n">1 เรื่อง</span><span class="y">ปี '66</span></div>
@@ -344,21 +463,12 @@
             <h4>ที่ปรึกษาด้าน CQI &amp; Suggestion</h4>
             <p class="cap">ครอบคลุมหน่วยงานเครือข่ายภายในสถาบันฯ</p>
             <ul class="branches">
-              <li>งานประชาสัมพันธ์</li>
-              <li>งานวิสัญญี</li>
-              <li>แผนกรักษ์ (EYE)</li>
-              <li>หอผู้ป่วย 3/3</li>
+              <li><span class="spark"></span>งานประชาสัมพันธ์</li>
+              <li><span class="spark"></span>งานวิสัญญี</li>
+              <li><span class="spark"></span>แผนกรักษ์ (EYE)</li>
+              <li><span class="spark"></span>หอผู้ป่วย 3/3</li>
             </ul>
           </div>
-        </div>
-
-        <div class="sub-head"><span class="num">3.3</span> The Ecosystem of Care Diagram</div>
-        <div class="flow">
-          <div class="flow-step"><div class="num">1</div><h4>มาตรฐานสมาคมโรคไต</h4><p>(Outsource)</p></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step"><div class="num">2</div><h4>เทคโนโลยีนวัตกรรม</h4><p>(AI &amp; Smart WI)</p></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step"><div class="num">3</div><h4>ยกระดับผลลัพธ์</h4><p>ลดการใส่ท่อช่วยหายใจผู้ป่วยวิกฤต</p></div>
         </div>
       </section>
     </div>
