@@ -6,11 +6,9 @@
 <title>Renal Care Strategic Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap');
 
   :root{
     --bg:#ffffff;
@@ -160,6 +158,40 @@
   @keyframes livePulse{
     0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,.45);}
     50%{box-shadow:0 0 0 6px rgba(5,150,105,0);}
+  }
+
+  /* ---------- tab bar ---------- */
+  .tabbar{
+    display:flex;gap:8px;flex-wrap:wrap;
+    margin:0 0 12px;
+  }
+  .tabbar button{
+    appearance:none;border:1px solid var(--line);background:var(--surface-3);
+    color:var(--ink-soft);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.86rem;
+    padding:8px 18px;border-radius:999px;cursor:pointer;letter-spacing:.02em;
+    display:inline-flex;align-items:center;gap:7px;
+    transition:background .2s,color .2s,border-color .2s,box-shadow .2s,transform .15s;
+  }
+  .tabbar button svg{width:15px;height:15px;flex:none;}
+  .tabbar button:hover{border-color:var(--gold);color:var(--gold-bright);transform:translateY(-1px);}
+  .tabbar button.active{
+    background:linear-gradient(90deg,var(--gold),var(--gold-bright));
+    color:#fff;border-color:var(--gold-bright);
+    box-shadow:0 10px 22px -10px rgba(184,137,44,.6);
+  }
+
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  .embed-wrap{
+    background:var(--surface-3);border:1px solid var(--line);border-radius:20px;
+    padding:8px;box-shadow:0 20px 46px -28px rgba(13,60,45,.22);
+  }
+  .embed-frame{
+    width:100%;border:0;display:block;
+    min-height:80vh;
+    border-radius:14px;
+    background:#fff;
   }
 
   /* ---------- EKG pulse divider ---------- */
@@ -398,11 +430,9 @@
     62%{opacity:1;transform:scale(1);}
     100%{opacity:0;transform:scale(1.02);}
   }
-
 </style>
 </head>
 <body>
-
 
 <div class="curtain-panel left"></div>
 <div class="curtain-panel right"></div>
@@ -461,155 +491,198 @@
     </div>
   </header>
 
+  <nav class="tabbar" role="tablist" aria-label="เลือกหน้า">
+    <button type="button" class="active" data-tab="home" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+      หน้าแรก
+    </button>
+    <button type="button" data-tab="kpi" onclick="switchTab('kpi')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/></svg>
+      KPI
+    </button>
+    <button type="button" data-tab="ro" onclick="switchTab('ro')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.2 7 8.4 7 12a7 7 0 0 1-14 0c0-3.6 3.5-7.8 7-12Z"/></svg>
+      ระบบน้ำ RO
+    </button>
+    <button type="button" data-tab="academic" onclick="switchTab('academic')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5A1.5 1.5 0 0 1 4 18.5v-13Z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5a1.5 1.5 0 0 0 1.5-1.5v-13Z"/></svg>
+      ผลงานวิชาการ
+    </button>
+  </nav>
+
   <div class="pulse-wrap">
     <svg viewBox="0 0 800 32" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <path class="pulse-line" d="M0 16 L320 16 L345 4 L365 28 L385 16 L800 16" fill="none" stroke="var(--ekg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
 
-  <div class="layout">
+  <!-- ============ TAB: หน้าแรก ============ -->
+  <div id="tab-home" class="tab-panel active">
+    <div class="layout">
 
-    <!-- LEFT COLUMN -->
-    <div class="col">
+      <!-- LEFT COLUMN -->
+      <div class="col">
 
-      <section class="panel">
-        <div class="panel-head"><span class="bar"></span><h2>ข้อมูลพื้นฐานและการจัดการเชิงปฏิบัติการ</h2></div>
+        <section class="panel">
+          <div class="panel-head"><span class="bar"></span><h2>ข้อมูลพื้นฐานและการจัดการเชิงปฏิบัติการ</h2></div>
 
-        <div class="sub-head">Ward Capability Matrix</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>พื้นที่ให้บริการ</th><th>เตียง</th><th>เป้าหมายการดูแล</th></tr></thead>
-            <tbody>
-              <tr>
-                <td class="strong">ตึก 4 ชั้น 2</td>
-                <td><span class="num">5</span> Beds<span class="cell-note">HD 5 · CRRT 1 · Portable RO 3</span></td>
-                <td>ICU &amp; Infectious Diseases</td>
-              </tr>
-              <tr>
-                <td class="strong">ศูนย์ Outsource 1<span class="cell-note">(ตึก 5 ชั้น 1)</span></td>
-                <td><span class="num">10</span> Beds</td>
-                <td>49 CKD Patients</td>
-              </tr>
-              <tr>
-                <td class="strong">ศูนย์ Outsource 2<span class="cell-note">(ตึก 5 ชั้น 2)</span></td>
-                <td><span class="num">8</span> Beds</td>
-                <td>32 CKD Patients</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          <div class="sub-head">Ward Capability Matrix</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>พื้นที่ให้บริการ</th><th>เตียง</th><th>เป้าหมายการดูแล</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="strong">ตึก 4 ชั้น 2</td>
+                  <td><span class="num">5</span> Beds<span class="cell-note">HD 5 · CRRT 1 · Portable RO 3</span></td>
+                  <td>ICU &amp; Infectious Diseases</td>
+                </tr>
+                <tr>
+                  <td class="strong">ศูนย์ Outsource 1<span class="cell-note">(ตึก 5 ชั้น 1)</span></td>
+                  <td><span class="num">10</span> Beds</td>
+                  <td>49 CKD Patients</td>
+                </tr>
+                <tr>
+                  <td class="strong">ศูนย์ Outsource 2<span class="cell-note">(ตึก 5 ชั้น 2)</span></td>
+                  <td><span class="num">8</span> Beds</td>
+                  <td>32 CKD Patients</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-        <div class="feat-row">
-          <div class="feat">
+          <div class="feat-row">
+            <div class="feat">
+              <span class="icon-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 19c0-3 2-5 5-5s5 2 5 5"/><circle cx="17" cy="9" r="2.3"/><path d="M14.6 19c.3-2 1.4-3.3 2.9-3.7"/></svg>
+              </span>
+              <div class="txt">
+                <h4>Lean Staffing</h4>
+                <p>พยาบาลไตเทียม 2 คน ยังขาดอัตรากำลังผู้ช่วยเหลือคนไข้</p>
+              </div>
+            </div>
+            <div class="feat">
+              <span class="icon-badge v">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><g class="hand"><path d="M12 7.3v5l3.4 2"/></g></svg>
+              </span>
+              <div class="txt">
+                <h4>On Call 24 ชม. (16.30–08.30 น.)</h4>
+                <p>เป้าหมายทางคลินิก: รองรับเคสวิกฤต &amp; ลดอัตราการใส่ท่อช่วยหายใจ</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><span class="bar"></span><h2>จุดเด่นความเป็นเลิศทางคลินิก</h2></div>
+          <div class="clin-card">
             <span class="icon-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M4 19c0-3 2-5 5-5s5 2 5 5"/><circle cx="17" cy="9" r="2.3"/><path d="M14.6 19c.3-2 1.4-3.3 2.9-3.7"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-9.3-8.8C1 8 2.5 5 6 5c2 0 3.3 1 4 2.3.7-1.3 2-2.3 4-2.3 3.5 0 5 3 3.3 6.2C19 15.6 12 20 12 20Z"/></svg>
             </span>
-            <div class="txt">
-              <h4>Lean Staffing</h4>
-              <p>พยาบาลไตเทียม 2 คน ยังขาดอัตรากำลังผู้ช่วยเหลือคนไข้</p>
+            <div>
+              <h4>ความเชี่ยวชาญพิเศษ</h4>
+              <p>การฟอกเลือดกลุ่มผู้ป่วยโรคติดต่ออุบัติใหม่ อุบัติซ้ำ และ HIV</p>
             </div>
           </div>
-          <div class="feat">
-            <span class="icon-badge v">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><g class="hand"><path d="M12 7.3v5l3.4 2"/></g></svg>
-            </span>
-            <div class="txt">
-              <h4>On Call 24 ชม. (16.30–08.30 น.)</h4>
-              <p>เป้าหมายทางคลินิก: รองรับเคสวิกฤต &amp; ลดอัตราการใส่ท่อช่วยหายใจ</p>
-            </div>
-          </div>
-        </div>
-      </section>
+          <div class="banner">ด้วยหัวใจความเป็นมนุษย์ (Humanized Care)</div>
+        </section>
 
-      <section class="panel">
-        <div class="panel-head"><span class="bar"></span><h2>จุดเด่นความเป็นเลิศทางคลินิก</h2></div>
-        <div class="clin-card">
-          <span class="icon-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-9.3-8.8C1 8 2.5 5 6 5c2 0 3.3 1 4 2.3.7-1.3 2-2.3 4-2.3 3.5 0 5 3 3.3 6.2C19 15.6 12 20 12 20Z"/></svg>
-          </span>
-          <div>
-            <h4>ความเชี่ยวชาญพิเศษ</h4>
-            <p>การฟอกเลือดกลุ่มผู้ป่วยโรคติดต่ออุบัติใหม่ อุบัติซ้ำ และ HIV</p>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="col">
+        <section class="panel">
+          <div class="panel-head"><span class="bar"></span><h2>การพัฒนาคุณภาพผู้นำและการยกระดับมาตรฐาน</h2></div>
+
+          <div class="sub-head"><span class="num">3.1</span> Innovation Kanban Board</div>
+          <div class="split">
+            <div class="kcol">
+              <div class="kcol-head done"><span class="status-dot"></span><span>นำไปปฏิบัติแล้ว</span></div>
+              <ul class="item-list">
+                <li>
+                  <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+                  <span><b>บทความวิชาการ</b>การป้องกันเชื้อ Mpox ในหน่วยไตเทียม</span>
+                </li>
+                <li>
+                  <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 14h9"/></svg></span>
+                  <span><b>วิจัยทางคลินิก</b>ภาวะแทรกซ้อนฟอกเลือดผู้ป่วย AKI ใน ICU</span>
+                </li>
+                <li>
+                  <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.4" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg></span>
+                  <span><b>3 Standard WI/SOPs</b>ควบคุมเครือข่าย (คุณสุกัญญา 2 เรื่อง, คุณอ้อมอารีย์ 1 เรื่อง)</span>
+                </li>
+              </ul>
+            </div>
+            <div class="kcol">
+              <div class="kcol-head plan"><span class="status-dot"></span><span>แผนพัฒนาปี 2570</span></div>
+              <ul class="item-list">
+                <li>
+                  <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.6v10.8L12 22l-8-4.6V6.6Z"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></span>
+                  <span><b>AI Scheduling</b>โปรแกรมจัดเวรลดภาระงาน</span>
+                </li>
+                <li>
+                  <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 19h2"/></svg></span>
+                  <span><b>Smart WI</b>ดิจิทัลไกด์ไลน์ใช้งานแบบเรียลไทม์</span>
+                </li>
+                <li>
+                  <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.3l6 3.7-6 3.7z"/></svg></span>
+                  <span><b>PR Health Media</b>สื่อวิดีโอเพื่อผู้ป่วย &amp; ส่งเสริมภาพลักษณ์สถาบันฯ</span>
+                </li>
+                <li>
+                  <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c0 5 10 5 10 10s-10 5-10 10M17 3c0 5-10 5-10 10s10 5 10 10"/><path d="M8 7h8M8 12h8M8 17h8"/></svg></span>
+                  <span><b>Specialized HIV Research</b>วิจัยเชิงลึกการฟอกเลือด (HD) ในผู้ป่วย HIV</span>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-        <div class="banner">ด้วยหัวใจความเป็นมนุษย์ (Humanized Care)</div>
-      </section>
+
+          <div class="sub-head"><span class="num">3.2</span> Strategic Head Nurse Role Scope Matrix</div>
+          <div class="role-grid">
+            <div class="role-card">
+              <h4>Golden Staircase</h4>
+              <p class="cap">จำนวนเรื่องเชิงคุณภาพที่ผลักดันต่อปี</p>
+              <div class="stairs">
+                <div class="step"><div class="bar"></div><span class="n">1 เรื่อง</span><span class="y">ปี '66</span></div>
+                <div class="step"><div class="bar"></div><span class="n">9 เรื่อง</span><span class="y">ปี '67</span></div>
+                <div class="step"><div class="bar"></div><span class="n">1 เรื่อง</span><span class="y">ปี '68</span></div>
+                <div class="step"><div class="bar"></div><span class="n">14 เรื่อง</span><span class="y">เป้าปี '69</span></div>
+              </div>
+            </div>
+            <div class="role-card">
+              <h4>ที่ปรึกษาด้าน CQI &amp; Suggestion</h4>
+              <p class="cap">ครอบคลุมหน่วยงานเครือข่ายภายในสถาบันฯ</p>
+              <ul class="branches">
+                <li><span class="spark"></span>งานประชาสัมพันธ์</li>
+                <li><span class="spark"></span>งานวิสัญญี</li>
+                <li><span class="spark"></span>แผนกตา (EYE)</li>
+                <li><span class="spark"></span>หอผู้ป่วย 3/3</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
 
     </div>
+  </div>
 
-    <!-- RIGHT COLUMN -->
-    <div class="col">
-      <section class="panel">
-        <div class="panel-head"><span class="bar"></span><h2>การพัฒนาคุณภาพผู้นำและการยกระดับมาตรฐาน</h2></div>
-
-        <div class="sub-head"><span class="num">3.1</span> Innovation Kanban Board</div>
-        <div class="split">
-          <div class="kcol">
-            <div class="kcol-head done"><span class="status-dot"></span><span>นำไปปฏิบัติแล้ว</span></div>
-            <ul class="item-list">
-              <li>
-                <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
-                <span><b>บทความวิชาการ</b>การป้องกันเชื้อ Mpox ในหน่วยไตเทียม</span>
-              </li>
-              <li>
-                <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7.5 14h9"/></svg></span>
-                <span><b>วิจัยทางคลินิก</b>ภาวะแทรกซ้อนฟอกเลือดผู้ป่วย AKI ใน ICU</span>
-              </li>
-              <li>
-                <span class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.4" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg></span>
-                <span><b>3 Standard WI/SOPs</b>ควบคุมเครือข่าย (คุณสุกัญญา 2 เรื่อง, คุณอ้อมอารีย์ 1 เรื่อง)</span>
-              </li>
-            </ul>
-          </div>
-          <div class="kcol">
-            <div class="kcol-head plan"><span class="status-dot"></span><span>แผนพัฒนาปี 2570</span></div>
-            <ul class="item-list">
-              <li>
-                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.6v10.8L12 22l-8-4.6V6.6Z"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></span>
-                <span><b>AI Scheduling</b>โปรแกรมจัดเวรลดภาระงาน</span>
-              </li>
-              <li>
-                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 19h2"/></svg></span>
-                <span><b>Smart WI</b>ดิจิทัลไกด์ไลน์ใช้งานแบบเรียลไทม์</span>
-              </li>
-              <li>
-                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.3l6 3.7-6 3.7z"/></svg></span>
-                <span><b>PR Health Media</b>สื่อวิดีโอเพื่อผู้ป่วย &amp; ส่งเสริมภาพลักษณ์สถาบันฯ</span>
-              </li>
-              <li>
-                <span class="icon-badge v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c0 5 10 5 10 10s-10 5-10 10M17 3c0 5-10 5-10 10s10 5 10 10"/><path d="M8 7h8M8 12h8M8 17h8"/></svg></span>
-                <span><b>Specialized HIV Research</b>วิจัยเชิงลึกการฟอกเลือด (HD) ในผู้ป่วย HIV</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="sub-head"><span class="num">3.2</span> Strategic Head Nurse Role Scope Matrix</div>
-        <div class="role-grid">
-          <div class="role-card">
-            <h4>Golden Staircase</h4>
-            <p class="cap">จำนวนเรื่องเชิงคุณภาพที่ผลักดันต่อปี</p>
-            <div class="stairs">
-              <div class="step"><div class="bar"></div><span class="n">1 เรื่อง</span><span class="y">ปี '66</span></div>
-              <div class="step"><div class="bar"></div><span class="n">9 เรื่อง</span><span class="y">ปี '67</span></div>
-              <div class="step"><div class="bar"></div><span class="n">1 เรื่อง</span><span class="y">ปี '68</span></div>
-              <div class="step"><div class="bar"></div><span class="n">14 เรื่อง</span><span class="y">เป้าปี '69</span></div>
-            </div>
-          </div>
-          <div class="role-card">
-            <h4>ที่ปรึกษาด้าน CQI &amp; Suggestion</h4>
-            <p class="cap">ครอบคลุมหน่วยงานเครือข่ายภายในสถาบันฯ</p>
-            <ul class="branches">
-              <li><span class="spark"></span>งานประชาสัมพันธ์</li>
-              <li><span class="spark"></span>งานวิสัญญี</li>
-              <li><span class="spark"></span>แผนกตา (EYE)</li>
-              <li><span class="spark"></span>หอผู้ป่วย 3/3</li>
-            </ul>
-          </div>
-        </div>
-      </section>
+  <!-- ============ TAB: KPI ============ -->
+  <div id="tab-kpi" class="tab-panel">
+    <div class="embed-wrap">
+      <iframe class="embed-frame" data-src="kpi.html" title="Dashboard KPI & Risk-profile หน่วยไตเทียม"></iframe>
     </div>
+  </div>
 
+  <!-- ============ TAB: ระบบน้ำ RO ============ -->
+  <div id="tab-ro" class="tab-panel">
+    <div class="embed-wrap">
+      <iframe class="embed-frame" data-src="ro.html" title="Dashboard KPI ระบบน้ำ RO"></iframe>
+    </div>
+  </div>
+
+  <!-- ============ TAB: ผลงานวิชาการ ============ -->
+  <div id="tab-academic" class="tab-panel">
+    <div class="embed-wrap">
+      <iframe class="embed-frame" data-src="academic.html" title="คลังผลงานวิชาการ หน่วยไตเทียม"></iframe>
+    </div>
   </div>
 
   <div class="foot">
@@ -633,7 +706,24 @@
   tick();
   setInterval(tick, 1000);
 })();
-</script>
 
+function switchTab(name){
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tabbar button').forEach(function(b){ b.classList.remove('active'); });
+
+  var panel = document.getElementById('tab-' + name);
+  var btn = document.querySelector('.tabbar button[data-tab="' + name + '"]');
+  if(panel) panel.classList.add('active');
+  if(btn) btn.classList.add('active');
+
+  if(panel){
+    var iframe = panel.querySelector('iframe[data-src]');
+    if(iframe){
+      iframe.src = iframe.getAttribute('data-src');
+      iframe.removeAttribute('data-src');
+    }
+  }
+}
+</script>
 </body>
 </html>
