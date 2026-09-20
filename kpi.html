@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard หน่วยไตเทียม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mint: { light: '#e0f2f1', DEFAULT: '#26a69a', dark: '#00796b', gradient1: '#4db6ac', gradient2: '#00897b' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4fdfb; }
+        .gradient-mint { background: linear-gradient(135deg, #4db6ac 0%, #00897b 100%); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        /* Scrollbar สีมิ้นท์สำหรับ Modal */
+        .swal-custom-scroll::-webkit-scrollbar { width: 6px; }
+        .swal-custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .swal-custom-scroll::-webkit-scrollbar-thumb { background: #26a69a; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-6 text-gray-800">
+
+    <div class="gradient-mint text-white rounded-xl p-6 mb-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+        <h1 class="text-2xl font-bold flex items-center gap-3">
+            <i class="fa-solid fa-notes-medical text-3xl"></i> Dashboard KPI & Risk-profile หน่วยไตเทียม
+        </h1>
+
+        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <div class="bg-white/20 px-3 py-1.5 rounded-lg flex items-center gap-2 relative">
+                <i class="fa-solid fa-calendar-days"></i>
+                <button id="monthDropdownBtn" onclick="toggleMonthDropdown(event)" type="button" class="bg-transparent text-white font-semibold focus:outline-none cursor-pointer text-sm whitespace-nowrap">
+                    ทุกเดือน <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                </button>
+                <div id="monthDropdownPanel" class="hidden absolute top-11 left-0 bg-white text-gray-800 rounded-lg shadow-2xl p-3 z-50 w-72 max-h-96 overflow-y-auto border border-mint-light">
+                    <div class="text-xs font-bold text-mint-dark mb-2">เลือกเดือน (เลือกได้หลายเดือน สำหรับดูรายไตรมาส)</div>
+                    <div class="flex gap-1 mb-2 flex-wrap text-xs">
+                        <button onclick="selectAllMonths()" type="button" class="px-2 py-1 bg-mint-light rounded hover:bg-mint hover:text-white transition">ทั้งหมด</button>
+                        <button onclick="clearMonths()" type="button" class="px-2 py-1 bg-gray-100 rounded hover:bg-gray-300 transition">ล้าง</button>
+                        <button onclick="selectQuarter(1)" type="button" class="px-2 py-1 bg-gray-100 rounded hover:bg-mint hover:text-white transition">Q1 (ต.ค.-ธ.ค.)</button>
+                        <button onclick="selectQuarter(2)" type="button" class="px-2 py-1 bg-gray-100 rounded hover:bg-mint hover:text-white transition">Q2 (ม.ค.-มี.ค.)</button>
+                        <button onclick="selectQuarter(3)" type="button" class="px-2 py-1 bg-gray-100 rounded hover:bg-mint hover:text-white transition">Q3 (เม.ย.-มิ.ย.)</button>
+                        <button onclick="selectQuarter(4)" type="button" class="px-2 py-1 bg-gray-100 rounded hover:bg-mint hover:text-white transition">Q4 (ก.ค.-ก.ย.)</button>
+                    </div>
+                    <div id="monthCheckboxList" class="grid grid-cols-2 gap-1 text-sm"></div>
+                    <button onclick="closeMonthDropdown()" type="button" class="mt-3 w-full bg-mint text-white rounded-lg py-1.5 text-sm font-semibold hover:bg-mint-dark transition">ตกลง</button>
+                </div>
+            </div>
+            <div class="bg-white/20 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                <i class="fa-solid fa-sliders"></i>
+                <select id="yearModeFilter" class="bg-transparent text-white font-semibold focus:outline-none [&>option]:text-gray-800 cursor-pointer" onchange="onYearModeChange()">
+                    <option value="fiscal">ปีงบประมาณ</option>
+                    <option value="calendar">ปี พ.ศ.</option>
+                </select>
+            </div>
+            <div class="bg-white/20 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                <i class="fa-solid fa-clock"></i>
+                <select id="yearFilter" class="bg-transparent text-white font-semibold focus:outline-none [&>option]:text-gray-800 cursor-pointer" onchange="applyFilters()">
+                    <option value="all">ทุกปี</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <button id="aiAnalyzeBtn" onclick="analyzeWithAI()" type="button" class="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg flex items-center justify-center gap-2 transition transform hover:scale-[1.02]">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            วิเคราะห์ภาพรวมองค์กรด้วย AI (3P Safety)
+        </button>
+    </div>
+
+    <h2 class="text-lg font-bold text-mint-dark mb-3"><i class="fa-solid fa-building mr-2"></i>ทรัพยากรองค์กร</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-teal-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-user-nurse"></i> พยาบาลไตเทียม</div><div id="stat-nurse" class="text-2xl font-bold text-gray-700">-</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-teal-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-people-group"></i> อัตรากำลัง</div><div id="stat-manpower" class="text-2xl font-bold text-gray-700">-</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-teal-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-hand-holding-medical"></i> ผู้ช่วยเหลือ</div><div id="stat-assistant" class="text-2xl font-bold text-gray-700">-</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-teal-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-kit-medical"></i> เครื่องไตเทียม</div><div id="stat-machine" class="text-2xl font-bold text-gray-700">-</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-teal-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-gears"></i> CRRT</div><div id="stat-crrt" class="text-2xl font-bold text-gray-700">-</div></div>
+    </div>
+
+    <h2 class="text-lg font-bold text-mint-dark mb-3"><i class="fa-solid fa-star mr-2"></i>สถิติผู้รับบริการ</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-8">
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-chart-line"></i> Productivity (เฉลี่ย)</div><div id="stat-productivity" class="text-2xl font-bold text-gray-700">0.00</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-users"></i> จำนวนผู้ป่วย Visit</div><div id="stat-visit" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-bed-pulse"></i> AKI</div><div id="stat-aki" class="text-2xl font-bold text-red-500">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-heart-pulse"></i> Chronic</div><div id="stat-chronic" class="text-2xl font-bold text-blue-500">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-wheelchair"></i> HD นอกแผนก</div><div id="stat-hd-out" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-procedures"></i> ICU</div><div id="stat-icu" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-ribbon"></i> HIV</div><div id="stat-hiv" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-viruses"></i> EID</div><div id="stat-eid" class="text-2xl font-bold text-gray-700">0</div></div>
+    </div>
+
+    <h2 class="text-lg font-bold text-pink-600 mb-3"><i class="fa-solid fa-comment-dots mr-2"></i>Customer feedback</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-pink-400 shadow"><div class="text-sm font-bold text-pink-700 mb-1"><i class="fa-solid fa-heart mr-1"></i> คำชมเชยจากผู้รับบริการ</div><div id="stat-compliment" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-red-400 shadow"><div class="text-sm font-bold text-red-700 mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ข้อร้องเรียนจากผู้รับบริการ</div><div id="stat-complaint" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-yellow-500 shadow"><div class="text-sm font-bold text-yellow-700 mb-1"><i class="fa-solid fa-face-smile mr-1"></i> ร้อยละความพึงพอใจของผู้รับบริการ</div><div id="stat-satisfaction" class="text-2xl font-bold text-gray-700">0.00%</div></div>
+    </div>
+
+    <h2 class="text-lg font-bold text-indigo-600 mb-3"><i class="fa-solid fa-graduation-cap mr-2"></i>ผลงานวิชาการ</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-indigo-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-flask"></i> วิจัย</div><div id="stat-research" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-indigo-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-book"></i> ตีพิมพ์วารสารวิชาการ</div><div id="stat-publish" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-indigo-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-chalkboard-user"></i> นำเสนอผลงานวิชาการ หน่วยงานภายนอก</div><div id="stat-present" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-indigo-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-file-lines"></i> WI</div><div id="stat-wi" class="text-2xl font-bold text-gray-700">0</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-indigo-400 shadow"><div class="text-mint-dark text-xl mb-1"><i class="fa-solid fa-arrows-rotate"></i> CQI/นวัตรกรรม</div><div id="stat-cqi" class="text-2xl font-bold text-gray-700">0</div></div>
+    </div>
+
+    <h2 class="text-lg font-bold text-red-500 mb-3"><i class="fa-solid fa-triangle-exclamation mr-2"></i>complication Intra-HD</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div class="stat-card bg-red-50 p-4 rounded-xl border-l-4 border-red-400 shadow"><div class="text-sm font-bold text-red-700 mb-1">Hypotension</div><div id="comp-hypo" class="text-2xl font-bold text-gray-800">0</div><div id="comp-hypo-pct" class="text-xs text-gray-500 mt-1">0.00%</div></div>
+        <div class="stat-card bg-orange-50 p-4 rounded-xl border-l-4 border-orange-400 shadow"><div class="text-sm font-bold text-orange-700 mb-1">Muscle cramp</div><div id="comp-muscle" class="text-2xl font-bold text-gray-800">0</div><div id="comp-muscle-pct" class="text-xs text-gray-500 mt-1">0.00%</div></div>
+        <div class="stat-card bg-blue-50 p-4 rounded-xl border-l-4 border-blue-400 shadow"><div class="text-sm font-bold text-blue-700 mb-1">Chill</div><div id="comp-chill" class="text-2xl font-bold text-gray-800">0</div><div id="comp-chill-pct" class="text-xs text-gray-500 mt-1">0.00%</div></div>
+        <div class="stat-card bg-purple-50 p-4 rounded-xl border-l-4 border-purple-400 shadow"><div class="text-sm font-bold text-purple-700 mb-1">Cadiac arrythimia</div><div id="comp-cardiac" class="text-2xl font-bold text-gray-800">0</div><div id="comp-cardiac-pct" class="text-xs text-gray-500 mt-1">0.00%</div></div>
+        <div class="stat-card bg-gray-100 p-4 rounded-xl border-l-4 border-gray-600 shadow"><div class="text-sm font-bold text-gray-700 mb-1">Sudden death</div><div id="comp-death" class="text-2xl font-bold text-gray-800">0</div><div id="comp-death-pct" class="text-xs text-gray-500 mt-1">0.00%</div></div>
+    </div>
+
+    <h2 class="text-lg font-bold text-orange-600 mb-3"><i class="fa-solid fa-shield-virus mr-2"></i>Risk profile</h2>
+    <div id="risk-profile-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
+        </div>
+
+    <h2 class="text-lg font-bold text-mint-dark mb-3"><i class="fa-solid fa-hand-holding-heart mr-2"></i>ผลลัพธ์การพยาบาล</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-cyan-400 shadow"><div class="text-sm font-bold text-cyan-700 mb-1">อัตราการติดเชื้อ AVF</div><div id="stat-avf" class="text-2xl font-bold text-gray-700">0.00%</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-cyan-400 shadow"><div class="text-sm font-bold text-cyan-700 mb-1">อัตราการติดเชื้อ AVG</div><div id="stat-avg" class="text-2xl font-bold text-gray-700">0.00%</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-cyan-400 shadow"><div class="text-sm font-bold text-cyan-700 mb-1">อัตราการติดเชื้อ Perm catheter</div><div id="stat-perm" class="text-2xl font-bold text-gray-700">0.00%</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-cyan-400 shadow"><div class="text-sm font-bold text-cyan-700 mb-1">อัตราการติดเชื้อ DLC</div><div id="stat-dlc" class="text-2xl font-bold text-gray-700">0.00%</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-red-500 shadow"><div class="text-sm font-bold text-red-700 mb-1">อัตรา Sepsis</div><div id="stat-sepsis" class="text-2xl font-bold text-gray-700">0.00%</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-gray-600 shadow"><div class="text-sm font-bold text-gray-700 mb-1">อัตราการตาย</div><div id="stat-mortality" class="text-2xl font-bold text-gray-800">0</div><div id="stat-mortality-pct" class="text-xs text-gray-500 mt-1">(0.00%)</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-green-500 shadow"><div class="text-sm font-bold text-green-700 mb-1">AKI recovery</div><div id="stat-akirecovery" class="text-2xl font-bold text-gray-800">0</div><div id="stat-akirecovery-pct" class="text-xs text-gray-500 mt-1">(0.00%)</div></div>
+        <div class="stat-card bg-white p-4 rounded-xl border-l-4 border-mint shadow"><div class="text-sm font-bold text-mint-dark mb-1">อัตราความสมบูรณ์ Nurse note</div><div id="stat-nursenote" class="text-2xl font-bold text-gray-700">0.00%</div></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-bold text-mint-dark mb-2"><i class="fa-solid fa-chart-area mr-1"></i> แนวโน้ม Productivity</h3>
+            <div class="h-64"><canvas id="productivityChart"></canvas></div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-bold text-mint-dark mb-2"><i class="fa-solid fa-chart-bar mr-1"></i> สถิติการให้บริการ (Visits)</h3>
+            <div class="h-64"><canvas id="visitChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow mb-8">
+        <h3 class="font-bold text-mint-dark mb-2"><i class="fa-solid fa-chart-column mr-1"></i> ผลงานวิจาการ</h3>
+        <div class="h-72"><canvas id="academicChart"></canvas></div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-4">
+        <h3 class="font-bold text-lg text-mint-dark mb-4"><i class="fa-solid fa-table mr-1"></i> ข้อมูลรายละเอียด</h3>
+        <div class="overflow-x-auto no-scrollbar border rounded-lg">
+            <table class="w-full text-sm text-left whitespace-nowrap">
+                <thead class="bg-mint-light text-mint-dark border-b-2 border-mint">
+                    <tr>
+                        <th class="px-4 py-3">เดือน / ปี</th>
+                        <th class="px-4 py-3 text-center">Productivity</th>
+                        <th class="px-4 py-3 text-center">Visits</th>
+                        <th class="px-4 py-3 text-center">AKI</th>
+                        <th class="px-4 py-3 text-center">Chronic</th>
+                        <th class="px-4 py-3 text-center text-mint-dark"><i class="fa-solid fa-eye"></i> ดู</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y divide-gray-100">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let globalData = [];
+        let currentFilteredData = [];
+        let prodChart, visitChart, academicChart;
+
+        // เดือนเรียงตามปีงบประมาณ (ต.ค. - ก.ย.)
+        const monthOrderFiscal = ['ตุลาคม','พฤศจิกายน','ธันวาคม','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน'];
+        const q1q4Months = { 1: ['ตุลาคม','พฤศจิกายน','ธันวาคม'], 2: ['มกราคม','กุมภาพันธ์','มีนาคม'], 3: ['เมษายน','พฤษภาคม','มิถุนายน'], 4: ['กรกฎาคม','สิงหาคม','กันยายน'] };
+        let selectedMonths = []; // ว่าง = ทุกเดือน
+        let yearMode = 'fiscal'; // 'fiscal' = ปีงบประมาณ, 'calendar' = ปี พ.ศ.
+
+        document.addEventListener('DOMContentLoaded', () => { buildMonthCheckboxes(); loadData(); });
+
+        // ปิด dropdown เดือนเมื่อคลิกนอกกรอบ
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('monthDropdownPanel');
+            const btn = document.getElementById('monthDropdownBtn');
+            if (panel && !panel.classList.contains('hidden') && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                panel.classList.add('hidden');
+            }
+        });
+
+        function showLoading() {
+            Swal.fire({ title: 'กำลังโหลดข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+        }
+
+        // ตั้งค่าดึงข้อมูลจาก Google Sheet โดยตรง (สำหรับรันบน GitHub Pages / เว็บ static)
+        const SHEET_ID = '15LpL6VbGE_akZji9GGM-cfNt_M5q4adpN5J3IZGQg3w';
+        const SHEET_TAB_NAME = 'KPI';
+        const DATA_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(SHEET_TAB_NAME);
+
+        // แปลง CSV เป็น array of arrays (รองรับข้อความที่มี comma/quote/ขึ้นบรรทัดใหม่ในเซลล์)
+        function parseCSV(text) {
+            const rows = [];
+            let row = [], field = '', inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                if (inQuotes) {
+                    if (c === '"') {
+                        if (text[i + 1] === '"') { field += '"'; i++; }
+                        else { inQuotes = false; }
+                    } else {
+                        field += c;
+                    }
+                } else {
+                    if (c === '"') { inQuotes = true; }
+                    else if (c === ',') { row.push(field); field = ''; }
+                    else if (c === '\r') { /* ข้าม */ }
+                    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+                    else { field += c; }
+                }
+            }
+            if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+            return rows.filter(r => !(r.length === 1 && r[0] === ''));
+        }
+
+        function loadData() {
+            showLoading();
+            fetch(DATA_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.text();
+                })
+                .then(csvText => {
+                    const rows = parseCSV(csvText);
+                    let data = [];
+                    if (rows.length > 1) {
+                        const headers = rows[0].map(h => h.toString().trim());
+                        data = rows.slice(1).map(r => {
+                            const obj = {};
+                            headers.forEach((h, idx) => { obj[h] = r[idx] !== undefined ? r[idx] : ''; });
+                            return obj;
+                        });
+                    }
+                    globalData = data;
+                    updateStaffingCards();
+                    setupYearFilter(globalData);
+                    updateAcademicChart(globalData);
+                    applyFilters();
+                    Swal.close();
+                })
+                .catch(err => {
+                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อข้อมูลได้: ' + err.message, 'error');
+                });
+        }
+
+        // --- ตัวเลือกเดือน (multi-select) ---
+        function buildMonthCheckboxes() {
+            const container = document.getElementById('monthCheckboxList');
+            container.innerHTML = monthOrderFiscal.map(m => `
+                <label class="flex items-center gap-1 cursor-pointer hover:bg-mint-light/50 rounded px-1 py-0.5">
+                    <input type="checkbox" value="${m}" onchange="onMonthCheckChange()" class="month-checkbox accent-mint">
+                    <span>${m}</span>
+                </label>
+            `).join('');
+        }
+
+        function toggleMonthDropdown(e) {
+            if (e) e.stopPropagation();
+            document.getElementById('monthDropdownPanel').classList.toggle('hidden');
+        }
+        function closeMonthDropdown() { document.getElementById('monthDropdownPanel').classList.add('hidden'); }
+
+        function onMonthCheckChange() {
+            selectedMonths = Array.from(document.querySelectorAll('.month-checkbox:checked')).map(cb => cb.value);
+            updateMonthButtonLabel();
+            applyFilters();
+        }
+
+        function updateMonthButtonLabel() {
+            const btn = document.getElementById('monthDropdownBtn');
+            const arrow = ' <i class="fa-solid fa-chevron-down text-xs ml-1"></i>';
+            if (selectedMonths.length === 0 || selectedMonths.length === 12) {
+                btn.innerHTML = 'ทุกเดือน' + arrow;
+            } else if (selectedMonths.length === 1) {
+                btn.innerHTML = selectedMonths[0] + arrow;
+            } else {
+                btn.innerHTML = selectedMonths.length + ' เดือนที่เลือก' + arrow;
+            }
+        }
+
+        function selectAllMonths() {
+            document.querySelectorAll('.month-checkbox').forEach(cb => cb.checked = true);
+            onMonthCheckChange();
+        }
+        function clearMonths() {
+            document.querySelectorAll('.month-checkbox').forEach(cb => cb.checked = false);
+            onMonthCheckChange();
+        }
+        function selectQuarter(q) {
+            const set = q1q4Months[q];
+            document.querySelectorAll('.month-checkbox').forEach(cb => { cb.checked = set.includes(cb.value); });
+            onMonthCheckChange();
+        }
+
+        // --- ปีงบบระมาณ / ปี พ.ศ. ---
+        function getFiscalYear(row) {
+            const y = parseInt(row['ปี']) || 0;
+            const m = (row['เดือน'] || '').toString().trim();
+            return q1q4Months[1].includes(m) ? y + 1 : y; // ต.ค.-ธ.ค. อยู่ปีงบัดไป
+        }
+        function getCalendarYear(row) {
+            return parseInt(row['ปี']) || 0;
+        }
+        function getRowYear(row) {
+            return yearMode === 'fiscal' ? getFiscalYear(row) : getCalendarYear(row);
+        }
+
+        function onYearModeChange() {
+            yearMode = document.getElementById('yearModeFilter').value;
+            setupYearFilter(globalData);
+            applyFilters();
+        }
+
+        function setupYearFilter(data) {
+            const yearSelect = document.getElementById('yearFilter');
+            const years = new Set();
+            data.forEach(row => { const y = getRowYear(row); if (y) years.add(y.toString()); });
+            yearSelect.innerHTML = '<option value="all">ทุกปี</option>';
+            Array.from(years).sort().reverse().forEach(year => {
+                const opt = document.createElement('option');
+                opt.value = year;
+                opt.innerText = (yearMode === 'fiscal' ? 'ปีงบ ' : 'พ.ศ. ') + year;
+                yearSelect.appendChild(opt);
+            });
+        }
+
+        function applyFilters() {
+            const yearVal = document.getElementById('yearFilter').value;
+
+            let filtered = globalData;
+            if (selectedMonths.length > 0 && selectedMonths.length < 12) {
+                filtered = filtered.filter(row => selectedMonths.includes((row['เดือน'] || '').toString().trim()));
+            }
+            if (yearVal !== 'all') {
+                filtered = filtered.filter(row => getRowYear(row).toString() === yearVal);
+            }
+
+            // เก็บ id ชั่วคราวเพื่อให้ใช้อ้างอิงตอนกดปุ่มรูปตาได้แม่นยำ
+            filtered.forEach((row, idx) => row._tempId = idx);
+            currentFilteredData = filtered;
+
+            updateDashboard(filtered);
+        }
+
+        function updateDashboard(data) {
+            updateSummaryCards(data);
+            updateAcademicCards(data);
+            updateCustomerFeedback(data);
+            updateComplicationCards(data);
+            updateRiskProfile(data);
+            updateNursingOutcomes(data);
+            updateCharts(data);
+            renderTable(data);
+        }
+
+        // ค่าเฉลี่ยของอัตราร้อยละ (ใช้ร่วมกันหลายการ์ด) - นับเฉพาะเดือนที่มีค่า > 0
+        function avgRate(data, key) {
+            let sum = 0, count = 0;
+            data.forEach(row => {
+                let v = parseFloat(row[key]);
+                if (!isNaN(v) && v > 0) { sum += v; count++; }
+            });
+            return count > 0 ? (sum / count).toFixed(2) : '0.00';
+        }
+
+        // Customer feedback: คำชมเชย / ข้อร้องเรียน / ร้อยละความพึงพอใจ
+        function updateCustomerFeedback(data) {
+            let sumCompliment = 0, sumComplaint = 0;
+            data.forEach(row => {
+                sumCompliment += parseInt(row['คำชมเชยจากผู้รับบริการ']) || 0;
+                sumComplaint += parseInt(row['ข้อร้องเรียนจากผู้รับบริการ']) || 0;
+            });
+            document.getElementById('stat-compliment').innerText = sumCompliment.toLocaleString();
+            document.getElementById('stat-complaint').innerText = sumComplaint.toLocaleString();
+            document.getElementById('stat-satisfaction').innerText = avgRate(data, 'ร้อยละความพึงพอใจของผู้รับบริการ') + '%';
+        }
+
+        function updateSummaryCards(data) {
+            let totalProd = 0, countProd = 0, sumVisit = 0, sumAki = 0, sumChronic = 0;
+            let sumHdOut = 0, sumIcu = 0, sumHiv = 0, sumEid = 0;
+
+            data.forEach(row => {
+                let prod = parseFloat(row['Productivity']) || 0;
+                if(prod > 0) { totalProd += prod; countProd++; }
+                sumVisit += parseInt(row['จำนวนผู้ป่วย Visit']) || 0;
+                sumAki += parseInt(row['AKI']) || 0;
+                sumChronic += parseInt(row['Chronic']) || 0;
+                sumHdOut += parseInt(row['HD นอกแผนก']) || 0;
+                sumIcu += parseInt(row['ICU']) || 0;
+                sumHiv += parseInt(row['HIV']) || 0;
+                sumEid += parseInt(row['EID']) || 0;
+            });
+
+            document.getElementById('stat-productivity').innerText = countProd > 0 ? (totalProd / countProd).toFixed(2) : "0.00";
+            document.getElementById('stat-visit').innerText = sumVisit.toLocaleString();
+            document.getElementById('stat-aki').innerText = sumAki.toLocaleString();
+            document.getElementById('stat-chronic').innerText = sumChronic.toLocaleString();
+            document.getElementById('stat-hd-out').innerText = sumHdOut.toLocaleString();
+            document.getElementById('stat-icu').innerText = sumIcu.toLocaleString();
+            document.getElementById('stat-hiv').innerText = sumHiv.toLocaleString();
+            document.getElementById('stat-eid').innerText = sumEid.toLocaleString();
+        }
+
+        // ข้อมูลอัตรากำลัง/เครื่องมือ - ค่าคงที่ ดึงจากแถว 2 ของชีตเท่านั้น (ไม่ผูกกับ filter)
+        function updateStaffingCards() {
+            const row2 = globalData[0] || {};
+            document.getElementById('stat-nurse').innerText = (row2['พยาบาลไตเทียม'] !== undefined && row2['พยาบาลไตเทียม'] !== '') ? row2['พยาบาลไตเทียม'] : '-';
+            document.getElementById('stat-manpower').innerText = (row2['อัตรากำลัง'] !== undefined && row2['อัตรากำลัง'] !== '') ? row2['อัตรากำลัง'] : '-';
+            document.getElementById('stat-assistant').innerText = (row2['ผู้ช่วยเหลือ'] !== undefined && row2['ผู้ช่วยเหลือ'] !== '') ? row2['ผู้ช่วยเหลือ'] : '-';
+            document.getElementById('stat-machine').innerText = (row2['เครื่องไตเทียม'] !== undefined && row2['เครื่องไตเทียม'] !== '') ? row2['เครื่องไตเทียม'] : '-';
+            document.getElementById('stat-crrt').innerText = (row2['CRRT'] !== undefined && row2['CRRT'] !== '') ? row2['CRRT'] : '-';
+        }
+
+        // การ์ดวิจัย/ตีพิมพ์/นำเสนอผลงานภายนอก/WI/CQI - รวมตาม filter ที่เลือก
+        function updateAcademicCards(data) {
+            let sumResearch = 0, sumPublish = 0, sumPresent = 0, sumWI = 0, sumCQI = 0;
+            data.forEach(row => {
+                sumResearch += parseInt(row['วิจัย']) || 0;
+                sumPublish += parseInt(row['ตีพิมพ์วารสารวิชาการ']) || 0;
+                sumPresent += parseInt(row['นำเสนอผลงานวิชาการ หน่วยงานภายนอก']) || 0;
+                sumWI += parseInt(row['WI']) || 0;
+                sumCQI += parseInt(row['CQI/นวัตรกรรม']) || parseInt(row['CQI']) || 0;
+            });
+            document.getElementById('stat-research').innerText = sumResearch.toLocaleString();
+            document.getElementById('stat-publish').innerText = sumPublish.toLocaleString();
+            document.getElementById('stat-present').innerText = sumPresent.toLocaleString();
+            document.getElementById('stat-wi').innerText = sumWI.toLocaleString();
+            document.getElementById('stat-cqi').innerText = sumCQI.toLocaleString();
+        }
+
+        function updateComplicationCards(data) {
+            let sumHypo = 0, sumMuscle = 0, sumChill = 0, sumCardiac = 0, sumDeath = 0, sumVisit = 0;
+            data.forEach(row => {
+                sumHypo += parseInt(row['Hypotension']) || 0;
+                sumMuscle += parseInt(row['Muscle cramp']) || 0;
+                sumChill += parseInt(row['Chill']) || 0;
+                sumCardiac += parseInt(row['Cadiac arrythimia']) || parseInt(row['Cardiac arrhythmia']) || 0;
+                sumDeath += parseInt(row['Sudden death indialysispa patiens']) || parseInt(row['Sudden death']) || 0;
+                sumVisit += parseInt(row['จำนวนผู้ป่วย Visit']) || 0;
+            });
+            function pct(n) { return sumVisit > 0 ? (n / sumVisit * 100).toFixed(2) + '%' : '0.00%'; }
+            document.getElementById('comp-hypo').innerText = sumHypo.toLocaleString();
+            document.getElementById('comp-hypo-pct').innerText = pct(sumHypo);
+            document.getElementById('comp-muscle').innerText = sumMuscle.toLocaleString();
+            document.getElementById('comp-muscle-pct').innerText = pct(sumMuscle);
+            document.getElementById('comp-chill').innerText = sumChill.toLocaleString();
+            document.getElementById('comp-chill-pct').innerText = pct(sumChill);
+            document.getElementById('comp-cardiac').innerText = sumCardiac.toLocaleString();
+            document.getElementById('comp-cardiac-pct').innerText = pct(sumCardiac);
+            document.getElementById('comp-death').innerText = sumDeath.toLocaleString();
+            document.getElementById('comp-death-pct').innerText = pct(sumDeath);
+        }
+
+        function updateRiskProfile(data) {
+            const riskKeys = [
+                "Fall", "ความคลาดเคลื่อนทางยา (Medication error)",
+                "ข้อร้องเรียนจากผู้รับบริการ", "ตัวกรองมีสาร Peracitic ตกค้าง", "การใช้ตัวกรองสลับคน",
+                "การได้รับยาและสารน้ำไม่ถูกต้อง", "การคิดค่าใช้จ่ายในโปรแกรมไม่ถูกต้อง", "การบาดเจ็บจากการแทงเส้นเลือด",
+                "เกิดปฏิกิริยาจากการให้เลือด", "เกิดปฏิกิริยาจากการน้ำ", "A-V เลื่อนหลุด",
+                "เกิดการหลุดของข้อต่อต่างๆ ของสาร Blood line", "เกิดการแตกของ Fistular aneurysm",
+                "เครื่องไตเทียมไม่พร้อมใช้งาน", "ระบบน้ำไม่พร้อมใช้งาน", "ระบบน้ำ RO มีสารปนเปื้อนเกินมาตรฐาน",
+                "ระบบน้ำ RO เกิดการแตกรั่ว", "Air embolism", "บุคลากรได้รับบาดเจ็บจากการปฏิบัติงาน"
+            ];
+
+            let sums = {};
+            riskKeys.forEach(k => sums[k] = 0);
+            let specialKey = "บุคลากรถูกของมีคม";
+            sums[specialKey] = 0;
+
+            data.forEach(row => {
+                riskKeys.forEach(k => sums[k] += parseInt(row[k]) || 0);
+                for(let key in row) {
+                    if(key.includes("บุคลากรถูกของมีคม")) sums[specialKey] += parseInt(row[key]) || 0;
+                }
+            });
+
+            // ชุดสีพาสเทลสำหรับ Risk Profile
+            const pastelColors = [
+                'bg-red-50 border-red-200 text-red-700', 'bg-orange-50 border-orange-200 text-orange-700',
+                'bg-amber-50 border-amber-200 text-amber-700', 'bg-yellow-50 border-yellow-200 text-yellow-700',
+                'bg-lime-50 border-lime-200 text-lime-700', 'bg-green-50 border-green-200 text-green-700',
+                'bg-emerald-50 border-emerald-200 text-emerald-700', 'bg-teal-50 border-teal-200 text-teal-700',
+                'bg-cyan-50 border-cyan-200 text-cyan-700', 'bg-sky-50 border-sky-200 text-sky-700',
+                'bg-blue-50 border-blue-200 text-blue-700', 'bg-indigo-50 border-indigo-200 text-indigo-700',
+                'bg-violet-50 border-violet-200 text-violet-700', 'bg-purple-50 border-purple-200 text-purple-700',
+                'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700', 'bg-pink-50 border-pink-200 text-pink-700',
+                'bg-rose-50 border-rose-200 text-rose-700', 'bg-slate-50 border-slate-200 text-slate-700'
+            ];
+
+            const container = document.getElementById('risk-profile-container');
+            container.innerHTML = '';
+
+            let colorIndex = 0;
+            for(let key in sums) {
+                let displayTitle = key === specialKey ? "บุคลากรถูกของมีคม/สัมผัสเลือด" : key;
+                let colorClass = pastelColors[colorIndex % pastelColors.length];
+
+                container.innerHTML += `
+                    <div class="${colorClass} p-3 rounded-xl border border-b-4 shadow-sm flex flex-col justify-between hover:scale-105 transition cursor-default">
+                        <div class="text-[11px] font-bold leading-tight mb-2 opacity-90">${displayTitle}</div>
+                        <div class="text-2xl font-black">${sums[key].toLocaleString()}</div>
+                    </div>
+                `;
+                colorIndex++;
+            }
+        }
+
+        // ผลลัพธ์การพยาบาล
+        function updateNursingOutcomes(data) {
+            document.getElementById('stat-avf').innerText = avgRate(data, 'อัตราการติดเชื้อ AVF') + '%';
+            document.getElementById('stat-avg').innerText = avgRate(data, 'อัตราการติดเชื้อ AVG') + '%';
+            document.getElementById('stat-perm').innerText = avgRate(data, 'อัตราการติดเชื้อ Perm catheter') + '%';
+            document.getElementById('stat-dlc').innerText = avgRate(data, 'อัตราการติดเชื้อ DLC') + '%';
+            document.getElementById('stat-sepsis').innerText = avgRate(data, 'อัตรา Sepsis') + '%';
+            document.getElementById('stat-nursenote').innerText = avgRate(data, 'อัตราความสมบูรณ์ Nurse note') + '%';
+
+            // อัตราการตาย: ค่าจริง (ผลรวม) + % จากผู้รับบริการทั้งหมด
+            // AKI recovery: ค่าจริง (ผลรวม) + % จากเคส AKI ทั้งหมด
+            let sumDeath = 0, sumVisit = 0, sumAkiRecover = 0, sumAki = 0;
+            data.forEach(row => {
+                sumDeath += parseInt(row['อัตราการตาย']) || 0;
+                sumVisit += parseInt(row['จำนวนผู้ป่วย Visit']) || 0;
+                sumAkiRecover += parseInt(row['AKI recovery']) || 0;
+                sumAki += parseInt(row['AKI']) || 0;
+            });
+            document.getElementById('stat-mortality').innerText = sumDeath.toLocaleString();
+            document.getElementById('stat-mortality-pct').innerText = '(' + (sumVisit > 0 ? (sumDeath / sumVisit * 100).toFixed(2) : '0.00') + '%)';
+            document.getElementById('stat-akirecovery').innerText = sumAkiRecover.toLocaleString();
+            document.getElementById('stat-akirecovery-pct').innerText = '(' + (sumAki > 0 ? (sumAkiRecover / sumAki * 100).toFixed(2) : '0.00') + '%)';
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-gray-500 bg-gray-50">ไม่พบข้อมูล</td></tr>`;
+                return;
+            }
+
+            data.forEach(row => {
+                // จัดการทศนิยม Productivity
+                let prodValue = parseFloat(row['Productivity']) || 0;
+                let prodFormatted = prodValue.toFixed(2);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-mint-light/30 transition";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-bold text-mint-dark">${row['เดือน'] || '-'} ${row['ปี'] || '-'}</td>
+                    <td class="px-4 py-3 text-center">${prodFormatted}</td>
+                    <td class="px-4 py-3 text-center font-bold">${row['จำนวนผู้ป่วย Visit'] || '0'}</td>
+                    <td class="px-4 py-3 text-center text-red-500">${row['AKI'] || '0'}</td>
+                    <td class="px-4 py-3 text-center text-blue-500">${row['Chronic'] || '0'}</td>
+                    <td class="px-4 py-3 text-center">
+                        <button onclick="viewDetails(${row._tempId})" class="text-white bg-mint hover:bg-mint-dark px-3 py-1.5 rounded-full shadow-sm transition transform hover:scale-110">
+                            <i class="fa-solid fa-eye"></i> ดู
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function viewDetails(id) {
+            const row = currentFilteredData.find(r => r._tempId === id);
+            if(!row) return;
+
+            let html = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-left text-sm max-h-[60vh] overflow-y-auto swal-custom-scroll p-2">';
+            const bgColors = ['bg-red-50','bg-blue-50','bg-green-50','bg-yellow-50','bg-purple-50','bg-pink-50','bg-indigo-50','bg-teal-50'];
+            let colorIdx = 0;
+
+            for(let key in row) {
+                if(key !== '_tempId' && row[key] !== '' && row[key] !== null) {
+                    let bg = bgColors[colorIdx % bgColors.length];
+
+                    // ปรับ Productivity ใน Popup ให้เป็นทศนิยม 2 ตำแหน่ง
+                    let displayValue = row[key];
+                    if (key === 'Productivity' && !isNaN(parseFloat(displayValue))) {
+                        displayValue = parseFloat(displayValue).toFixed(2);
+                    }
+
+                    html += `
+                        <div class="${bg} p-3 rounded-lg border border-gray-100 shadow-sm flex flex-col justify-center hover:scale-105 transition cursor-default">
+                            <div class="text-[10px] text-gray-500 font-bold mb-1 break-words leading-tight">${key}</div>
+                            <div class="font-black text-gray-800 text-base">${displayValue}</div>
+                        </div>`;
+                    colorIdx++;
+                }
+            }
+            html += '</div>';
+
+            Swal.fire({
+                title: `<span class="text-mint-dark text-xl font-bold border-b-2 border-mint pb-2">รายละเอียดเดือน ${row['เดือน'] || ''} ${row['ปี'] || ''}</span>`,
+                html: html,
+                width: '900px',
+                background: '#ffffff',
+                showCloseButton: true,
+                confirmButtonText: '<i class="fa-solid fa-check mr-1"></i> ปิดหน้าต่าง',
+                confirmButtonColor: '#26a69a',
+                buttonsStyling: true,
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl border border-mint-light',
+                    confirmButton: 'rounded-lg px-6 py-2 shadow-md'
+                }
+            });
+        }
+
+        function updateCharts(data) {
+            const labels = data.map(d => `${d['เดือน'] || ''} ${d['ปี'] ? d['ปี'].toString().substr(2) : ''}`.trim());
+            const prodData = data.map(d => parseFloat(d['Productivity'] || 0).toFixed(2));
+            const visitData = data.map(d => parseInt(d['จำนวนผู้ป่วย Visit'] || 0));
+
+            if(prodChart) prodChart.destroy();
+            if(visitChart) visitChart.destroy();
+
+            prodChart = new Chart(document.getElementById('productivityChart'), {
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: 'Productivity', data: prodData, borderColor: '#26a69a', backgroundColor: '#e0f2f1', fill: true, tension: 0.4, pointBackgroundColor: '#00796b' }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            visitChart = new Chart(document.getElementById('visitChart'), {
+                type: 'bar',
+                data: { labels: labels, datasets: [{ label: 'Visits', data: visitData, backgroundColor: '#4db6ac', borderRadius: 4 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        // กราฟแท่งเปรียบเทียบผลงานวิชาการ 3 ปี (ปีปัจจุบัน + ย้อนหลัง 2 ปี) - อิงปีงบประมาณ ไม่ผูกกับ filter เดือน/ปี
+        function updateAcademicChart(data) {
+            const yearTotals = {};
+            data.forEach(row => {
+                const y = getFiscalYear(row);
+                if(!y) return;
+                if(!yearTotals[y]) yearTotals[y] = { research: 0, publish: 0, present: 0, wi: 0, cqi: 0 };
+                yearTotals[y].research += parseInt(row['วิจัย']) || 0;
+                yearTotals[y].publish += parseInt(row['ตีพิมพ์วารสารวิชาการ']) || 0;
+                yearTotals[y].present += parseInt(row['นำเสนอผลงานวิชาการ หน่วยงานภายนอก']) || 0;
+                yearTotals[y].wi += parseInt(row['WI']) || 0;
+                yearTotals[y].cqi += parseInt(row['CQI/นวัตรกรรม']) || parseInt(row['CQI']) || 0;
+            });
+
+            const years = Object.keys(yearTotals).map(Number).sort((a,b) => b - a).slice(0, 3).sort((a,b) => a - b);
+
+            if(academicChart) academicChart.destroy();
+            academicChart = new Chart(document.getElementById('academicChart'), {
+                type: 'bar',
+                data: {
+                    labels: years.map(y => 'ปีงบ ' + y),
+                    datasets: [
+                        { label: 'วิจัย', data: years.map(y => yearTotals[y].research), backgroundColor: '#64b5f6', borderRadius: 4 },
+                        { label: 'ตีพิมพ์วารสารวิชาการ', data: years.map(y => yearTotals[y].publish), backgroundColor: '#ffb74d', borderRadius: 4 },
+                        { label: 'นำเสนอผลงานวิชาการภายนอก', data: years.map(y => yearTotals[y].present), backgroundColor: '#ba68c8', borderRadius: 4 },
+                        { label: 'WI', data: years.map(y => yearTotals[y].wi), backgroundColor: '#f06292', borderRadius: 4 },
+                        { label: 'CQI/นวัตรกรรม', data: years.map(y => yearTotals[y].cqi), backgroundColor: '#ffd54f', borderRadius: 4 }
+                    ]
+                },
+                options: { maintainAspectRatio: false, responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // ==================== วิเคราะห์ภาพรวมองค์กรด้วย AI (3P Safety) ====================
+        // ตั้งค่า URL ของ Google Apps Script Web App ที่ deploy ไว้ (ดูขั้นตอนใน README.md)
+        const AI_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyO1hfoB6-qO1l2cFK26Uz-T88EXUW-WiJa_uwa4zCO5fTFvxmAMpOXNgq_RnCrBhYD/exec';
+
+        // ดึงค่าตัวเลขที่กำลังแสดงอยู่บนแดชบอร์ด (ตาม filter ปัจจุบัน) มาสรุปเป็นก้อนข้อมูลให้ AI วิเคราะห์
+        function collectDashboardSnapshot() {
+            const val = id => { const el = document.getElementById(id); return el ? el.innerText.trim() : ''; };
+            const yearSelect = document.getElementById('yearFilter');
+            const yearLabel = yearSelect.options[yearSelect.selectedIndex] ? yearSelect.options[yearSelect.selectedIndex].innerText : 'ทุกปี';
+
+            const riskProfile = {};
+            document.querySelectorAll('#risk-profile-container > div').forEach(card => {
+                const divs = card.querySelectorAll('div');
+                if (divs.length >= 2) {
+                    const title = divs[0].innerText.trim();
+                    const value = divs[1].innerText.trim();
+                    if (title) riskProfile[title] = value;
+                }
+            });
+
+            return {
+                ช่วงเวลาที่กรอง: {
+                    เดือน: (selectedMonths.length === 0 || selectedMonths.length === 12) ? 'ทุกเดือน' : selectedMonths.join(', '),
+                    โหมดปี: yearMode === 'fiscal' ? 'ปีงบประมาณ' : 'ปี พ.ศ.',
+                    ปี: yearLabel
+                },
+                ทรัพยากรองค์กร: {
+                    พยาบาลไตเทียม: val('stat-nurse'), อัตรากำลัง: val('stat-manpower'),
+                    ผู้ช่วยเหลือ: val('stat-assistant'), เครื่องไตเทียม: val('stat-machine'), CRRT: val('stat-crrt')
+                },
+                สถิติผู้รับบริการ: {
+                    Productivity: val('stat-productivity'), Visit: val('stat-visit'), AKI: val('stat-aki'),
+                    Chronic: val('stat-chronic'), HD_นอกแผนก: val('stat-hd-out'), ICU: val('stat-icu'),
+                    HIV: val('stat-hiv'), EID: val('stat-eid')
+                },
+                Customer_feedback: {
+                    คำชมเชยจากผู้รับบริการ: val('stat-compliment'),
+                    ข้อร้องเรียนจากผู้รับบริการ: val('stat-complaint'),
+                    ร้อยละความพึงพอใจ: val('stat-satisfaction')
+                },
+                ผลงานวิชาการ: {
+                    วิจัย: val('stat-research'), ตีพิมพ์วารสารวิชาการ: val('stat-publish'),
+                    นำเสนอผลงานภายนอก: val('stat-present'), WI: val('stat-wi'), CQI_นวัตกรรม: val('stat-cqi')
+                },
+                Complication_IntraHD: {
+                    Hypotension: val('comp-hypo') + ' (' + val('comp-hypo-pct') + ')',
+                    Muscle_cramp: val('comp-muscle') + ' (' + val('comp-muscle-pct') + ')',
+                    Chill: val('comp-chill') + ' (' + val('comp-chill-pct') + ')',
+                    Cardiac_arrhythmia: val('comp-cardiac') + ' (' + val('comp-cardiac-pct') + ')',
+                    Sudden_death: val('comp-death') + ' (' + val('comp-death-pct') + ')'
+                },
+                Risk_profile: riskProfile,
+                ผลลัพธ์การพยาบาล: {
+                    อัตราการติดเชื้อ_AVF: val('stat-avf'), อัตราการติดเชื้อ_AVG: val('stat-avg'),
+                    อัตราการติดเชื้อ_Perm: val('stat-perm'), อัตราการติดเชื้อ_DLC: val('stat-dlc'),
+                    อัตรา_Sepsis: val('stat-sepsis'),
+                    อัตราการตาย: val('stat-mortality') + ' ' + val('stat-mortality-pct'),
+                    AKI_recovery: val('stat-akirecovery') + ' ' + val('stat-akirecovery-pct'),
+                    ความสมบูรณ์ของ_Nurse_note: val('stat-nursenote')
+                }
+            };
+        }
+
+        // แปลงข้อความจาก AI (## หัวข้อ, - รายการ) เป็น HTML อย่างง่าย
+        function formatAIAnalysis(text) {
+            const lines = text.split('\n');
+            let html = '';
+            let inList = false;
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('## ')) {
+                    if (inList) { html += '</ul>'; inList = false; }
+                    html += `<h3 class="text-mint-dark font-bold text-base mt-4 mb-2">${trimmed.substring(3)}</h3>`;
+                } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                    if (!inList) { html += '<ul class="list-disc pl-5 space-y-1">'; inList = true; }
+                    html += `<li>${trimmed.substring(2)}</li>`;
+                } else if (trimmed === '') {
+                    // ข้ามบรรทัดว่าง
+                } else {
+                    if (inList) { html += '</ul>'; inList = false; }
+                    html += `<p class="mb-2">${trimmed}</p>`;
+                }
+            });
+            if (inList) html += '</ul>';
+            return html;
+        }
+
+        function analyzeWithAI() {
+            if (!AI_ENDPOINT || AI_ENDPOINT.indexOf('PASTE_YOUR') !== -1) {
+                Swal.fire('ยังไม่ได้ตั้งค่า AI', 'กรุณาตั้งค่า AI_ENDPOINT ในไฟล์ index.html ให้เป็น URL ของ Google Apps Script Web App ก่อนใช้งานฟีเจอร์นี้ (ดูขั้นตอนใน README.md)', 'info');
+                return;
+            }
+
+            Swal.fire({
+                title: 'กำลังวิเคราะห์ด้วย AI...',
+                html: 'ระบบกำลังประมวลผลข้อมูลตามมาตรฐาน HA และ 3P Safety Goals<br>อาจใช้เวลาสักครู่',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            const snapshot = collectDashboardSnapshot();
+
+            fetch(AI_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // เลี่ยง CORS preflight สำหรับ Apps Script
+                body: JSON.stringify(snapshot)
+            })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.status !== 'success') {
+                        Swal.fire('เกิดข้อผิดพลาด', result.message || 'ไม่สามารถวิเคราะห์ได้ในขณะนี้', 'error');
+                        return;
+                    }
+                    Swal.fire({
+                        title: `<span class="text-mint-dark text-xl font-bold border-b-2 border-mint pb-2"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>ผลการวิเคราะห์ภาพรวมองค์กร (3P Safety)</span>`,
+                        html: `<div class="text-left text-sm max-h-[65vh] overflow-y-auto swal-custom-scroll p-2">${formatAIAnalysis(result.analysis)}</div>`,
+                        width: '800px',
+                        background: '#ffffff',
+                        showCloseButton: true,
+                        confirmButtonText: '<i class="fa-solid fa-check mr-1"></i> ปิดหน้าต่าง',
+                        confirmButtonColor: '#26a69a',
+                        customClass: {
+                            popup: 'rounded-2xl shadow-2xl border border-mint-light',
+                            confirmButton: 'rounded-lg px-6 py-2 shadow-md'
+                        }
+                    });
+                })
+                .catch(err => {
+                    Swal.fire('เชื่อมต่อไม่สำเร็จ', 'ไม่สามารถเชื่อมต่อ AI ได้: ' + err.message, 'error');
+                });
+        }
+    </script>
+</body>
+</html>
+
