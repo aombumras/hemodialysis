@@ -50,7 +50,7 @@
     }
 
     /* ── 3D Book ออริจินอล ── */
-    .book-scene { perspective: 800px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .book-scene { perspective: 800px; display: flex; flex-direction: column; align-items: center; cursor: pointer; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
     .book-3d { width: 100%; max-width: 130px; height: 175px; position: relative; transform-style: preserve-3d; transition: transform 0.4s cubic-bezier(0.23,1,0.32,1); filter: drop-shadow(3px 6px 12px rgba(0,0,0,0.45)); }
     .book-scene:hover .book-3d { transform: rotateY(-28deg) translateX(7px) translateY(-10px); filter: drop-shadow(7px 14px 20px rgba(0,0,0,0.55)); }
     .book-cover { position: absolute; inset: 0; border-radius: 2px 10px 10px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 10px; text-align: center; color: white; font-size: 14px; font-weight: 600; line-height: 1.4; overflow: hidden; transform: translateZ(9px); }
@@ -65,6 +65,9 @@
     .bk-btn:hover { transform:scale(1.2); }
     .bk-edit  { color:#3b82f6; } .bk-del   { color:#ef4444; } .bk-share { color:#00B900; }
 
+    /* จุดเล็กๆ บอกว่าเล่มนี้มีภาพตัวอย่าง */
+    .pv-badge { position:absolute; top:6px; right:4px; z-index:5; width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.92); color:#2563eb; font-size:9px; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,0.3); transform: translateZ(12px); pointer-events:none; }
+
     @media (max-width: 640px) {
       .book-3d { max-width: 150px; height: 195px; }
       .book-cover { font-size: 24px !important; padding: 16px; line-height: 1.2; }
@@ -72,6 +75,42 @@
       .book-spine-face { height: 195px; }
       .book-actions { opacity: 1; transform: none; pointer-events: auto; }
     }
+
+    /* ════════════════════════════════════
+       ภาพตัวอย่าง One Page (Hover / กดค้าง)
+    ════════════════════════════════════ */
+    #previewPop {
+      position: fixed; z-index: 250; pointer-events: none; width: clamp(230px, min(30vw, calc((88vh - 80px) / 1.414)), 400px);
+      background: #fff; border-radius: 16px; padding: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.06);
+      opacity: 0; transform: translateY(8px) scale(0.95); visibility: hidden;
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+    }
+    #previewPop.show { opacity: 1; transform: none; visibility: visible; transition: opacity 0.18s ease, transform 0.18s ease; }
+    #previewPop .pv-frame { width: 100%; aspect-ratio: 1 / 1.414; background: #f1f5f9; border-radius: 9px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
+    #previewPop img { width: 100%; height: 100%; object-fit: contain; background: #fff; display: block; }
+    #previewPop .pv-empty { text-align: center; color: #94a3b8; font-size: 12px; padding: 12px; line-height: 1.5; }
+    #previewPop .pv-empty i { font-size: 34px; display: block; margin-bottom: 8px; color: #cbd5e1; }
+    #previewPop .pv-title { margin-top: 8px; font-size: 14px; font-weight: 500; color: #1e3a8a; text-align: center; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    #previewPop .pv-hint { font-size: 10.5px; color: #94a3b8; text-align: center; margin-top: 2px; }
+    @media (max-width: 900px) { #previewPop { width: clamp(230px, min(52vw, calc((86vh - 80px) / 1.414)), 400px); } }
+    @media (max-width: 640px) { #previewPop { width: clamp(220px, min(80vw, calc((84vh - 80px) / 1.414)), 380px); } }
+
+    /* ── วิดีโอ (แยกต่างหาก อยู่เหนือตู้หนังสือ กลางจอ) ── */
+    .video-section { max-width: 860px; margin: 0 auto 36px; }
+    .video-card { background: rgba(255,255,255,0.92); border-radius: 22px; padding: 16px; box-shadow: 0 10px 34px rgba(30,58,138,0.22), 0 0 0 1px rgba(59,130,246,0.15); }
+    .video-head { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; color: #1e3a8a; font-weight: 600; font-size: 18px; text-align: center; line-height: 1.35; }
+    .video-head i { color: #ef4444; font-size: 22px; flex-shrink: 0; }
+    .video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+    .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    @media (max-width: 640px) { .video-card { padding: 10px; border-radius: 16px; } .video-head { font-size: 15px; } .video-section { margin-bottom: 24px; } }
+
+    /* ภาพตัวอย่างในฟอร์ม */
+    .pv-form-box { width: 96px; flex-shrink: 0; aspect-ratio: 1 / 1.414; background: #f1f5f9; border: 2px dashed #bfdbfe; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #93c5fd; font-size: 26px; position: relative; }
+    .pv-form-box img { width: 100%; height: 100%; object-fit: contain; background: #fff; display: block; }
+    .pv-mini-btn { padding: 7px 12px; border-radius: 10px; font-size: 12px; font-weight: 500; border: none; cursor: pointer; transition: all 0.15s; font-family: 'Kanit', sans-serif; }
+    .pv-mini-btn:active { transform: scale(0.96); }
+    .pv-mini-btn:disabled { opacity: 0.5; cursor: wait; }
 
     .drop-zone { border:2px dashed #60a5fa; border-radius:16px; transition:all 0.2s; cursor:pointer; }
     .drop-zone:hover, .drop-zone.dragover { border-color:#2563eb; background:#eff6ff; }
@@ -95,7 +134,6 @@
     #rdScroll {
       flex: 1; overflow: auto; position: relative; width: 100%; height: 100%;
       -webkit-overflow-scrolling: touch;
-      /* ใช้ Flex เพื่อปรับ Center ด้วย JS */
       display: flex; align-items: flex-start; justify-content: flex-start;
       padding: 10px;
     }
@@ -163,6 +201,16 @@
     </div>
   </div>
 
+  <!-- วิดีโอ: แยกจากตู้ไม้ อยู่กลางจอเหนือชั้นหนังสือ -->
+  <div class="video-section">
+    <div class="video-card">
+      <div class="video-head"><i class="fab fa-youtube"></i><span>คู่มือการพัฒนาผลงาน CQI และนวัตกรรม</span></div>
+      <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/KitJHbB4SqY?si=795NxTxAoQbtURNi" title="คู่มือการพัฒนาผลงาน CQI และนวัตกรรม" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
   <div id="stateLoading" class="text-center py-20">
     <i class="fas fa-spinner fa-spin text-4xl text-blue-400 mb-4 block"></i>
     <p class="text-blue-800/50 text-sm">กำลังจัดเรียงหนังสือบนชั้น...</p>
@@ -183,8 +231,15 @@
 
 </div>
 
+<!-- ภาพตัวอย่าง One Page (ลอยขึ้นเมื่อเอาเมาส์ชี้ / กดนิ้วค้างบนหนังสือ) -->
+<div id="previewPop" aria-hidden="true">
+  <div class="pv-frame" id="pvFrame"></div>
+  <div class="pv-title" id="pvTitle"></div>
+  <div class="pv-hint" id="pvHint"></div>
+</div>
+
 <div id="formModal" class="fixed inset-0 modal-bg z-50 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 relative" style="max-height:92vh; overflow-y:auto;">
     <button onclick="closeForm()" class="absolute top-5 right-5 text-slate-300 hover:text-slate-500 text-lg transition-colors"><i class="fas fa-times"></i></button>
     <div class="flex items-center gap-3 mb-6">
       <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fas fa-book text-blue-500 text-lg"></i></div>
@@ -196,7 +251,7 @@
         <label class="block text-sm font-medium text-slate-500 mb-2">ชื่อหนังสือ</label>
         <input type="text" id="bookTitle" required placeholder="ชื่อหนังสือ..." class="w-full px-4 py-3 bg-slate-50 rounded-2xl ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-400 outline-none transition-all text-slate-700">
       </div>
-      <div class="mb-6">
+      <div class="mb-5">
         <label class="block text-sm font-medium text-slate-500 mb-2">ไฟล์ PDF</label>
         <div class="drop-zone p-5 text-center" id="dropZone" onclick="document.getElementById('bookFile').click()">
           <input type="file" id="bookFile" accept="application/pdf" class="hidden">
@@ -204,6 +259,31 @@
           <p id="fileName" class="text-xs text-slate-400">คลิกหรือลากไฟล์ PDF มาวางที่นี่</p>
         </div>
       </div>
+
+      <!-- คอลัมน์ภาพตัวอย่าง One Page -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-slate-500 mb-2"><i class="fas fa-image text-blue-300 mr-1"></i> ภาพตัวอย่างหน้าเดียว (One Page)</label>
+        <div class="flex gap-4 items-start">
+          <div class="pv-form-box" id="pvFormBox">
+            <i class="fas fa-file-image" id="pvFormEmpty"></i>
+            <img id="pvFormImg" class="hidden" alt="preview">
+          </div>
+          <div class="flex-1 min-w-0">
+            <input type="file" id="previewFile" accept="image/*" class="hidden">
+            <div class="flex flex-wrap gap-2 mb-2">
+              <button type="button" class="pv-mini-btn bg-blue-50 text-blue-600 hover:bg-blue-100" onclick="document.getElementById('previewFile').click()"><i class="fas fa-upload mr-1"></i>อัปโหลดรูป</button>
+              <button type="button" id="pvClearBtn" class="pv-mini-btn bg-rose-50 text-rose-500 hover:bg-rose-100" onclick="clearPreview()"><i class="fas fa-trash mr-1"></i>ลบภาพ</button>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs text-slate-500 whitespace-nowrap">ดึงจาก PDF หน้าที่</span>
+              <input type="number" id="pvPage" min="1" value="1" class="w-14 px-2 py-1.5 bg-slate-50 rounded-lg ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-400 outline-none text-sm text-slate-700 text-center">
+              <button type="button" id="pvGenBtn" class="pv-mini-btn bg-emerald-50 text-emerald-600 hover:bg-emerald-100" onclick="genPreviewFromPdf()"><i class="fas fa-wand-magic-sparkles mr-1"></i>ดึงภาพ</button>
+            </div>
+            <p id="pvStatus" class="text-xs text-slate-400 leading-relaxed">เลือกไฟล์ PDF แล้วระบบจะสร้างภาพจากหน้าแรกให้อัตโนมัติ</p>
+          </div>
+        </div>
+      </div>
+
       <div class="flex gap-3">
         <button type="button" onclick="closeForm()" class="flex-1 py-3 text-slate-400 hover:bg-slate-50 rounded-2xl transition-all font-medium">ยกเลิก</button>
         <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white py-3 rounded-2xl font-semibold shadow-md transition-all"><i class="fas fa-save mr-2"></i>บันทึก</button>
@@ -266,6 +346,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 // ==========================================
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbygfy7yad290Ox_Kdat3HqLPZm_2HhsiSwsFPl7SEZm6M3UXz604LT1hK9LvYMkhWuDYw/exec';
 
+// ชื่อคอลัมน์ในชีตที่เก็บภาพตัวอย่าง (Apps Script จะสร้างให้อัตโนมัติถ้ายังไม่มี)
+var PREVIEW_COL = 'Preview Image';
+// ภาพตัวอย่างเก็บเป็นไฟล์ใน Google Drive (ไม่ใช่ในเซลล์) จึงใช้ความละเอียดสูงได้
+var PREVIEW_MAX_CHARS = 1200000;
+
 var BOOKS_PER_SHELF = 4;
 var PALETTE = [
   ['#047857','#022c22'],['#0369a1','#0c2d48'],['#6d28d9','#2e1065'],
@@ -283,10 +368,22 @@ function callBackend(action, payload = {}) {
       else if (action === 'saveBook') { google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveBook(payload); }
       else if (action === 'deleteBook') { google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).deleteBook(payload.rowIndex, payload.fileId); }
     } else {
-      fetch(GAS_URL + "?action=" + action, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain;charset=utf-8" }
-      }).then(function(res) { return res.json(); }).then(function(data) {
-        if (data && (data.error || data.success === false)) reject(new Error(data.error || data.message)); else resolve(data);
-      }).catch(reject);
+      // อ่านข้อมูล (getBooks/getPdfData) ลองซ้ำอัตโนมัติได้ เพราะไม่ทำให้ข้อมูลซ้ำ; saveBook/deleteBook ไม่ลองซ้ำเอง
+      var maxTry = (action === 'getBooks' || action === 'getPdfData') ? 4 : 1;
+      var body = JSON.stringify(payload);
+      (function attempt(n) {
+        fetch(GAS_URL + "?action=" + action, { method: "POST", body: body, headers: { "Content-Type": "text/plain;charset=utf-8" }
+        }).then(function(res) { return res.text(); }).then(function(txt) {
+          var data;
+          try { data = JSON.parse(txt); }
+          catch (e) { throw new Error(/^\s*</.test(txt) ? 'HTML' : txt.slice(0, 80)); }
+          if (data && (data.error || data.success === false)) reject(new Error(data.error || data.message)); else resolve(data);
+        }).catch(function(err) {
+          if (n < maxTry) { setTimeout(function() { attempt(n + 1); }, 700 * n); return; }   // หน่วง 0.7s, 1.4s, 2.1s แล้วลองใหม่
+          if (err.message === 'HTML') err = new Error('เซิร์ฟเวอร์ (Google) ตอบกลับไม่ทัน/ไม่ใช่ข้อมูล — ลองกดอีกครั้ง หากเป็นบ่อยให้ตรวจการ Deploy และสิทธิ์ "ทุกคน" ของ Apps Script');
+          reject(err);
+        });
+      })(1);
     }
   });
 }
@@ -305,6 +402,7 @@ function loadBooks() {
 }
 
 function renderBooks() {
+  hidePreview();
   var container = document.getElementById('shelfContainer'); container.innerHTML = '';
   for (var i = 0; i < bookData.length; i += BOOKS_PER_SHELF) {
     var batch = bookData.slice(i, i + BOOKS_PER_SHELF);
@@ -314,6 +412,11 @@ function renderBooks() {
     var plank = document.createElement('div'); plank.className = 'shelf-plank';
     unit.appendChild(row); unit.appendChild(plank); container.appendChild(unit);
   }
+}
+
+function getPreviewOf(book) {
+  var v = String(book[PREVIEW_COL] || '').trim();
+  return (/^data:image\//.test(v) || /^https?:\/\//.test(v)) ? v : '';
 }
 
 function makeBook(book, idx) {
@@ -326,19 +429,254 @@ function makeBook(book, idx) {
   var eT = title.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   var eF = fid.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   var eU = furl.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var hasPv = !!getPreviewOf(book);
 
   var scene = document.createElement('div'); scene.className = 'book-scene';
   scene.innerHTML =
-    '<div class="book-3d" onclick="openReader(\'' + eF + '\',\'' + eT + '\')">' +
+    '<div class="book-3d" onclick="bookClick(\'' + eF + '\',\'' + eT + '\')">' +
       '<div class="book-spine-face" style="background:' + D + ';"><span>' + title + '</span></div>' +
       '<div class="book-cover" style="background:linear-gradient(150deg,' + L + ',' + D + ');"><i class="fas fa-book text-white/20 text-2xl mb-2"></i><span>' + title + '</span></div>' +
+      (hasPv ? '<div class="pv-badge" title="มีภาพตัวอย่าง"><i class="fas fa-eye"></i></div>' : '') +
     '</div><div class="book-actions">' +
       '<button class="bk-btn bk-share" onclick="event.stopPropagation();shareBook(\'' + eU + '\',\'' + eT + '\')" title="แชร์ LINE"><i class="fas fa-share-alt"></i></button>' +
       '<button class="bk-btn bk-edit"  onclick="event.stopPropagation();openForm(true,' + ri + ')" title="แก้ไข"><i class="fas fa-pen"></i></button>' +
       '<button class="bk-btn bk-del"   onclick="event.stopPropagation();confirmDelete(' + ri + ',\'' + eF + '\')" title="ลบ"><i class="fas fa-trash"></i></button>' +
     '</div>';
+
+  bindPreviewEvents(scene, book);
   return scene;
 }
+
+// ════════════════════════════════════════
+// 👁️ PREVIEW POPOVER (เมาส์ชี้ / กดนิ้วค้าง)
+// ════════════════════════════════════════
+var pvTimer = null;
+var pvLongPressed = false;
+var lastTouchTs = 0;
+var suppressClickUntil = 0;
+var LONG_PRESS_MS = 320;
+
+function bookClick(fid, title) {
+  // กดค้างเพื่อดูภาพตัวอย่างแล้วปล่อยนิ้ว → ไม่ต้องเปิดหนังสือ
+  if (Date.now() < suppressClickUntil) return;
+  hidePreview();
+  openReader(fid, title);
+}
+
+function bindPreviewEvents(scene, book) {
+  // ── เมาส์ (คอมพิวเตอร์) ──
+  scene.addEventListener('mouseenter', function() {
+    if (Date.now() - lastTouchTs < 900) return; // กัน mouse ปลอมที่ browser สร้างหลังแตะจอ
+    showPreview(book, scene, false);
+  });
+  scene.addEventListener('mouseleave', hidePreview);
+
+  // ── สัมผัส (สมาร์ทโฟน): กดนิ้วค้างเพื่อดู ปล่อยนิ้วเพื่อปิด ──
+  var startX = 0, startY = 0;
+  scene.addEventListener('touchstart', function(e) {
+    lastTouchTs = Date.now();
+    if (e.touches.length !== 1) { clearTimeout(pvTimer); return; }
+    if (e.target.closest && e.target.closest('.book-actions')) return; // ปุ่มแชร์/แก้ไข/ลบ
+    var t = e.touches[0]; startX = t.clientX; startY = t.clientY;
+    pvLongPressed = false;
+    clearTimeout(pvTimer);
+    pvTimer = setTimeout(function() {
+      pvLongPressed = true;
+      showPreview(book, scene, true);
+      if (navigator.vibrate) { try { navigator.vibrate(12); } catch(_) {} }
+    }, LONG_PRESS_MS);
+  }, { passive: true });
+
+  scene.addEventListener('touchmove', function(e) {
+    if (!e.touches.length) return;
+    var t = e.touches[0];
+    if (Math.abs(t.clientX - startX) > 12 || Math.abs(t.clientY - startY) > 12) {
+      clearTimeout(pvTimer);
+      if (pvLongPressed) { pvLongPressed = false; hidePreview(); }
+    }
+  }, { passive: true });
+
+  function endTouch() {
+    lastTouchTs = Date.now();
+    clearTimeout(pvTimer);
+    if (pvLongPressed) {
+      pvLongPressed = false;
+      suppressClickUntil = Date.now() + 600;
+      hidePreview();
+    }
+  }
+  scene.addEventListener('touchend', endTouch, { passive: true });
+  scene.addEventListener('touchcancel', endTouch, { passive: true });
+
+  // กันเมนู "บันทึกรูป/คัดลอก" ของมือถือตอนกดค้าง
+  scene.addEventListener('contextmenu', function(e) {
+    if (Date.now() - lastTouchTs < 1500) e.preventDefault();
+  });
+}
+
+function showPreview(book, anchorEl, centered) {
+  var pop   = document.getElementById('previewPop');
+  var frame = document.getElementById('pvFrame');
+  var url   = getPreviewOf(book);
+
+  document.getElementById('pvTitle').textContent = String(book['Book Title'] || '');
+  frame.innerHTML = '';
+  if (url) {
+    var img = new Image();
+    img.alt = 'ตัวอย่างหน้าหนังสือ';
+    img.src = url;
+    frame.appendChild(img);
+    document.getElementById('pvHint').textContent = centered ? 'ปล่อยนิ้วเพื่อปิด • แตะเพื่อเปิดอ่าน' : 'คลิกเพื่อเปิดอ่าน';
+  } else {
+    frame.innerHTML = '<div class="pv-empty"><i class="fas fa-image"></i>ยังไม่มีภาพตัวอย่าง<br>กดปุ่มแก้ไข <i class="fas fa-pen" style="display:inline;font-size:10px;margin:0;color:#94a3b8"></i> เพื่อเพิ่ม</div>';
+    document.getElementById('pvHint').textContent = '';
+  }
+
+  var vw = window.innerWidth, vh = window.innerHeight;
+  var pw = pop.offsetWidth, ph = pop.offsetHeight;
+  var left, top;
+
+  if (centered) {
+    left = (vw - pw) / 2;
+    top  = (vh - ph) / 2;
+  } else {
+    var r = anchorEl.getBoundingClientRect();
+    left = r.right + 4;
+    if (left + pw > vw - 8) left = r.left - pw + 4 - 8;          // ไม่พอทางขวา → ไปซ้าย
+    if (left < 8) left = Math.max(8, (vw - pw) / 2);              // จอแคบมาก → กลาง
+    top = r.top + r.height / 2 - ph / 2;
+  }
+  left = Math.min(Math.max(8, left), Math.max(8, vw - pw - 8));
+  top  = Math.min(Math.max(8, top),  Math.max(8, vh - ph - 8));
+
+  pop.style.left = left + 'px';
+  pop.style.top  = top + 'px';
+  pop.classList.add('show');
+  pop.setAttribute('aria-hidden', 'false');
+}
+
+function hidePreview() {
+  var pop = document.getElementById('previewPop');
+  if (!pop) return;
+  pop.classList.remove('show');
+  pop.setAttribute('aria-hidden', 'true');
+}
+window.addEventListener('scroll', function() { clearTimeout(pvTimer); hidePreview(); }, { passive: true });
+window.addEventListener('resize', hidePreview);
+
+// ════════════════════════════════════════
+// 🖼️ PREVIEW IMAGE BUILDER (สร้าง/บีบอัดภาพตัวอย่าง)
+// ════════════════════════════════════════
+var formPreview = { data: '', changed: false, custom: false };
+
+// วาดภาพลงผืนผ้าใบขนาดเล็ก แล้วบีบเป็น JPEG ให้เล็กกว่าขีดจำกัดของเซลล์ชีต
+function compressToJpeg(source, srcW, srcH) {
+  var widths = [1100, 900, 720, 560];
+  var quals  = [0.9, 0.8, 0.7];
+  var last = '';
+  for (var wi = 0; wi < widths.length; wi++) {
+    var w = Math.min(widths[wi], srcW);
+    var h = Math.round(w * srcH / srcW);
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(source, 0, 0, w, h);
+    for (var qi = 0; qi < quals.length; qi++) {
+      last = c.toDataURL('image/jpeg', quals[qi]);
+      if (last.length <= PREVIEW_MAX_CHARS) return last;
+    }
+  }
+  return last;
+}
+
+async function pdfBytesToPreview(bytes, pageNum) {
+  var pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  var n = Math.min(Math.max(1, parseInt(pageNum) || 1), pdf.numPages);
+  var page = await pdf.getPage(n);
+  var vp1 = page.getViewport({ scale: 1 });
+  var vp  = page.getViewport({ scale: 1500 / vp1.width }); // เรนเดอร์ใหญ่ก่อน แล้วค่อยย่อให้คม
+  var c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+  var ctx = c.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  return { url: compressToJpeg(c, c.width, c.height), page: n, total: pdf.numPages };
+}
+
+function b64ToBytes(b64) {
+  var bin = atob(b64), bytes = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+function setPvStatus(msg, color) {
+  var el = document.getElementById('pvStatus');
+  el.textContent = msg; el.style.color = color || '';
+}
+function setPvBusy(b) {
+  document.getElementById('pvGenBtn').disabled = b;
+}
+
+function renderFormPreview() {
+  var img = document.getElementById('pvFormImg'), empty = document.getElementById('pvFormEmpty');
+  if (formPreview.data) { img.src = formPreview.data; img.classList.remove('hidden'); empty.classList.add('hidden'); }
+  else { img.removeAttribute('src'); img.classList.add('hidden'); empty.classList.remove('hidden'); }
+  document.getElementById('pvClearBtn').style.display = formPreview.data ? '' : 'none';
+}
+
+function clearPreview() {
+  formPreview = { data: '', changed: true, custom: false };
+  renderFormPreview();
+  setPvStatus('ลบภาพตัวอย่างแล้ว (กดบันทึกเพื่อยืนยัน)', '#ef4444');
+}
+
+// สร้างภาพจาก PDF (ไฟล์ที่เพิ่งเลือก หรือไฟล์เดิมบน Drive)
+async function genPreviewFromPdf(silentFirstPage) {
+  var page = silentFirstPage ? 1 : (parseInt(document.getElementById('pvPage').value) || 1);
+  var file = document.getElementById('bookFile').files[0];
+  var existingId = document.getElementById('existingId').value;
+  if (!file && !existingId) { setPvStatus('กรุณาเลือกไฟล์ PDF ก่อน', '#ef4444'); return; }
+
+  setPvBusy(true);
+  setPvStatus('กำลังสร้างภาพตัวอย่างหน้า ' + page + ' ...', '#2563eb');
+  try {
+    var bytes;
+    if (file) {
+      bytes = new Uint8Array(await file.arrayBuffer());
+    } else {
+      var res = await callBackend('getPdfData', { fileId: existingId });
+      if (!res || !res.success) throw new Error('โหลดไฟล์เดิมไม่สำเร็จ');
+      bytes = b64ToBytes(res.data);
+    }
+    var out = await pdfBytesToPreview(bytes, page);
+    formPreview = { data: out.url, changed: true, custom: false };
+    document.getElementById('pvPage').value = out.page;
+    document.getElementById('pvPage').max = out.total;
+    renderFormPreview();
+    setPvStatus('ได้ภาพจากหน้า ' + out.page + ' / ' + out.total + ' แล้ว', '#059669');
+  } catch (err) {
+    setPvStatus('สร้างภาพไม่สำเร็จ: ' + err.message, '#ef4444');
+  }
+  setPvBusy(false);
+}
+
+// อัปโหลดรูปเอง
+document.getElementById('previewFile').addEventListener('change', function() {
+  var f = this.files[0]; if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var im = new Image();
+    im.onload = function() {
+      formPreview = { data: compressToJpeg(im, im.naturalWidth, im.naturalHeight), changed: true, custom: true };
+      renderFormPreview();
+      setPvStatus('ใช้รูปที่อัปโหลดแล้ว', '#059669');
+    };
+    im.onerror = function() { setPvStatus('อ่านไฟล์รูปไม่ได้', '#ef4444'); };
+    im.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+  this.value = '';
+});
 
 // ════════════════════════════════════════
 // E-BOOK READER CORE (PERFECT WIDTH & FIT)
@@ -693,14 +1031,16 @@ function handleSave(e) {
   e.preventDefault(); var file = document.getElementById('bookFile').files[0];
   var info = { rowIndex: parseInt(document.getElementById('rowIndex').value)||null, bookTitle: document.getElementById('bookTitle').value.trim(), existingUrl: document.getElementById('existingUrl').value||'', existingId: document.getElementById('existingId').value||'' };
   if (!file && !info.existingUrl) return;
+  // ส่งภาพตัวอย่างเฉพาะเมื่อมีการเปลี่ยนแปลง ('' = ลบภาพ) — ฝั่ง Apps Script จะสร้างคอลัมน์ให้ถ้ายังไม่มี
+  if (formPreview.changed) info.previewImage = formPreview.data || '';
   Swal.fire({ title: 'กำลังนำหนังสือขึ้นชั้น...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
   if (file) { var rd = new FileReader(); rd.onload = function(ev) { info.fileBase64 = ev.target.result; submitData(info); }; rd.readAsDataURL(file); } else { submitData(info); }
 }
 
 function submitData(info) {
   callBackend('saveBook', info).then(function(res) {
-    if (res && res.success) { Swal.fire({ icon:'success', title:'บันทึกสำเร็จ!', timer:1500, showConfirmButton:false }); closeForm(); loadBooks(); } else { Swal.fire({ icon:'error', title:'บันทึกไม่สำเร็จ', text:res.message }); }
-  });
+    if (res && res.success) { Swal.fire({ icon:'success', title:'บันทึกสำเร็จ!', timer:1500, showConfirmButton:false }); closeForm(); loadBooks(); } else { Swal.fire({ icon:'error', title:'บันทึกไม่สำเร็จ', text:(res && res.message) || '' }); }
+  }).catch(function(err) { Swal.fire({ icon:'error', title:'บันทึกไม่สำเร็จ', text: err.message }); });
 }
 
 function confirmDelete(rowIndex, fileId) {
@@ -712,18 +1052,29 @@ function confirmDelete(rowIndex, fileId) {
 }
 
 function openForm(isEdit, rowIndex) {
-  isEdit = isEdit || false; rowIndex = rowIndex || null; document.getElementById('bookForm').reset(); document.getElementById('fileName').innerText  = 'คลิกหรือลากไฟล์ PDF มาวางที่นี่'; document.getElementById('rowIndex').value      = ''; document.getElementById('existingUrl').value   = ''; document.getElementById('existingId').value    = '';
+  isEdit = isEdit || false; rowIndex = rowIndex || null; hidePreview();
+  document.getElementById('bookForm').reset(); document.getElementById('fileName').innerText  = 'คลิกหรือลากไฟล์ PDF มาวางที่นี่'; document.getElementById('rowIndex').value      = ''; document.getElementById('existingUrl').value   = ''; document.getElementById('existingId').value    = '';
+  formPreview = { data: '', changed: false, custom: false };
+  document.getElementById('pvPage').value = 1;
+  setPvStatus('เลือกไฟล์ PDF แล้วระบบจะสร้างภาพจากหน้าแรกให้อัตโนมัติ', '');
   if (isEdit && rowIndex) {
     var book = bookData.find(b => b.rowIndex === rowIndex);
     if (!book) return; document.getElementById('modalTitle').innerText = 'แก้ไขหนังสือ'; document.getElementById('rowIndex').value = rowIndex; document.getElementById('bookTitle').value = book['Book Title']; document.getElementById('existingUrl').value = book['File URL'] || ''; document.getElementById('existingId').value = book['File ID']  || '';
     if (book['File URL']) document.getElementById('fileName').innerText = '(มีไฟล์เดิม — เลือกใหม่เพื่อเปลี่ยน)';
+    formPreview.data = getPreviewOf(book);
+    setPvStatus(formPreview.data ? 'มีภาพตัวอย่างอยู่แล้ว — เปลี่ยนได้โดยอัปโหลดรูป หรือระบุหน้าแล้วกด "ดึงภาพ"' : 'ยังไม่มีภาพตัวอย่าง — ระบุหน้าแล้วกด "ดึงภาพ" หรืออัปโหลดรูปเอง', '');
   } else { document.getElementById('modalTitle').innerText = 'เพิ่มหนังสือใหม่'; }
+  renderFormPreview();
   document.getElementById('formModal').classList.remove('hidden'); document.getElementById('formModal').classList.add('flex');
 }
 
 function closeForm() { document.getElementById('formModal').classList.add('hidden'); document.getElementById('formModal').classList.remove('flex'); }
 document.getElementById('formModal').addEventListener('click', function(e) { if (e.target === this) closeForm(); });
-document.getElementById('bookFile').addEventListener('change', function() { document.getElementById('fileName').innerText = this.files[0] ? this.files[0].name : 'คลิกหรือลากไฟล์ PDF มาวางที่นี่'; });
+document.getElementById('bookFile').addEventListener('change', function() {
+  document.getElementById('fileName').innerText = this.files[0] ? this.files[0].name : 'คลิกหรือลากไฟล์ PDF มาวางที่นี่';
+  // เลือก PDF ใหม่ → สร้างภาพหน้าแรกให้อัตโนมัติ (ยกเว้นผู้ใช้อัปโหลดรูปเองไว้แล้ว)
+  if (this.files[0] && !formPreview.custom) { document.getElementById('pvPage').value = 1; genPreviewFromPdf(true); }
+});
 
 function setState(s, msg) {
   ['Loading','Error','Empty','Shelf'].forEach(function(n) { document.getElementById('state' + n).classList.add('hidden'); });
@@ -733,4 +1084,3 @@ function setState(s, msg) {
 </script>
 </body>
 </html>
-
