@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>จุดเด่น หน่วยไตเทียม สถาบันบำราศนราดูร</title>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#f3f6f5;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:18px;
+    padding:18px 14px 28px;
+  }
+  .shot{
+    width:100%;
+    max-width:1400px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:calc(100vh - 36px);
+  }
+  .shot img{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:calc(100vh - 36px);
+    object-fit:contain;
+    border-radius:16px;
+    box-shadow:0 20px 46px -20px rgba(13,60,45,.28);
+    background:#fff;
+  }
+  @media (max-width:640px){
+    body{padding:10px 0 18px;gap:12px;}
+    .shot{min-height:auto;}
+    .shot img{border-radius:10px;max-height:none;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="shot"><img src="highlight-1.jpg" alt="จุดเด่น หน่วยไตเทียม สถาบันบำราศนราดูร"></div>
+  <div class="shot"><img src="highlight-2.jpg" alt="เช็คลิสต์ประจำปีสำหรับบุคลากรหน่วยไตเทียม"></div>
+
+</body>
+</html>
