@@ -496,6 +496,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
       หน้าแรก
     </button>
+    <button type="button" data-tab="highlight" onclick="switchTab('highlight')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 14.6 9l6.9.6-5.2 4.5 1.6 6.7-6-3.7-6 3.7 1.6-6.7-5.2-4.5L9.4 9Z"/></svg>
+      จุดเด่น
+    </button>
     <button type="button" data-tab="kpi" onclick="switchTab('kpi')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/></svg>
       KPI
@@ -669,6 +673,13 @@
         </section>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ============ TAB: จุดเด่น ============ -->
+  <div id="tab-highlight" class="tab-panel">
+    <div class="embed-wrap">
+      <iframe class="embed-frame" data-src="highlight.html" title="จุดเด่น หน่วยไตเทียม สถาบันบำราศนราดูร"></iframe>
     </div>
   </div>
 
