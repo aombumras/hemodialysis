@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Risk Profile หน่วยไตเทียม - สถาบันบำราศนราดูร</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --surface-2:#e8eef2; --ink:#16232b; --muted:#566771; --line:#cfd9df;
+  --accent:#0f5f7a; --accent-soft:#dcebf1;
+  --low:#1f9d55; --low-ink:#ffffff; --low-soft:#dff3e7;
+  --mod:#f4d21f; --mod-ink:#2b2400; --mod-soft:#fdf6cf;
+  --high:#f08a12; --high-ink:#2a1500; --high-soft:#fde7cc;
+  --ext:#d42020; --ext-ink:#ffffff; --ext-soft:#fadada;
+  --focus:#0f5f7a;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e171c; --surface:#15222a; --surface-2:#1c2c35; --ink:#e4edf1; --muted:#98abb5; --line:#2b3e48;
+    --accent:#6fc0dc; --accent-soft:#193642;
+    --low:#23a55d; --low-soft:#16321f; --mod:#e6c41b; --mod-soft:#3a3310;
+    --high:#ea8616; --high-soft:#3d2710; --ext:#d12a2a; --ext-soft:#3e1616; --focus:#6fc0dc;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e171c; --surface:#15222a; --surface-2:#1c2c35; --ink:#e4edf1; --muted:#98abb5; --line:#2b3e48;
+  --accent:#6fc0dc; --accent-soft:#193642;
+  --low:#23a55d; --low-soft:#16321f; --mod:#e6c41b; --mod-soft:#3a3310;
+  --high:#ea8616; --high-soft:#3d2710; --ext:#d12a2a; --ext-soft:#3e1616; --focus:#6fc0dc;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Sarabun","Leelawadee UI","Tahoma",sans-serif;font-size:16px;line-height:1.6;padding:0 16px}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:"IBM Plex Sans Thai","Sarabun",sans-serif;line-height:1.3;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.6rem,3.2vw,2.2rem);font-weight:700}
+h2{font-size:1.4rem;font-weight:600}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:.8rem;letter-spacing:.06em;color:var(--accent);font-weight:600}
+header{display:flex;flex-direction:column;gap:8px;border-bottom:2px solid var(--line);padding-bottom:20px}
+header .sub{color:var(--muted);max-width:70ch}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs a{color:var(--accent);text-decoration:none;font-weight:600;font-size:.92rem;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.tabs a:hover{background:var(--accent-soft)}
+section{display:flex;flex-direction:column;gap:16px}
+.sec-head{display:flex;flex-direction:column;gap:4px}
+.sec-head p{color:var(--muted);max-width:75ch}
+
+/* matrix */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.scroll{overflow-x:auto}
+table.matrix{border-collapse:separate;border-spacing:3px;width:100%;min-width:860px;font-variant-numeric:tabular-nums}
+.matrix th,.matrix td{padding:8px 10px;text-align:center;vertical-align:middle;font-size:.9rem}
+.matrix thead th{background:var(--surface-2);font-weight:600}
+.matrix thead .cons-no{background:var(--accent);color:#fff;font-size:1.05rem}
+.matrix .axis{background:transparent;font-family:"IBM Plex Sans Thai",sans-serif;color:var(--accent);font-size:.95rem}
+.matrix .lk-no{background:var(--accent);color:#fff;font-weight:700;width:44px;font-size:1.05rem}
+.matrix .lk-txt{background:var(--surface-2);text-align:left;white-space:nowrap}
+.matrix .corner{background:transparent}
+.cell{border:0;border-radius:6px;cursor:pointer;min-height:64px;width:100%;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:8px 4px;transition:transform .12s ease, box-shadow .12s ease}
+.cell b{font-size:1.25rem;line-height:1.1}
+.cell span{font-size:.82rem}
+.cell:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.cell:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.cell[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+.lv-low{background:var(--low);color:var(--low-ink)}
+.lv-mod{background:var(--mod);color:var(--mod-ink)}
+.lv-high{background:var(--high);color:var(--high-ink)}
+.lv-ext{background:var(--ext);color:var(--ext-ink)}
+.matrix td.pad{padding:0}
+.rot{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+
+/* calculator */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;align-items:start}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:.92rem}
+select{font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+select:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.result{border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line)}
+.result .score{font-size:2rem;font-weight:700;font-family:"IBM Plex Sans Thai",sans-serif;line-height:1}
+.result .lv{font-weight:700;font-size:1.1rem}
+.result.rs-low{background:var(--low-soft);border-color:var(--low)}
+.result.rs-mod{background:var(--mod-soft);border-color:var(--mod)}
+.result.rs-high{background:var(--high-soft);border-color:var(--high)}
+.result.rs-ext{background:var(--ext-soft);border-color:var(--ext)}
+
+/* reference tables */
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+table.ref{border-collapse:collapse;width:100%;font-size:.92rem}
+.ref th,.ref td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.ref thead th{background:var(--surface-2);font-weight:600}
+.ref td.n{font-weight:700;text-align:center;width:52px;color:var(--accent);font-variant-numeric:tabular-nums}
+.ref td.code{font-weight:700;width:44px;text-align:center}
+.grp td{border-top:2px solid var(--line)}
+
+/* levels */
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.lvcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.lvcard .top{padding:14px 16px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lvcard .top h3{font-size:1.15rem}
+.lvcard .top small{font-size:.85rem;font-weight:600;opacity:.9}
+.lvcard .body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:.93rem}
+.lvcard dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 10px}
+.lvcard dt{color:var(--muted);font-weight:600;white-space:nowrap}
+.lvcard dd{margin:0}
+.lvcard ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.78rem;padding:1px 8px;border-radius:999px;background:var(--surface-2);font-variant-numeric:tabular-nums;border:1px solid var(--line)}
+.note{font-size:.88rem;color:var(--muted);border-left:3px solid var(--mod);padding:8px 12px;background:var(--surface);border-radius:0 8px 8px 0}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:reduce){.cell{transition:none}}
+
+/* ---------- register ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.toolbar .left,.toolbar .right{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:inherit;font-weight:600;font-size:.92rem;border-radius:8px;padding:8px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{background:var(--surface-2)}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--ext);border-color:var(--ext)}
+.btn.small{padding:4px 10px;font-size:.84rem}
+a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.btn.hrms{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn[disabled]{opacity:.55;cursor:wait}
+input[type=search],input[type=text],textarea{font:inherit;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+textarea{min-height:78px;resize:vertical;line-height:1.5}
+.search{max-width:260px}
+.fchip{font:inherit;font-size:.85rem;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.fchip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.fchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.sum .tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;border-top:4px solid var(--line)}
+.sum .tile b{font-size:1.6rem;font-family:"IBM Plex Sans Thai",sans-serif;line-height:1.1;font-variant-numeric:tabular-nums}
+.sum .tile span{font-size:.85rem;color:var(--muted)}
+.sum .t-ext{border-top-color:var(--ext)} .sum .t-high{border-top-color:var(--high)} .sum .t-mod{border-top-color:var(--mod)} .sum .t-low{border-top-color:var(--low)}
+table.reg{border-collapse:collapse;width:100%;min-width:1080px;font-size:.9rem}
+.reg th{background:var(--accent);color:#fff;font-weight:600;padding:10px 8px;text-align:left;position:sticky;top:0;white-space:nowrap}
+.reg td{border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top}
+.reg tr:hover td{background:var(--surface-2)}
+.reg td.no{text-align:center;font-weight:700;color:var(--accent);width:52px;font-variant-numeric:tabular-nums}
+.reg td.topic{font-weight:600;min-width:200px}
+.reg td.long{min-width:170px;white-space:pre-wrap}
+.reg td.freq{min-width:110px}
+.reg .muted{color:var(--muted);font-size:.82rem}
+.empty{color:var(--muted);font-style:italic}
+.badge{display:inline-flex;flex-direction:column;align-items:center;border-radius:8px;padding:4px 10px;font-weight:700;font-size:.85rem;white-space:nowrap;line-height:1.3}
+.badge small{font-weight:500;font-size:.75rem}
+.badge.none{background:var(--surface-2);color:var(--muted);font-weight:500}
+.status{font-size:.88rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--low)} .dot.err{background:var(--ext)} .dot.busy{background:var(--mod)}
+.cell .pins{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px}
+.cell .pins em{font-style:normal;font-size:.7rem;font-weight:700;background:rgba(255,255,255,.85);color:#1a1a1a;border-radius:999px;padding:0 5px;min-width:18px}
+/* dialog */
+dialog{border:0;border-radius:14px;padding:0;width:min(720px,calc(100vw - 32px));max-height:calc(100vh - 32px);background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,20,26,.55)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100vh - 32px)}
+.dlg header{padding:16px 20px;border-bottom:1px solid var(--line);flex-direction:row;justify-content:space-between;align-items:center}
+.dlg .content{padding:16px 20px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.dlg footer{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;color:inherit;font-size:inherit}
+.dlg footer .r{display:flex;gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.hint{font-size:.84rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lvprev{border-radius:10px;padding:10px 14px;font-weight:700}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:600;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100vw - 32px)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">สถาบันบำราศนราดูร · กลุ่มการพยาบาล</div>
+    <h1>ระบบ Risk Profile หน่วยไตเทียม</h1>
+    <p class="sub">ประเมินความเสี่ยงจากโอกาสเกิด (Likelihood) และผลกระทบ (Consequence) ตาม Risk Matrix ฉบับปรับใหม่ บันทึกทะเบียนความเสี่ยงลงชีต Risk Profile ให้การจัดการความเสี่ยงเป็นไปอย่างทันท่วงที ปลอดภัย และเหมาะสม</p>
+    <nav class="tabs" aria-label="ส่วนของหน้า">
+      <a href="#matrix">Risk Matrix</a>
+      <a href="#calc">ประเมินความเสี่ยง</a>
+      <a href="#criteria">เกณฑ์การให้คะแนน</a>
+      <a href="#levels">ระดับความเสี่ยง</a>
+      <a href="#register">ตาราง Risk Profile</a>
+    </nav>
+    <div><a class="btn hrms" href="https://bidi.thai-nrls.org/" target="_blank" rel="noopener">รายงานความเสี่ยงในโปรแกรม HRMS (สรพ.) ↗</a></div>
+  </header>
+
+  <section id="matrix">
+    <div class="sec-head">
+      <h2>ตาราง Risk Matrix (ฉบับปรับใหม่)</h2>
+      <p>คะแนนความเสี่ยง = โอกาสเกิด × ผลกระทบ ระดับของแต่ละช่องกำหนดตามตาราง ตัวเลขวงกลมในช่องคือลำดับที่ของความเสี่ยงที่ประเมินแล้ว กดที่ช่องเพื่อกรองตาราง Risk Profile</p>
+    </div>
+    <div class="panel scroll">
+      <table class="matrix" id="matrixTable"></table>
+    </div>
+  </section>
+
+  <section id="calc">
+    <div class="sec-head">
+      <h2>ประเมินความเสี่ยง</h2>
+      <p>เลือกโอกาสเกิดและระดับผลกระทบ ระบบจะแสดงคะแนนและระดับความเสี่ยงพร้อมแนวทางจัดการ</p>
+    </div>
+    <div class="panel calc">
+      <div class="field">
+        <label for="selL">โอกาสเกิด (Likelihood)</label>
+        <select id="selL"></select>
+      </div>
+      <div class="field">
+        <label for="selC">ผลกระทบ (Consequence)</label>
+        <select id="selC"></select>
+      </div>
+      <div class="result" id="result" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="criteria">
+    <div class="sec-head">
+      <h2>เกณฑ์การให้คะแนน</h2>
+      <p>ผลกระทบแบ่งตามระดับความรุนแรงของอุบัติการณ์ A–I และมูลค่าความเสียหาย (บาท) ส่วนโอกาสเกิดแบ่งตามความถี่ต่อปีและต่อไตรมาส</p>
+    </div>
+    <div class="ref-grid">
+      <div class="panel">
+        <h3 style="margin-bottom:10px">ผลกระทบ (Consequence)</h3>
+        <table class="ref" id="consTable"></table>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:10px">โอกาสเกิด (Likelihood)</h3>
+        <table class="ref" id="lkTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <section id="levels">
+    <div class="sec-head">
+      <h2>ระดับความเสี่ยง</h2>
+      <p>แบ่งเป็น 4 ระดับ แต่ละระดับกำหนดผู้รับผิดชอบ กรอบเวลา และการดำเนินการ</p>
+    </div>
+    <div class="levels" id="levelCards"></div>
+    <p class="note">แนวทางการจัดการและกรอบเวลาในแต่ละระดับเป็นร่างเสนอ ควรปรับให้ตรงกับระเบียบการบริหารความเสี่ยงของสถาบันก่อนใช้งานจริง</p>
+  </section>
+
+  <section id="register">
+    <div class="sec-head">
+      <h2>ตาราง Risk Profile หน่วยไตเทียม</h2>
+      <p>ข้อมูลอ่านและบันทึกลงชีต “Risk Profile” โดยตรง กดปุ่ม “แก้ไข” เพื่อกรอกมาตรการป้องกัน ตัวชี้วัด ความถี่ ระดับ และผลลัพธ์ ความถี่ที่เกิดจริงนับอัตโนมัติจากชีต “บันทึกข้อมูล” ตามปีงบประมาณ</p>
+    </div>
+    <div class="sum" id="summary"></div>
+    <div class="toolbar">
+      <div class="left" id="filters" role="group" aria-label="กรองตามระดับ"></div>
+      <div class="right">
+        <input type="search" class="search" id="q" placeholder="ค้นหาหัวข้อ มาตรการ ตัวชี้วัด" aria-label="ค้นหา">
+        <a class="btn hrms" href="https://bidi.thai-nrls.org/" target="_blank" rel="noopener">รายงานความเสี่ยงในโปรแกรม HRMS (สรพ.) ↗</a>
+        <button type="button" class="btn" id="btnReload">โหลดข้อมูลใหม่</button>
+        <button type="button" class="btn primary" id="btnAdd">+ เพิ่มหัวข้อ</button>
+      </div>
+    </div>
+    <div class="status" id="status"><span class="dot busy"></span><span>กำลังโหลดข้อมูลจากชีต…</span></div>
+    <div class="panel scroll" style="padding:0">
+      <table class="reg">
+        <thead><tr>
+          <th>ลำดับที่</th><th>หัวข้อ</th><th>มาตรการป้องกัน</th><th>ตัวชี้วัด</th><th>ความถี่</th><th>ระดับ</th><th>ผลลัพธ์</th><th></th>
+        </tr></thead>
+        <tbody id="regBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>อ้างอิง: ตาราง Risk Matrix ฉบับปรับใหม่ หน่วยไตเทียม · ระดับความรุนแรงของอุบัติการณ์ A–I (ศูนย์พัฒนาคุณภาพ โรงพยาบาลค่ายวชิราวุธ)</footer>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <form class="dlg" id="frm" method="dialog">
+    <header><h3 id="dlgTitle">แก้ไขความเสี่ยง</h3><button type="button" class="btn small" id="btnClose" aria-label="ปิด">ปิด</button></header>
+    <div class="content">
+      <div class="field"><label for="fTopic">หัวข้อ</label><input type="text" id="fTopic" required></div>
+      <div class="field"><label for="fMeasure">มาตรการป้องกัน</label><textarea id="fMeasure" placeholder="เช่น ตรวจสอบสารตกค้างด้วยแถบทดสอบก่อนใช้ตัวกรองทุกครั้ง"></textarea></div>
+      <div class="field"><label for="fKpi">ตัวชี้วัด</label><textarea id="fKpi" placeholder="เช่น อุบัติการณ์ตัวกรองมีสารตกค้างถึงผู้ป่วย = 0"></textarea></div>
+      <div class="field"><label for="fFreq">ความถี่</label><input type="text" id="fFreq" placeholder="เช่น 3 ครั้ง/ปี">
+        <div class="hint" id="freqHint"></div></div>
+      <div class="grid2">
+        <div class="field"><label for="fL">โอกาสเกิด (L)</label><select id="fL"></select></div>
+        <div class="field"><label for="fC">ผลกระทบ (C)</label><select id="fC"></select></div>
+      </div>
+      <div class="lvprev" id="lvPrev"></div>
+      <div class="field"><label for="fResult">ผลลัพธ์</label><textarea id="fResult" placeholder="ผลการดำเนินงาน / ผลการติดตามตัวชี้วัด"></textarea></div>
+      <div class="field"><label for="fBy">ผู้บันทึก</label><input type="text" id="fBy" placeholder="ชื่อผู้บันทึก"></div>
+      <div class="muted" id="fUpdated" style="font-size:.84rem;color:var(--muted)"></div>
+    </div>
+    <footer>
+      <div class="confirm" id="delWrap">
+        <button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>
+      </div>
+      <div class="r">
+        <button type="button" class="btn" id="btnCancel">ยกเลิก</button>
+        <button type="submit" class="btn primary" id="btnSave">บันทึกลงชีต</button>
+      </div>
+    </footer>
+  </form>
+</dialog>
+<div class="toast" id="toast" hidden></div>
+<script>
+// ===== ตั้งค่า: URL ของ Apps Script Web App (โครงการ "Risk Profile") =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbz17zrUZt3o67i8SLU59e9PI3FyGz-cF6ulQRsYE9Df0dKc6_n-bBOtVemC4CgS0qsi/exec';
+
+const LEVELS = {
+  low:  {th:"ต่ำ", en:"Low", cls:"lv-low", rs:"rs-low", owner:"ผู้ปฏิบัติงาน / หัวหน้าเวร", time:"รายงานในระบบภายในเวร",
+         acts:["ยอมรับความเสี่ยงได้ จัดการตามระบบงานปกติ","บันทึกรายงานอุบัติการณ์ในระบบ","หัวหน้าหน่วยทบทวนแนวโน้มรายไตรมาส"]},
+  mod:  {th:"ปานกลาง", en:"Moderate", cls:"lv-mod", rs:"rs-mod", owner:"หัวหน้าหน่วยไตเทียม", time:"รายงานภายใน 24 ชั่วโมง ทบทวนภายใน 7 วัน",
+         acts:["ทบทวนสาเหตุในหน่วยงาน","กำหนดมาตรการควบคุมและสื่อสารแก่ผู้ปฏิบัติงาน","ติดตามผลลัพธ์รายเดือน"]},
+  high: {th:"สูง", en:"High", cls:"lv-high", rs:"rs-high", owner:"หัวหน้าหน่วย ร่วมกับหัวหน้ากลุ่มการพยาบาล", time:"รายงานทันทีหรือภายในเวร ทบทวนเชิงระบบภายใน 7 วัน",
+         acts:["ทบทวนหาสาเหตุราก (RCA)","จัดทำแผนลดความเสี่ยง กำหนดผู้รับผิดชอบและกำหนดเสร็จ","รายงานคณะกรรมการบริหารความเสี่ยง","ติดตามผลต่อเนื่องจนความเสี่ยงลดระดับ"]},
+  ext:  {th:"สูงมาก", en:"Extreme", cls:"lv-ext", rs:"rs-ext", owner:"ผู้บริหารระดับสูง / ทีมนำสถาบัน", time:"รายงานผู้บริหารทันที ทบทวน RCA ภายใน 72 ชั่วโมง",
+         acts:["แก้ไขเฉพาะหน้าทันทีเพื่อความปลอดภัยของผู้ป่วย","รายงานผู้บริหารและคณะกรรมการบริหารความเสี่ยงทันที","ทบทวน RCA แบบสหสาขาวิชาชีพ","ปรับระบบงานและติดตามผลจนมั่นใจว่าไม่เกิดซ้ำ"]}
+};
+const TH2KEY = {"ต่ำ":"low","ปานกลาง":"mod","สูง":"high","สูงมาก":"ext"};
+const CONS = [
+  {n:1, sev:"A–B", money:"≤ 1,000"},
+  {n:2, sev:"C–D", money:"1,001 – 10,000"},
+  {n:3, sev:"E",   money:"10,001 – 100,000"},
+  {n:4, sev:"F–G", money:"100,001 – 1,000,000"},
+  {n:5, sev:"H–I", money:"≥ 1,000,000"}
+];
+const LIKE = [
+  {n:5, year:"≥ 40 ครั้ง/ปี",  q:"5 ครั้ง/3 เดือน"},
+  {n:4, year:"31–39 ครั้ง/ปี", q:"4 ครั้ง/3 เดือน"},
+  {n:3, year:"24–30 ครั้ง/ปี", q:"3 ครั้ง/3 เดือน"},
+  {n:2, year:"16–23 ครั้ง/ปี", q:"2 ครั้ง/3 เดือน"},
+  {n:1, year:"< 16 ครั้ง/ปี",  q:"1 ครั้ง/3 เดือน"}
+];
+const MAP = {
+  5:{1:"mod",2:"high",3:"ext",4:"ext",5:"ext"},
+  4:{1:"mod",2:"high",3:"ext",4:"ext",5:"ext"},
+  3:{1:"low",2:"mod", 3:"high",4:"ext",5:"ext"},
+  2:{1:"low",2:"mod", 3:"mod", 4:"high",5:"high"},
+  1:{1:"low",2:"low", 3:"mod", 4:"high",5:"ext"}
+};
+const SEV = [
+  ["A","เหตุการณ์ซึ่งมีโอกาสก่อให้เกิดความคลาดเคลื่อน",1],
+  ["B","เกิดความคลาดเคลื่อนขึ้นแต่ยังไม่ถึงผู้ป่วย",1],
+  ["C","เกิดกับผู้ป่วยแต่ไม่ทำให้ผู้ป่วยได้รับอันตราย",2],
+  ["D","เกิดกับผู้ป่วย ส่งผลให้ต้องเฝ้าระวังต่อ",2],
+  ["E","เกิดกับผู้ป่วย เป็นอันตรายชั่วคราวและมีการบำบัดรักษา",3],
+  ["F","เกิดกับผู้ป่วย เป็นอันตรายชั่วคราวและนอนโรงพยาบาลนานขึ้น",4],
+  ["G","เกิดกับผู้ป่วย ส่งผลให้เกิดอันตรายถาวรแก่ผู้ป่วย",4],
+  ["H","เกิดกับผู้ป่วย ส่งผลให้ต้องทำการช่วยชีวิต",5],
+  ["I","เกิดกับผู้ป่วย เป็นสาเหตุของการเสียชีวิต",5]
+];
+// ตัวอย่างสำรอง ใช้เมื่อยังเชื่อมต่อชีตไม่ได้เท่านั้น
+const DEFAULT_TOPICS = ['ข้อร้องเรียนจากผู้รับบริการ','ตัวกรองมีสาร Peracitic ตกค้าง','การใช้ตัวกรองสลับคน','การได้รับยาและสารน้ำไม่ถูกต้อง','การคิดค่าใช้จ่ายในโปรแกรมไม่ถูกต้อง','การบาดเจ็บจากการแทงเส้นเลือด','เกิดปฏิกิริยาจากการให้เลือด','เกิดปฏิกิริยาจากการให้ยาหรือสารน้ำ','A-V เลื่อนหลุด','เกิดการหลุดของข้อต่อต่างๆ ของสาย Blood line','เกิดการแตกของ Fistular aneurysm','เครื่องไตเทียมไม่พร้อมใช้งาน','ระบบน้ำไม่พร้อมใช้งาน','ระบบน้ำ RO มีสารปนเปื้อนเกินมาตรฐาน','ระบบน้ำ RO เกิดการแตกรั่ว','Air embolism','บุคลากรได้รับบาดเจ็บจากการปฏิบัติงาน','บุคลากรถูกของมีคม/เข็มตำ/สัมผัสเลือด/สารคัดหลั่งกรเด็นเข้าเยื่อบุหรือผิวหนังที่มีบาดแผล','Sudden death indialysispa patiens'];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let selL = 3, selC = 3;
+let ROWS = [], COUNTS = {}, FY = null, ONLINE = false;
+let fLevel = "all", fCell = null, editing = null;
+
+/* ---------- server ---------- */
+async function api(action, payload){
+  if (!API_URL || !API_URL.startsWith('https://')) throw new Error('ยังไม่ได้ตั้งค่า URL ของ Apps Script');
+  let res;
+  if (action === 'list') res = await fetch(API_URL + '?action=list', {redirect:'follow'});
+  else res = await fetch(API_URL, {method:'POST', redirect:'follow', body: JSON.stringify(Object.assign({action}, payload||{}))});
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'บันทึกไม่สำเร็จ');
+  return data;
+}
+function setStatus(kind, text){ $("status").innerHTML = `<span class="dot ${kind}"></span><span>${esc(text)}</span>`; }
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 2600); }
+function applyData(d){
+  ROWS = d.rows || []; COUNTS = d.counts || {}; FY = d.fy; ONLINE = true;
+  const t = new Date();
+  setStatus("ok", `เชื่อมต่อชีต Risk Profile แล้ว · ${ROWS.length} หัวข้อ · ความถี่เกิดจริงปีงบ ${FY} · อัปเดต ${t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`);
+  renderAll();
+}
+async function load(){
+  setStatus("busy", "กำลังโหลดข้อมูลจากชีต…");
+  try { applyData(await api('list')); }
+  catch(e){
+    ONLINE = false;
+    if (!ROWS.length) ROWS = DEFAULT_TOPICS.map((t,i)=>({"ลำดับที่":String(i+1),"หัวข้อ":t}));
+    setStatus("err", "เชื่อมต่อชีตไม่สำเร็จ: " + e.message + " (แสดงรายการหัวข้อ แก้ไขไม่ได้จนกว่าจะเชื่อมต่อ)");
+    renderAll();
+  }
+}
+
+/* ---------- helpers ---------- */
+function rowLevelKey(r){
+  const L = +r["โอกาสเกิด (L)"], C = +r["ผลกระทบ (C)"];
+  if (L>=1 && L<=5 && C>=1 && C<=5) return MAP[L][C];
+  return TH2KEY[String(r["ระดับ"]||"").trim()] || null;
+}
+function suggestL(n){ if (n==null) return null; if (n>=40) return 5; if (n>=31) return 4; if (n>=24) return 3; if (n>=16) return 2; return 1; }
+function badge(r){
+  const k = rowLevelKey(r);
+  if (!k) return `<span class="badge none">ยังไม่ประเมิน</span>`;
+  const lv = LEVELS[k], L = r["โอกาสเกิด (L)"], C = r["ผลกระทบ (C)"];
+  const sc = (L && C) ? `<small>${L}×${C} = ${L*C}</small>` : "";
+  return `<span class="badge ${lv.cls}">${lv.th}${sc}</span>`;
+}
+
+/* ---------- matrix / calc / refs / levels ---------- */
+function buildMatrix(){
+  let h = `<thead>
+  <tr><th class="corner" colspan="3"></th><th class="axis" colspan="5">ระดับผลกระทบ Consequence (Impact)</th></tr>
+  <tr><th colspan="3">คะแนน</th>${CONS.map(c=>`<th class="cons-no">${c.n}</th>`).join("")}</tr>
+  <tr><th colspan="3">ระดับความรุนแรง</th>${CONS.map(c=>`<th>${c.sev}</th>`).join("")}</tr>
+  <tr><th>คะแนน</th><th>โอกาสที่จะเกิดขึ้นในอนาคต</th><th>ความถี่ที่เกิดขึ้นจริง</th>${CONS.map(c=>`<th>${c.money}</th>`).join("")}</tr>
+  </thead><tbody>`;
+  LIKE.forEach(l=>{
+    h += `<tr><th class="lk-no">${l.n}</th><td class="lk-txt">โอกาสเกิด ${l.year}</td><td class="lk-txt">${l.q}</td>`;
+    CONS.forEach(c=>{
+      const lv = LEVELS[MAP[l.n][c.n]];
+      h += `<td class="pad"><button type="button" class="cell ${lv.cls}" data-l="${l.n}" data-c="${c.n}"
+        aria-label="โอกาสเกิด ${l.n} ผลกระทบ ${c.n} คะแนน ${l.n*c.n} ระดับ${lv.th}" aria-pressed="false">
+        <b>${l.n*c.n}</b><span>(${lv.th} - ${lv.en})</span><span class="pins" id="pin-${l.n}-${c.n}"></span></button></td>`;
+    });
+    h += `</tr>`;
+  });
+  $("matrixTable").innerHTML = h + `</tbody>`;
+  $("matrixTable").addEventListener("click", e=>{
+    const b = e.target.closest(".cell"); if(!b) return;
+    selL = +b.dataset.l; selC = +b.dataset.c; sync();
+    const key = selL+"-"+selC;
+    fCell = (fCell === key) ? null : key; fLevel = "all";
+    renderRegister();
+  });
+}
+function renderPins(){
+  document.querySelectorAll(".pins").forEach(p=>p.innerHTML="");
+  ROWS.forEach(r=>{
+    const L=+r["โอกาสเกิด (L)"], C=+r["ผลกระทบ (C)"];
+    if (L && C){ const p=$(`pin-${L}-${C}`); if(p) p.insertAdjacentHTML("beforeend", `<em title="${esc(r["หัวข้อ"])}">${esc(r["ลำดับที่"])}</em>`); }
+  });
+}
+function optsL(){ return LIKE.map(l=>`<option value="${l.n}">${l.n} — ${l.year} (${l.q})</option>`).join(""); }
+function optsC(){ return CONS.map(c=>`<option value="${c.n}">${c.n} — ระดับ ${c.sev} / ${c.money} บาท</option>`).join(""); }
+function buildSelects(){
+  $("selL").innerHTML = optsL(); $("selC").innerHTML = optsC();
+  $("fL").innerHTML = `<option value="">— ยังไม่ประเมิน —</option>` + optsL();
+  $("fC").innerHTML = `<option value="">— ยังไม่ประเมิน —</option>` + optsC();
+  $("selL").addEventListener("change", e=>{selL=+e.target.value; sync()});
+  $("selC").addEventListener("change", e=>{selC=+e.target.value; sync()});
+}
+function sync(){
+  $("selL").value = selL; $("selC").value = selC;
+  document.querySelectorAll(".cell").forEach(b=>b.setAttribute("aria-pressed", (+b.dataset.l===selL && +b.dataset.c===selC) ? "true":"false"));
+  const lv = LEVELS[MAP[selL][selC]], c = CONS.find(x=>x.n===selC), l = LIKE.find(x=>x.n===selL);
+  const r = $("result"); r.className = "result " + lv.rs;
+  r.innerHTML = `<div class="score">${selL*selC}</div><div class="lv">ระดับ${lv.th} (${lv.en})</div>
+    <div>โอกาสเกิด ${selL} (${l.year}) × ผลกระทบ ${selC} (ระดับ ${c.sev})</div>
+    <div><strong>ผู้รับผิดชอบ:</strong> ${lv.owner}</div><div><strong>กรอบเวลา:</strong> ${lv.time}</div>`;
+}
+function buildRefs(){
+  let h = `<thead><tr><th>คะแนน</th><th>ระดับ</th><th>ความรุนแรงของอุบัติการณ์</th></tr></thead><tbody>`, prev = 0;
+  SEV.forEach(([code,txt,n])=>{
+    const c = CONS.find(x=>x.n===n);
+    h += `<tr class="${n!==prev && prev? 'grp':''}">${n!==prev?`<td class="n" rowspan="${SEV.filter(s=>s[2]===n).length}">${n}<div style="font-weight:400;font-size:.75rem;color:var(--muted)">${c.money}</div></td>`:''}<td class="code">${code}</td><td>${txt}</td></tr>`;
+    prev = n;
+  });
+  $("consTable").innerHTML = h + `</tbody>`;
+  $("lkTable").innerHTML = `<thead><tr><th>คะแนน</th><th>โอกาสที่จะเกิดขึ้นในอนาคต</th><th>ความถี่ที่เกิดขึ้นจริง</th></tr></thead><tbody>` +
+    LIKE.map(l=>`<tr><td class="n">${l.n}</td><td>${l.year}</td><td>${l.q}</td></tr>`).join("") + `</tbody>`;
+}
+function buildLevels(){
+  $("levelCards").innerHTML = ["ext","high","mod","low"].map(k=>{
+    const lv = LEVELS[k], cells = [];
+    LIKE.forEach(l=>CONS.forEach(c=>{ if(MAP[l.n][c.n]===k) cells.push({s:l.n*c.n, t:`${l.n}×${c.n}`}); }));
+    const sc = cells.map(x=>x.s);
+    return `<article class="lvcard">
+      <div class="top ${lv.cls}"><h3>${lv.th} · ${lv.en}</h3><small>${cells.length} ช่อง · คะแนน ${Math.min(...sc)}–${Math.max(...sc)}</small></div>
+      <div class="body"><dl><dt>ผู้รับผิดชอบ</dt><dd>${lv.owner}</dd><dt>กรอบเวลา</dt><dd>${lv.time}</dd></dl>
+        <ul>${lv.acts.map(a=>`<li>${a}</li>`).join("")}</ul>
+        <div><div style="color:var(--muted);font-size:.8rem;margin-bottom:4px">ตำแหน่งในตาราง (โอกาสเกิด × ผลกระทบ)</div>
+        <div class="cells">${cells.map(x=>`<span class="chip">${x.t} = ${x.s}</span>`).join("")}</div></div></div></article>`;
+  }).join("");
+}
+
+/* ---------- register ---------- */
+function renderSummary(){
+  const n = {ext:0,high:0,mod:0,low:0,none:0};
+  ROWS.forEach(r=>{ const k=rowLevelKey(r); n[k||"none"]++; });
+  $("summary").innerHTML = `
+    <div class="tile t-ext"><b>${n.ext}</b><span>สูงมาก</span></div>
+    <div class="tile t-high"><b>${n.high}</b><span>สูง</span></div>
+    <div class="tile t-mod"><b>${n.mod}</b><span>ปานกลาง</span></div>
+    <div class="tile t-low"><b>${n.low}</b><span>ต่ำ</span></div>
+    <div class="tile"><b>${n.none}</b><span>ยังไม่ประเมิน</span></div>`;
+  const opts = [["all","ทั้งหมด",""],["ext","สูงมาก","var(--ext)"],["high","สูง","var(--high)"],["mod","ปานกลาง","var(--mod)"],["low","ต่ำ","var(--low)"],["none","ยังไม่ประเมิน","var(--line)"]];
+  $("filters").innerHTML = opts.map(([k,t,c])=>`<button type="button" class="fchip" data-f="${k}" aria-pressed="${fLevel===k && !fCell}">${c?`<i style="background:${c}"></i>`:""}${t}</button>`).join("")
+    + (fCell ? `<button type="button" class="fchip" data-f="clearcell" aria-pressed="true">ช่อง ${fCell.replace("-","×")} ✕</button>` : "");
+}
+function renderRegister(){
+  renderSummary();
+  const q = $("q").value.trim().toLowerCase();
+  const list = ROWS.filter(r=>{
+    const k = rowLevelKey(r) || "none";
+    if (fCell && `${r["โอกาสเกิด (L)"]}-${r["ผลกระทบ (C)"]}` !== fCell) return false;
+    if (!fCell && fLevel!=="all" && k!==fLevel) return false;
+    if (q && !["หัวข้อ","มาตรการป้องกัน","ตัวชี้วัด","ผลลัพธ์"].some(h=>String(r[h]||"").toLowerCase().includes(q))) return false;
+    return true;
+  });
+  const cell = (v)=> v ? esc(v) : `<span class="empty">—</span>`;
+  $("regBody").innerHTML = list.length ? list.map(r=>{
+    const cnt = ONLINE ? (COUNTS[r["หัวข้อ"]] ?? 0) : null;
+    return `<tr>
+      <td class="no">${esc(r["ลำดับที่"])}</td>
+      <td class="topic">${esc(r["หัวข้อ"])}</td>
+      <td class="long">${cell(r["มาตรการป้องกัน"])}</td>
+      <td class="long">${cell(r["ตัวชี้วัด"])}</td>
+      <td class="freq">${cell(r["ความถี่"])}${cnt!=null && ONLINE ? `<div class="muted">เกิดจริงปีงบ ${FY}: ${cnt} ครั้ง</div>`:""}</td>
+      <td>${badge(r)}</td>
+      <td class="long">${cell(r["ผลลัพธ์"])}</td>
+      <td><button type="button" class="btn small" data-edit="${esc(r["ลำดับที่"])}" ${ONLINE?"":"disabled"}>แก้ไข</button></td>
+    </tr>`;}).join("") : `<tr><td colspan="8" class="empty" style="text-align:center;padding:24px">ไม่พบรายการตามเงื่อนไข</td></tr>`;
+}
+function renderAll(){ renderPins(); renderRegister(); }
+
+/* ---------- dialog ---------- */
+function updPrev(){
+  const L=+$("fL").value, C=+$("fC").value, p=$("lvPrev");
+  if (L && C){ const lv=LEVELS[MAP[L][C]]; p.className="lvprev "+lv.cls; p.textContent=`ระดับ${lv.th} (${lv.en}) · คะแนน ${L}×${C} = ${L*C}`; }
+  else { p.className="lvprev badge none"; p.style.display="block"; p.textContent="ยังไม่ประเมินระดับ เลือกโอกาสเกิดและผลกระทบ"; }
+}
+function openEdit(no){
+  const r = no==null ? {} : ROWS.find(x=>String(x["ลำดับที่"])===String(no));
+  if (!r) return;
+  editing = no==null ? null : String(no);
+  $("dlgTitle").textContent = editing ? `แก้ไขความเสี่ยง ลำดับที่ ${editing}` : "เพิ่มหัวข้อความเสี่ยง";
+  $("fTopic").value = r["หัวข้อ"]||""; $("fMeasure").value = r["มาตรการป้องกัน"]||"";
+  $("fKpi").value = r["ตัวชี้วัด"]||""; $("fFreq").value = r["ความถี่"]||"";
+  $("fL").value = r["โอกาสเกิด (L)"]||""; $("fC").value = r["ผลกระทบ (C)"]||"";
+  $("fResult").value = r["ผลลัพธ์"]||"";
+  let by = r["ผู้บันทึก"]||""; if(!by){ try{ by = localStorage.getItem("rp_by")||""; }catch(e){} }
+  $("fBy").value = by;
+  $("fUpdated").textContent = r["ปรับปรุงล่าสุด"] ? "ปรับปรุงล่าสุด " + r["ปรับปรุงล่าสุด"] : "";
+  const cnt = ONLINE && r["หัวข้อ"] ? (COUNTS[r["หัวข้อ"]] ?? 0) : null, sug = suggestL(cnt);
+  $("freqHint").innerHTML = cnt!=null
+    ? `เกิดจริงปีงบ ${FY} จากชีตบันทึกข้อมูล: <strong>${cnt} ครั้ง</strong> → โอกาสเกิดที่แนะนำ ${sug} <button type="button" class="btn small" id="useCnt">ใช้ค่านี้</button>`
+    : (editing ? `ไม่พบคอลัมน์ชื่อนี้ในชีตบันทึกข้อมูล กรอกความถี่เอง` : "");
+  const u = $("useCnt"); if(u) u.onclick = ()=>{ $("fFreq").value = `${cnt} ครั้ง/ปีงบ ${FY}`; $("fL").value = sug; updPrev(); };
+  $("delWrap").innerHTML = editing ? `<button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>` : "";
+  if (editing) $("btnDel").onclick = askDelete;
+  updPrev();
+  $("dlg").showModal();
+}
+function askDelete(){
+  $("delWrap").innerHTML = `<span>ยืนยันลบลำดับที่ ${esc(editing)} ออกจากชีต?</span>
+    <button type="button" class="btn danger" id="delYes">ลบ</button><button type="button" class="btn" id="delNo">ไม่ลบ</button>`;
+  $("delNo").onclick = ()=>{ $("delWrap").innerHTML = `<button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>`; $("btnDel").onclick = askDelete; };
+  $("delYes").onclick = async ()=>{
+    try{ busy(true); applyData(await api('deleteRow', {no: editing})); $("dlg").close(); toast("ลบหัวข้อแล้ว"); }
+    catch(e){ toast("ลบไม่สำเร็จ: "+e.message); } finally{ busy(false); }
+  };
+}
+function busy(on){ ["btnSave","btnCancel"].forEach(id=>$(id).disabled=on); $("btnSave").textContent = on ? "กำลังบันทึก…" : "บันทึกลงชีต"; }
+async function save(e){
+  e.preventDefault();
+  const topic = $("fTopic").value.trim();
+  if (!topic){ $("fTopic").focus(); toast("กรุณาระบุหัวข้อ"); return; }
+  const L = $("fL").value, C = $("fC").value;
+  const row = {
+    "หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(),
+    "ความถี่": $("fFreq").value.trim(), "ผลลัพธ์": $("fResult").value.trim(),
+    "โอกาสเกิด (L)": L, "ผลกระทบ (C)": C, "ระดับ": (L && C) ? LEVELS[MAP[L][C]].th : "",
+    "ผู้บันทึก": $("fBy").value.trim()
+  };
+  try{ localStorage.setItem("rp_by", row["ผู้บันทึก"]); }catch(x){}
+  try{
+    busy(true);
+    if (editing){ row["ลำดับที่"] = editing; applyData(await api('saveRow', {row})); }
+    else applyData(await api('addRow', {row}));
+    $("dlg").close(); toast("บันทึกลงชีตเรียบร้อย");
+  }catch(err){ toast("บันทึกไม่สำเร็จ: " + err.message); }
+  finally{ busy(false); }
+}
+
+/* ---------- init ---------- */
+buildMatrix(); buildSelects(); buildRefs(); buildLevels(); sync();
+$("filters").addEventListener("click", e=>{
+  const b = e.target.closest(".fchip"); if(!b) return;
+  if (b.dataset.f==="clearcell") fCell = null; else { fLevel = b.dataset.f; fCell = null; }
+  renderRegister();
+});
+$("q").addEventListener("input", renderRegister);
+$("regBody").addEventListener("click", e=>{ const b=e.target.closest("[data-edit]"); if(b) openEdit(b.dataset.edit); });
+$("btnAdd").addEventListener("click", ()=>{ if(!ONLINE){ toast("ยังเชื่อมต่อชีตไม่ได้"); return; } openEdit(null); });
+$("btnReload").addEventListener("click", load);
+$("fL").addEventListener("change", updPrev); $("fC").addEventListener("change", updPrev);
+$("frm").addEventListener("submit", save);
+$("btnCancel").addEventListener("click", ()=>$("dlg").close());
+$("btnClose").addEventListener("click", ()=>$("dlg").close());
+renderAll();
+load();
+</script>
+</body>
+</html>
