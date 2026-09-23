@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Risk Profile หน่วยไตเทียม - สถาบันบำราศนราดูร</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --surface-2:#e8eef2; --ink:#16232b; --muted:#566771; --line:#cfd9df;
+  --accent:#0f5f7a; --accent-soft:#dcebf1;
+  --low:#1f9d55; --low-ink:#ffffff; --low-soft:#dff3e7;
+  --mod:#f4d21f; --mod-ink:#2b2400; --mod-soft:#fdf6cf;
+  --high:#f08a12; --high-ink:#2a1500; --high-soft:#fde7cc;
+  --ext:#d42020; --ext-ink:#ffffff; --ext-soft:#fadada;
+  --focus:#0f5f7a;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e171c; --surface:#15222a; --surface-2:#1c2c35; --ink:#e4edf1; --muted:#98abb5; --line:#2b3e48;
+    --accent:#6fc0dc; --accent-soft:#193642;
+    --low:#23a55d; --low-soft:#16321f; --mod:#e6c41b; --mod-soft:#3a3310;
+    --high:#ea8616; --high-soft:#3d2710; --ext:#d12a2a; --ext-soft:#3e1616; --focus:#6fc0dc;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e171c; --surface:#15222a; --surface-2:#1c2c35; --ink:#e4edf1; --muted:#98abb5; --line:#2b3e48;
+  --accent:#6fc0dc; --accent-soft:#193642;
+  --low:#23a55d; --low-soft:#16321f; --mod:#e6c41b; --mod-soft:#3a3310;
+  --high:#ea8616; --high-soft:#3d2710; --ext:#d12a2a; --ext-soft:#3e1616; --focus:#6fc0dc;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Sarabun","Leelawadee UI","Tahoma",sans-serif;font-size:16px;line-height:1.6;padding:0 16px}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:"IBM Plex Sans Thai","Sarabun",sans-serif;line-height:1.3;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.6rem,3.2vw,2.2rem);font-weight:700}
+h2{font-size:1.4rem;font-weight:600}
+h3{font-size:1.05rem;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:.8rem;letter-spacing:.06em;color:var(--accent);font-weight:600}
+header{display:flex;flex-direction:column;gap:8px;border-bottom:2px solid var(--line);padding-bottom:20px}
+header .sub{color:var(--muted);max-width:70ch}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs a{color:var(--accent);text-decoration:none;font-weight:600;font-size:.92rem;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.tabs a:hover{background:var(--accent-soft)}
+section{display:flex;flex-direction:column;gap:16px}
+.sec-head{display:flex;flex-direction:column;gap:4px}
+.sec-head p{color:var(--muted);max-width:75ch}
+
+/* matrix */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.scroll{overflow-x:auto}
+table.matrix{border-collapse:separate;border-spacing:3px;width:100%;min-width:640px;font-variant-numeric:tabular-nums}
+.matrix th,.matrix td{padding:8px 10px;text-align:center;vertical-align:middle;font-size:.9rem}
+.matrix thead th{background:var(--surface-2);font-weight:600}
+.matrix thead .cons-no{background:var(--accent);color:#fff;font-size:1.05rem}
+.matrix .axis{background:transparent;font-family:"IBM Plex Sans Thai",sans-serif;color:var(--accent);font-size:.95rem}
+.matrix .lk-no{background:var(--accent);color:#fff;font-weight:700;width:44px;font-size:1.05rem}
+.matrix .lk-txt{background:var(--surface-2);text-align:left;white-space:nowrap}
+.matrix .corner{background:transparent}
+.cell{border:0;border-radius:6px;cursor:pointer;min-height:64px;width:100%;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:8px 4px;transition:transform .12s ease, box-shadow .12s ease}
+.cell b{font-size:1.25rem;line-height:1.1}
+.cell span{font-size:.82rem}
+.cell:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.cell:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.cell[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+.lv-low{background:var(--low);color:var(--low-ink)}
+.lv-mod{background:var(--mod);color:var(--mod-ink)}
+.lv-high{background:var(--high);color:var(--high-ink)}
+.lv-ext{background:var(--ext);color:var(--ext-ink)}
+.matrix td.pad{padding:0}
+.rot{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+
+/* calculator */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;align-items:start}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:.92rem}
+select{font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+select:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.result{border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line)}
+.result .score{font-size:2rem;font-weight:700;font-family:"IBM Plex Sans Thai",sans-serif;line-height:1}
+.result .lv{font-weight:700;font-size:1.1rem}
+.result.rs-low{background:var(--low-soft);border-color:var(--low)}
+.result.rs-mod{background:var(--mod-soft);border-color:var(--mod)}
+.result.rs-high{background:var(--high-soft);border-color:var(--high)}
+.result.rs-ext{background:var(--ext-soft);border-color:var(--ext)}
+
+/* reference tables */
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+table.ref{border-collapse:collapse;width:100%;font-size:.92rem}
+.ref th,.ref td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.ref thead th{background:var(--surface-2);font-weight:600}
+.ref td.n{font-weight:700;text-align:center;width:52px;color:var(--accent);font-variant-numeric:tabular-nums}
+.ref td.code{font-weight:700;width:44px;text-align:center}
+.grp td{border-top:2px solid var(--line)}
+
+/* levels */
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.lvcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.lvcard .top{padding:14px 16px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.lvcard .top h3{font-size:1.15rem}
+.lvcard .top small{font-size:.85rem;font-weight:600;opacity:.9}
+.lvcard .body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:.93rem}
+.lvcard dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 10px}
+.lvcard dt{color:var(--muted);font-weight:600;white-space:nowrap}
+.lvcard dd{margin:0}
+.lvcard ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:4px}
+.cells{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:.78rem;padding:1px 8px;border-radius:999px;background:var(--surface-2);font-variant-numeric:tabular-nums;border:1px solid var(--line)}
+.note{font-size:.88rem;color:var(--muted);border-left:3px solid var(--mod);padding:8px 12px;background:var(--surface);border-radius:0 8px 8px 0}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+@media (prefers-reduced-motion:reduce){.cell{transition:none}}
+
+/* ---------- register ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.toolbar .left,.toolbar .right{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:inherit;font-weight:600;font-size:.92rem;border-radius:8px;padding:8px 14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{background:var(--surface-2)}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--ext);border-color:var(--ext)}
+.btn.small{padding:4px 10px;font-size:.84rem}
+a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.btn.hrms{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn[disabled]{opacity:.55;cursor:wait}
+input[type=search],input[type=text],textarea{font:inherit;padding:9px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+input:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+textarea{min-height:78px;resize:vertical;line-height:1.5}
+.search{max-width:260px}
+.fchip{font:inherit;font-size:.85rem;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.fchip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.fchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.sum .tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;border-top:4px solid var(--line)}
+.sum .tile b{font-size:1.6rem;font-family:"IBM Plex Sans Thai",sans-serif;line-height:1.1;font-variant-numeric:tabular-nums}
+.sum .tile span{font-size:.85rem;color:var(--muted)}
+.sum .t-ext{border-top-color:var(--ext)} .sum .t-high{border-top-color:var(--high)} .sum .t-mod{border-top-color:var(--mod)} .sum .t-low{border-top-color:var(--low)}
+table.reg{border-collapse:collapse;width:100%;min-width:1080px;font-size:.9rem}
+.reg th{background:var(--accent);color:#fff;font-weight:600;padding:10px 8px;text-align:left;position:sticky;top:0;white-space:nowrap}
+.reg td{border-bottom:1px solid var(--line);padding:10px 8px;vertical-align:top}
+.reg tr:hover td{background:var(--surface-2)}
+.reg td.no{text-align:center;font-weight:700;color:var(--accent);width:52px;font-variant-numeric:tabular-nums}
+.reg td.topic{font-weight:600;min-width:200px}
+.reg td.long{min-width:170px;white-space:pre-wrap}
+.reg td.freq{min-width:110px}
+.reg .muted{color:var(--muted);font-size:.82rem}
+.empty{color:var(--muted);font-style:italic}
+.badge{display:inline-flex;flex-direction:column;align-items:center;border-radius:8px;padding:4px 10px;font-weight:700;font-size:.85rem;white-space:nowrap;line-height:1.3}
+.badge small{font-weight:500;font-size:.75rem}
+.badge.none{background:var(--surface-2);color:var(--muted);font-weight:500}
+.status{font-size:.88rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--low)} .dot.err{background:var(--ext)} .dot.busy{background:var(--mod)}
+.cell .pins{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px}
+.cell .pins em{font-style:normal;font-size:.7rem;font-weight:700;background:rgba(255,255,255,.85);color:#1a1a1a;border-radius:999px;padding:0 5px;min-width:18px}
+/* dialog */
+dialog{border:0;border-radius:14px;padding:0;width:min(720px,calc(100vw - 32px));max-height:calc(100vh - 32px);background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,20,26,.55)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100vh - 32px)}
+.dlg header{padding:16px 20px;border-bottom:1px solid var(--line);flex-direction:row;justify-content:space-between;align-items:center}
+.dlg .content{padding:16px 20px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.dlg footer{padding:12px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;color:inherit;font-size:inherit}
+.dlg footer .r{display:flex;gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.hint{font-size:.84rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lvprev{border-radius:10px;padding:10px 14px;font-weight:700}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:600;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100vw - 32px)}
+
+/* ---------- layout & responsive ---------- */
+.explain-head{display:flex;flex-direction:column;gap:6px;border-top:2px solid var(--line);padding-top:28px}
+.explain-head p{color:var(--muted);max-width:75ch}
+#register{scroll-margin-top:12px}
+.reg td.act{text-align:right}
+@media (max-width:900px){
+  .wrap{gap:28px;padding-block:20px 40px}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .toolbar .right{width:100%}
+  .search{max-width:none;flex:1 1 200px}
+}
+@media (max-width:760px){
+  body{font-size:15px}
+  .panel{padding:12px}
+  .sum{grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+  .sum .tile{padding:8px 10px}
+  .sum .tile b{font-size:1.35rem}
+  .fchip{padding:4px 10px;font-size:.8rem}
+  .toolbar .right .btn,.toolbar .right a.btn{flex:1 1 auto;justify-content:center;text-align:center}
+  /* matrix + reference */
+  .matrix th,.matrix td{padding:6px 5px;font-size:.78rem}
+  .matrix .lk-txt{white-space:normal;min-width:84px}
+  .cell{min-height:54px;padding:6px 2px}
+  .cell b{font-size:1.05rem}
+  .cell span{font-size:.68rem}
+  .ref-grid{grid-template-columns:1fr}
+  .ref th,.ref td{padding:6px 6px;font-size:.86rem}
+  .levels{grid-template-columns:1fr}
+  .calc{grid-template-columns:1fr}
+  .dlg header,.dlg .content,.dlg footer{padding-inline:14px}
+  .dlg footer{flex-direction:column-reverse;align-items:stretch}
+  .dlg footer .r{justify-content:stretch}
+  .dlg footer .r .btn{flex:1}
+}
+@media (max-width:560px){
+  table.matrix{min-width:0}
+  .matrix .lk-txt,.matrix .lk-h{display:none}
+  .matrix .lk-no{width:32px}
+  .matrix thead th{font-size:.7rem;padding:5px 3px}
+  .matrix .axis{font-size:.78rem}
+  .cell span:not(.pins){display:none}
+  .cell{min-height:48px}
+  .matrix-note{display:block}
+}
+.matrix-note{display:none;font-size:.8rem;color:var(--muted);margin-top:8px}
+@media (max-width:380px){
+  .sum{grid-template-columns:repeat(3,1fr)}
+  .tabs a{padding:5px 10px;font-size:.84rem}
+}
+
+.reg thead th{position:static}
+.reg thead tr:first-child th[rowspan]{vertical-align:bottom}
+.reg th.res-h{text-align:center;border-bottom:1px solid rgba(255,255,255,.35)}
+.reg thead tr+tr th{background:var(--accent);font-size:.82rem;text-align:center}
+.reg th small{font-weight:500;opacity:.85}
+.reg td.res{min-width:150px;white-space:pre-wrap}
+.ysel{display:inline-flex;align-items:center;gap:6px;font-size:.88rem;font-weight:600;color:var(--muted)}
+.ysel select{padding:7px 10px}
+.badge .sev{font-size:1.05rem}
+.resset{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0}
+.resset legend{font-weight:600;font-size:.92rem;padding:0 6px}
+.resgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.resgrid label{font-size:.85rem;font-weight:600}
+@media (max-width:760px){ table.reg td.res{grid-column:1 / -1;min-width:0} .ysel{flex:1 1 100%} .ysel select{flex:1} }
+
+/* ---------- editable register table ---------- */
+.reg-wrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:78vh}
+table.reg{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;font-size:.9rem}
+.reg thead th{position:sticky;top:0;z-index:3;background:var(--accent);color:#fff;font-weight:600;padding:9px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.22);border-bottom:1px solid rgba(255,255,255,.22);white-space:nowrap}
+.reg thead tr+tr th{top:39px;font-size:.88rem}
+.reg td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0;vertical-align:top;background:var(--surface)}
+.reg td.no{text-align:center;font-weight:700;color:var(--accent);padding:10px 6px;width:56px;font-variant-numeric:tabular-nums}
+.reg th.c-no,.reg td.no{position:sticky;left:0;z-index:2}
+.reg thead th.c-no{z-index:4}
+.reg tbody tr:hover td{background:var(--surface-2)}
+.ed{min-height:42px;padding:10px 9px;white-space:pre-wrap;word-break:break-word;outline:none;line-height:1.5;border-radius:4px;transition:background .15s}
+.ed:empty::before{content:"—";color:var(--muted)}
+.ed:focus{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--focus)}
+.ed.saving,.sevsel.saving{background:var(--mod-soft)}
+.ed.saved,.sevsel.saved{background:var(--low-soft)}
+.ed.err,.sevsel.err{background:var(--ext-soft)}
+.reg td.topic .ed{font-weight:600;min-width:210px}
+.reg td.w-l .ed{min-width:190px}
+.reg td.w-m .ed{min-width:110px}
+.reg td.res .ed{min-width:130px}
+.reg td.lv{width:92px;padding:6px;text-align:center;vertical-align:middle}
+.sevsel{font:inherit;font-weight:700;width:100%;min-width:64px;padding:6px 4px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-align:center;cursor:pointer}
+.sevsel.s1{background:var(--low);color:var(--low-ink);border-color:var(--low)}
+.sevsel.s2{background:var(--mod);color:var(--mod-ink);border-color:var(--mod)}
+.sevsel.s3{background:var(--high);color:var(--high-ink);border-color:var(--high)}
+.sevsel.s4,.sevsel.s5{background:var(--ext);color:var(--ext-ink);border-color:var(--ext)}
+.sevsel:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.reg td.act{width:118px;text-align:center;vertical-align:middle;padding:4px;white-space:nowrap}
+.editbtn{font:inherit;font-size:.82rem;font-weight:600;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);border-radius:7px;padding:5px 9px;cursor:pointer;margin-right:4px}
+.editbtn:hover{background:var(--accent);color:#fff}
+.editbtn:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.ed{cursor:text}
+.ed:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.reg-wrap.loading{opacity:.55;pointer-events:none}
+.resset{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0}
+.resset legend{font-weight:600;font-size:.92rem;padding:0 6px}
+.resgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.delbtn{font:inherit;border:0;background:transparent;color:var(--muted);cursor:pointer;border-radius:6px;padding:4px 7px;font-size:1rem;line-height:1}
+.delbtn:hover{color:var(--ext);background:var(--ext-soft)}
+.delbtn:focus-visible{outline:3px solid var(--focus)}
+.confirm-row td{background:var(--ext-soft)!important}
+.confirm-row .cbox{padding:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.help{font-size:.86rem;color:var(--muted)}
+.legend-sev{display:flex;flex-wrap:wrap;gap:6px;font-size:.8rem;color:var(--muted);align-items:center}
+.legend-sev i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:3px}
+@media (max-width:760px){
+  table.reg{min-width:860px;font-size:.84rem}
+  .reg-wrap{max-height:none}
+  .reg td.topic .ed{min-width:170px}
+  .reg td.w-l .ed{min-width:160px}
+  .reg td.res .ed{min-width:110px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">สถาบันบำราศนราดูร · กลุ่มการพยาบาล</div>
+    <h1>ระบบ Risk Profile หน่วยไตเทียม</h1>
+    <p class="sub">ประเมินความเสี่ยงจากโอกาสเกิด (Likelihood) และผลกระทบ (Consequence) ตาม Risk Matrix ฉบับปรับใหม่ บันทึกทะเบียนความเสี่ยงลงชีต Risk Profile ให้การจัดการความเสี่ยงเป็นไปอย่างทันท่วงที ปลอดภัย และเหมาะสม</p>
+    <nav class="tabs" aria-label="ส่วนของหน้า">
+      <a href="#register">ตาราง Risk Profile</a>
+      <a href="#matrix">Risk Matrix</a>
+      <a href="#calc">ประเมินความเสี่ยง</a>
+      <a href="#criteria">เกณฑ์การให้คะแนน</a>
+      <a href="#levels">ระดับความเสี่ยง</a>
+    </nav>
+    <div><a class="btn hrms" href="https://bidi.thai-nrls.org/" target="_blank" rel="noopener">รายงานความเสี่ยงในโปรแกรม HRMS (สรพ.) ↗</a></div>
+  </header>
+
+  <section id="register">
+    <div class="sec-head">
+      <h2>ตาราง Risk Profile หน่วยไตเทียม</h2>
+      <p>แก้ไขได้ 2 วิธี คือคลิกที่ช่องในตารางแล้วพิมพ์ได้ทันที (บันทึกเมื่อคลิกออกจากช่อง) หรือกดปุ่ม “✎ แก้ไข” ท้ายแถวเพื่อแก้ทั้งแถวในแบบฟอร์ม ข้อมูลบันทึกลงชีต “Risk Profile” ช่องระดับเลือกระดับความรุนแรง A–I ผลลัพธ์แสดงปีงบประมาณปัจจุบันเทียบย้อนหลัง 3 ปีเสมอ ส่วนในชีตเก็บผลลัพธ์ทุกปี</p>
+    </div>
+    <div class="toolbar">
+      <div class="left">
+        <div class="status" id="status"><span class="dot busy"></span><span>กำลังโหลดข้อมูลจากชีต…</span></div>
+      </div>
+      <div class="right">
+        <a class="btn hrms" href="https://bidi.thai-nrls.org/" target="_blank" rel="noopener">รายงานความเสี่ยงในโปรแกรม HRMS (สรพ.) ↗</a>
+        <button type="button" class="btn" id="btnReload">โหลดข้อมูลใหม่</button>
+        <button type="button" class="btn primary" id="btnAdd">+ เพิ่มหัวข้อ</button>
+      </div>
+    </div>
+    <div class="reg-wrap" role="region" aria-label="ตาราง Risk Profile" tabindex="0">
+      <table class="reg">
+        <thead>
+          <tr>
+            <th rowspan="2" class="c-no">ลำดับที่</th><th rowspan="2">หัวข้อ</th><th rowspan="2">มาตรการป้องกัน</th><th rowspan="2">ตัวชี้วัด</th><th rowspan="2">ความถี่</th><th rowspan="2">ระดับ</th><th colspan="3">ผลลัพธ์</th><th rowspan="2">จัดการ</th>
+          </tr>
+          <tr id="resYears"></tr>
+        </thead>
+        <tbody id="regBody"></tbody>
+      </table>
+    </div>
+    <div class="legend-sev" id="sevLegend"></div>
+  </section>
+
+  <div class="explain-head" id="explain">
+    <div class="eyebrow">คำอธิบาย</div>
+    <h2>เกณฑ์การประเมินความเสี่ยง</h2>
+    <p>Risk Matrix เกณฑ์การให้คะแนน และระดับความเสี่ยง ใช้ประกอบการกรอกตาราง Risk Profile ด้านบน</p>
+  </div>
+
+  <section id="matrix">
+    <div class="sec-head">
+      <h2>ตาราง Risk Matrix (ฉบับปรับใหม่)</h2>
+      <p>คะแนนความเสี่ยง = โอกาสเกิด × ผลกระทบ ระดับของแต่ละช่องกำหนดตามตาราง ตัวเลขวงกลมในช่องคือลำดับที่ของความเสี่ยงที่ประเมินแล้ว กดที่ช่องเพื่อกรองตาราง Risk Profile ด้านบน</p>
+    </div>
+    <div class="panel scroll">
+      <table class="matrix" id="matrixTable"></table>
+      <p class="matrix-note">หน้าจอเล็กแสดงเฉพาะคะแนนและสีระดับ ดูเกณฑ์โอกาสเกิดได้ที่ตาราง “เกณฑ์การให้คะแนน” ด้านล่าง</p>
+    </div>
+  </section>
+
+  <section id="calc">
+    <div class="sec-head">
+      <h2>ประเมินความเสี่ยง</h2>
+      <p>เลือกโอกาสเกิดและระดับผลกระทบ ระบบจะแสดงคะแนนและระดับความเสี่ยงพร้อมแนวทางจัดการ</p>
+    </div>
+    <div class="panel calc">
+      <div class="field">
+        <label for="selL">โอกาสเกิด (Likelihood)</label>
+        <select id="selL"></select>
+      </div>
+      <div class="field">
+        <label for="selC">ผลกระทบ (Consequence)</label>
+        <select id="selC"></select>
+      </div>
+      <div class="result" id="result" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="criteria">
+    <div class="sec-head">
+      <h2>เกณฑ์การให้คะแนน</h2>
+      <p>ผลกระทบแบ่งตามระดับความรุนแรงของอุบัติการณ์ A–I และมูลค่าความเสียหาย (บาท) ส่วนโอกาสเกิดแบ่งตามความถี่ต่อปีและต่อไตรมาส</p>
+    </div>
+    <div class="ref-grid">
+      <div class="panel">
+        <h3 style="margin-bottom:10px">ผลกระทบ (Consequence)</h3>
+        <table class="ref" id="consTable"></table>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:10px">โอกาสเกิด (Likelihood)</h3>
+        <table class="ref" id="lkTable"></table>
+      </div>
+    </div>
+  </section>
+
+  <section id="levels">
+    <div class="sec-head">
+      <h2>ระดับความเสี่ยง</h2>
+      <p>แบ่งเป็น 4 ระดับ แต่ละระดับกำหนดผู้รับผิดชอบ กรอบเวลา และการดำเนินการ</p>
+    </div>
+    <div class="levels" id="levelCards"></div>
+    <p class="note">แนวทางการจัดการและกรอบเวลาในแต่ละระดับเป็นร่างเสนอ ควรปรับให้ตรงกับระเบียบการบริหารความเสี่ยงของสถาบันก่อนใช้งานจริง</p>
+  </section>
+
+  <footer>อ้างอิง: ตาราง Risk Matrix ฉบับปรับใหม่ หน่วยไตเทียม · ระดับความรุนแรงของอุบัติการณ์ A–I (ศูนย์พัฒนาคุณภาพ โรงพยาบาลค่ายวชิราวุธ)</footer>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <form class="dlg" id="frm" method="dialog">
+    <header><h3 id="dlgTitle">แก้ไขรายการ</h3><button type="button" class="btn small" id="btnClose">ปิด</button></header>
+    <div class="content">
+      <div class="field"><label for="fTopic">หัวข้อ</label><input type="text" id="fTopic"></div>
+      <div class="field"><label for="fMeasure">มาตรการป้องกัน</label><textarea id="fMeasure"></textarea></div>
+      <div class="field"><label for="fKpi">ตัวชี้วัด</label><textarea id="fKpi"></textarea></div>
+      <div class="grid2">
+        <div class="field"><label for="fFreq">ความถี่</label><input type="text" id="fFreq"></div>
+        <div class="field"><label for="fSev">ระดับ (A–I)</label><select id="fSev"></select></div>
+      </div>
+      <fieldset class="resset"><legend>ผลลัพธ์</legend><div id="resFields" class="resgrid"></div></fieldset>
+    </div>
+    <footer><span></span><div class="r"><button type="button" class="btn" id="btnCancel">ยกเลิก</button><button type="submit" class="btn primary" id="btnSave">บันทึกลงชีต</button></div></footer>
+  </form>
+</dialog>
+<div class="toast" id="toast" hidden></div>
+<script>
+// ===== ตั้งค่า: URL ของ Apps Script Web App (โครงการ "Risk Profile") =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbz17zrUZt3o67i8SLU59e9PI3FyGz-cF6ulQRsYE9Df0dKc6_n-bBOtVemC4CgS0qsi/exec';
+
+const LEVELS = {
+  low:  {th:"ต่ำ", en:"Low", cls:"lv-low", rs:"rs-low", owner:"ผู้ปฏิบัติงาน / หัวหน้าเวร", time:"รายงานในระบบภายในเวร",
+         acts:["ยอมรับความเสี่ยงได้ จัดการตามระบบงานปกติ","บันทึกรายงานอุบัติการณ์ในระบบ","หัวหน้าหน่วยทบทวนแนวโน้มรายไตรมาส"]},
+  mod:  {th:"ปานกลาง", en:"Moderate", cls:"lv-mod", rs:"rs-mod", owner:"หัวหน้าหน่วยไตเทียม", time:"รายงานภายใน 24 ชั่วโมง ทบทวนภายใน 7 วัน",
+         acts:["ทบทวนสาเหตุในหน่วยงาน","กำหนดมาตรการควบคุมและสื่อสารแก่ผู้ปฏิบัติงาน","ติดตามผลลัพธ์รายเดือน"]},
+  high: {th:"สูง", en:"High", cls:"lv-high", rs:"rs-high", owner:"หัวหน้าหน่วย ร่วมกับหัวหน้ากลุ่มการพยาบาล", time:"รายงานทันทีหรือภายในเวร ทบทวนเชิงระบบภายใน 7 วัน",
+         acts:["ทบทวนหาสาเหตุราก (RCA)","จัดทำแผนลดความเสี่ยง กำหนดผู้รับผิดชอบและกำหนดเสร็จ","รายงานคณะกรรมการบริหารความเสี่ยง","ติดตามผลต่อเนื่องจนความเสี่ยงลดระดับ"]},
+  ext:  {th:"สูงมาก", en:"Extreme", cls:"lv-ext", rs:"rs-ext", owner:"ผู้บริหารระดับสูง / ทีมนำสถาบัน", time:"รายงานผู้บริหารทันที ทบทวน RCA ภายใน 72 ชั่วโมง",
+         acts:["แก้ไขเฉพาะหน้าทันทีเพื่อความปลอดภัยของผู้ป่วย","รายงานผู้บริหารและคณะกรรมการบริหารความเสี่ยงทันที","ทบทวน RCA แบบสหสาขาวิชาชีพ","ปรับระบบงานและติดตามผลจนมั่นใจว่าไม่เกิดซ้ำ"]}
+};
+const TH2KEY = {"ต่ำ":"low","ปานกลาง":"mod","สูง":"high","สูงมาก":"ext"};
+const CONS = [
+  {n:1, sev:"A–B", money:"≤ 1,000"},
+  {n:2, sev:"C–D", money:"1,001 – 10,000"},
+  {n:3, sev:"E",   money:"10,001 – 100,000"},
+  {n:4, sev:"F–G", money:"100,001 – 1,000,000"},
+  {n:5, sev:"H–I", money:"≥ 1,000,000"}
+];
+const LIKE = [
+  {n:5, year:"≥ 40 ครั้ง/ปี",  q:"5 ครั้ง/3 เดือน"},
+  {n:4, year:"31–39 ครั้ง/ปี", q:"4 ครั้ง/3 เดือน"},
+  {n:3, year:"24–30 ครั้ง/ปี", q:"3 ครั้ง/3 เดือน"},
+  {n:2, year:"16–23 ครั้ง/ปี", q:"2 ครั้ง/3 เดือน"},
+  {n:1, year:"< 16 ครั้ง/ปี",  q:"1 ครั้ง/3 เดือน"}
+];
+const MAP = {
+  5:{1:"mod",2:"high",3:"ext",4:"ext",5:"ext"},
+  4:{1:"mod",2:"high",3:"ext",4:"ext",5:"ext"},
+  3:{1:"low",2:"mod", 3:"high",4:"ext",5:"ext"},
+  2:{1:"low",2:"mod", 3:"mod", 4:"high",5:"high"},
+  1:{1:"low",2:"low", 3:"mod", 4:"high",5:"ext"}
+};
+const SEV = [
+  ["A","เหตุการณ์ซึ่งมีโอกาสก่อให้เกิดความคลาดเคลื่อน",1],
+  ["B","เกิดความคลาดเคลื่อนขึ้นแต่ยังไม่ถึงผู้ป่วย",1],
+  ["C","เกิดกับผู้ป่วยแต่ไม่ทำให้ผู้ป่วยได้รับอันตราย",2],
+  ["D","เกิดกับผู้ป่วย ส่งผลให้ต้องเฝ้าระวังต่อ",2],
+  ["E","เกิดกับผู้ป่วย เป็นอันตรายชั่วคราวและมีการบำบัดรักษา",3],
+  ["F","เกิดกับผู้ป่วย เป็นอันตรายชั่วคราวและนอนโรงพยาบาลนานขึ้น",4],
+  ["G","เกิดกับผู้ป่วย ส่งผลให้เกิดอันตรายถาวรแก่ผู้ป่วย",4],
+  ["H","เกิดกับผู้ป่วย ส่งผลให้ต้องทำการช่วยชีวิต",5],
+  ["I","เกิดกับผู้ป่วย เป็นสาเหตุของการเสียชีวิต",5]
+];
+// ตัวอย่างสำรอง ใช้เมื่อยังเชื่อมต่อชีตไม่ได้เท่านั้น
+const DEFAULT_TOPICS = ['ข้อร้องเรียนจากผู้รับบริการ','ตัวกรองมีสาร Peracitic ตกค้าง','การใช้ตัวกรองสลับคน','การได้รับยาและสารน้ำไม่ถูกต้อง','การคิดค่าใช้จ่ายในโปรแกรมไม่ถูกต้อง','การบาดเจ็บจากการแทงเส้นเลือด','เกิดปฏิกิริยาจากการให้เลือด','เกิดปฏิกิริยาจากการให้ยาหรือสารน้ำ','A-V เลื่อนหลุด','เกิดการหลุดของข้อต่อต่างๆ ของสาย Blood line','เกิดการแตกของ Fistular aneurysm','เครื่องไตเทียมไม่พร้อมใช้งาน','ระบบน้ำไม่พร้อมใช้งาน','ระบบน้ำ RO มีสารปนเปื้อนเกินมาตรฐาน','ระบบน้ำ RO เกิดการแตกรั่ว','Air embolism','บุคลากรได้รับบาดเจ็บจากการปฏิบัติงาน','บุคลากรถูกของมีคม/เข็มตำ/สัมผัสเลือด/สารคัดหลั่งกรเด็นเข้าเยื่อบุหรือผิวหนังที่มีบาดแผล','Sudden death indialysispa patiens'];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+let selL = 3, selC = 3;
+let ROWS = [], ONLINE = false, CUR_FY = null;
+const RES = "ผลลัพธ์ ปีงบ ";
+const SEV2C = {A:1,B:1,C:2,D:2,E:3,F:4,G:4,H:5,I:5};
+const TEXT_FIELDS = ["หัวข้อ","มาตรการป้องกัน","ตัวชี้วัด","ความถี่"];
+function curFyLocal(){ const d=new Date(); return d.getFullYear()+543+(d.getMonth()>=9?1:0); }
+function years3(){ const b = CUR_FY || curFyLocal(); return [b-2, b-1, b]; }
+
+/* ---------- server ---------- */
+async function api(action, payload){
+  if (!API_URL || !API_URL.startsWith('https://')) throw new Error('ยังไม่ได้ตั้งค่า URL ของ Apps Script');
+  let res;
+  if (action === 'list') res = await fetch(API_URL + '?action=list', {redirect:'follow'});
+  else res = await fetch(API_URL, {method:'POST', redirect:'follow', body: JSON.stringify(Object.assign({action}, payload||{}))});
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'บันทึกไม่สำเร็จ');
+  return data;
+}
+function setStatus(kind, text){ $("status").innerHTML = `<span class="dot ${kind}"></span><span>${esc(text)}</span>`; }
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 2600); }
+function applyData(d, rerender){
+  ROWS = d.rows || []; ONLINE = true; CUR_FY = d.fy || curFyLocal();
+  const t = new Date();
+  setStatus("ok", `เชื่อมต่อชีตแล้ว · ${ROWS.length} หัวข้อ · ปีงบปัจจุบัน ${CUR_FY} · อัปเดต ${t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`);
+  if (rerender !== false) renderRegister();
+}
+async function load(){
+  setStatus("busy", "กำลังโหลดข้อมูลจากชีต… (ใช้เวลาประมาณ 5–10 วินาที)");
+  document.querySelector(".reg-wrap").classList.add("loading");
+  try { applyData(await api('list')); document.querySelector(".reg-wrap").classList.remove("loading"); }
+  catch(e){
+    document.querySelector(".reg-wrap").classList.remove("loading");
+    ONLINE = false;
+    if (!ROWS.length) ROWS = DEFAULT_TOPICS.map((t,i)=>({"ลำดับที่":String(i+1),"หัวข้อ":t}));
+    setStatus("err", "เชื่อมต่อชีตไม่สำเร็จ: " + e.message + " (แก้ไขไม่ได้จนกว่าจะเชื่อมต่อ)");
+    renderRegister();
+  }
+}
+
+/* ---------- matrix / calc / refs / levels ---------- */
+function buildMatrix(){
+  let h = `<thead>
+  <tr><th class="corner" colspan="3" data-span3></th><th class="axis" colspan="5">ระดับผลกระทบ Consequence (Impact)</th></tr>
+  <tr><th colspan="3" data-span3>คะแนน</th>${CONS.map(c=>`<th class="cons-no">${c.n}</th>`).join("")}</tr>
+  <tr><th colspan="3" data-span3>ระดับความรุนแรง</th>${CONS.map(c=>`<th>${c.sev}</th>`).join("")}</tr>
+  <tr><th>คะแนน</th><th class="lk-h">โอกาสที่จะเกิดขึ้นในอนาคต</th><th class="lk-h">ความถี่ที่เกิดขึ้นจริง</th>${CONS.map(c=>`<th>${c.money}</th>`).join("")}</tr>
+  </thead><tbody>`;
+  LIKE.forEach(l=>{
+    h += `<tr><th class="lk-no">${l.n}</th><td class="lk-txt">โอกาสเกิด ${l.year}</td><td class="lk-txt">${l.q}</td>`;
+    CONS.forEach(c=>{
+      const lv = LEVELS[MAP[l.n][c.n]];
+      h += `<td class="pad"><button type="button" class="cell ${lv.cls}" data-l="${l.n}" data-c="${c.n}"
+        aria-label="โอกาสเกิด ${l.n} ผลกระทบ ${c.n} คะแนน ${l.n*c.n} ระดับ${lv.th}" aria-pressed="false">
+        <b>${l.n*c.n}</b><span>(${lv.th} - ${lv.en})</span></button></td>`;
+    });
+    h += `</tr>`;
+  });
+  $("matrixTable").innerHTML = h + `</tbody>`;
+  const mq = matchMedia("(max-width:560px)");
+  const fit = ()=>document.querySelectorAll("#matrixTable [data-span3]").forEach(th=>th.colSpan = mq.matches ? 1 : 3);
+  fit(); mq.addEventListener ? mq.addEventListener("change", fit) : mq.addListener(fit);
+  $("matrixTable").addEventListener("click", e=>{
+    const b = e.target.closest(".cell"); if(!b) return;
+    selL = +b.dataset.l; selC = +b.dataset.c; sync();
+  });
+}
+function optsL(){ return LIKE.map(l=>`<option value="${l.n}">${l.n} — ${l.year} (${l.q})</option>`).join(""); }
+function optsC(){ return CONS.map(c=>`<option value="${c.n}">${c.n} — ระดับ ${c.sev} / ${c.money} บาท</option>`).join(""); }
+function buildSelects(){
+  $("selL").innerHTML = optsL(); $("selC").innerHTML = optsC();
+  $("selL").addEventListener("change", e=>{selL=+e.target.value; sync()});
+  $("selC").addEventListener("change", e=>{selC=+e.target.value; sync()});
+}
+function sync(){
+  $("selL").value = selL; $("selC").value = selC;
+  document.querySelectorAll(".cell").forEach(b=>b.setAttribute("aria-pressed", (+b.dataset.l===selL && +b.dataset.c===selC) ? "true":"false"));
+  const lv = LEVELS[MAP[selL][selC]], c = CONS.find(x=>x.n===selC), l = LIKE.find(x=>x.n===selL);
+  const r = $("result"); r.className = "result " + lv.rs;
+  r.innerHTML = `<div class="score">${selL*selC}</div><div class="lv">ระดับ${lv.th} (${lv.en})</div>
+    <div>โอกาสเกิด ${selL} (${l.year}) × ผลกระทบ ${selC} (ระดับ ${c.sev})</div>
+    <div><strong>ผู้รับผิดชอบ:</strong> ${lv.owner}</div><div><strong>กรอบเวลา:</strong> ${lv.time}</div>`;
+}
+function buildRefs(){
+  let h = `<thead><tr><th>คะแนน</th><th>ระดับ</th><th>ความรุนแรงของอุบัติการณ์</th></tr></thead><tbody>`, prev = 0;
+  SEV.forEach(([code,txt,n])=>{
+    const c = CONS.find(x=>x.n===n);
+    h += `<tr class="${n!==prev && prev? 'grp':''}">${n!==prev?`<td class="n" rowspan="${SEV.filter(s=>s[2]===n).length}">${n}<div style="font-weight:400;font-size:.75rem;color:var(--muted)">${c.money}</div></td>`:''}<td class="code">${code}</td><td>${txt}</td></tr>`;
+    prev = n;
+  });
+  $("consTable").innerHTML = h + `</tbody>`;
+  $("lkTable").innerHTML = `<thead><tr><th>คะแนน</th><th>โอกาสที่จะเกิดขึ้นในอนาคต</th><th>ความถี่ที่เกิดขึ้นจริง</th></tr></thead><tbody>` +
+    LIKE.map(l=>`<tr><td class="n">${l.n}</td><td>${l.year}</td><td>${l.q}</td></tr>`).join("") + `</tbody>`;
+}
+function buildLevels(){
+  $("levelCards").innerHTML = ["ext","high","mod","low"].map(k=>{
+    const lv = LEVELS[k], cells = [];
+    LIKE.forEach(l=>CONS.forEach(c=>{ if(MAP[l.n][c.n]===k) cells.push({s:l.n*c.n, t:`${l.n}×${c.n}`}); }));
+    const sc = cells.map(x=>x.s);
+    return `<article class="lvcard">
+      <div class="top ${lv.cls}"><h3>${lv.th} · ${lv.en}</h3><small>${cells.length} ช่อง · คะแนน ${Math.min(...sc)}–${Math.max(...sc)}</small></div>
+      <div class="body"><dl><dt>ผู้รับผิดชอบ</dt><dd>${lv.owner}</dd><dt>กรอบเวลา</dt><dd>${lv.time}</dd></dl>
+        <ul>${lv.acts.map(a=>`<li>${a}</li>`).join("")}</ul>
+        <div><div style="color:var(--muted);font-size:.8rem;margin-bottom:4px">ตำแหน่งในตาราง (โอกาสเกิด × ผลกระทบ)</div>
+        <div class="cells">${cells.map(x=>`<span class="chip">${x.t} = ${x.s}</span>`).join("")}</div></div></div></article>`;
+  }).join("");
+}
+
+
+/* ---------- editable register ---------- */
+function sevClass(v){ const c = SEV2C[v]; return c ? "s"+c : ""; }
+function edCell(r, field, cls){
+  const v = r[field] || "";
+  return `<td class="${cls}"><div class="ed" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="${esc(field)} ลำดับที่ ${esc(r["ลำดับที่"])}" data-no="${esc(r["ลำดับที่"])}" data-f="${esc(field)}">${esc(v)}</div></td>`;
+}
+function renderRegister(){
+  const ys = years3();
+  $("resYears").innerHTML = ys.map(y=>`<th title="ผลลัพธ์ ปีงบประมาณ ${y}">${String(y).slice(-2)}</th>`).join("");
+  $("regBody").innerHTML = ROWS.map(r=>{
+    const sev = String(r["ระดับ"]||"").trim().toUpperCase();
+    const opts = `<option value="">–</option>` + SEV.map(([c,t])=>`<option value="${c}" ${c===sev?"selected":""} title="${esc(t)}">${c}</option>`).join("");
+    return `<tr data-no="${esc(r["ลำดับที่"])}">
+      <td class="no">${esc(r["ลำดับที่"])}</td>
+      ${edCell(r,"หัวข้อ","topic")}
+      ${edCell(r,"มาตรการป้องกัน","w-l")}
+      ${edCell(r,"ตัวชี้วัด","w-l")}
+      ${edCell(r,"ความถี่","w-m")}
+      <td class="lv"><select class="sevsel ${sevClass(sev)}" data-no="${esc(r["ลำดับที่"])}" aria-label="ระดับ ลำดับที่ ${esc(r["ลำดับที่"])}" ${ONLINE?"":"disabled"}>${opts}</select></td>
+      ${ys.map(y=>edCell(r, RES+y, "res")).join("")}
+      <td class="act"><button type="button" class="editbtn" data-edit="${esc(r["ลำดับที่"])}" aria-label="แก้ไขลำดับที่ ${esc(r["ลำดับที่"])}">✎ แก้ไข</button><button type="button" class="delbtn" data-del="${esc(r["ลำดับที่"])}" aria-label="ลบลำดับที่ ${esc(r["ลำดับที่"])}" title="ลบหัวข้อ">✕</button></td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="10" class="help" style="padding:20px;text-align:center">ยังไม่มีรายการ</td></tr>`;
+}
+function flash(el, cls){ el.classList.remove("saving","saved","err"); if(cls) el.classList.add(cls); if(cls==="saved") setTimeout(()=>el.classList.remove("saved"),1200); }
+const queue = {};
+function saveField(no, field, value, el){
+  const row = {"ลำดับที่": no}; row[field] = value;
+  if (field === "ระดับ") row["ผลกระทบ (C)"] = value ? SEV2C[value] : "";
+  flash(el, "saving");
+  const prev = queue[no] || Promise.resolve();
+  queue[no] = prev.then(()=>api('saveRow', {row})).then(d=>{
+    applyData(d, false);
+    const r = ROWS.find(x=>String(x["ลำดับที่"])===String(no));
+    if (r) Object.assign(r, row);
+    flash(el, "saved");
+  }).catch(e=>{ flash(el, "err"); toast("บันทึกไม่สำเร็จ: " + e.message); });
+}
+$("regBody").addEventListener("focusin", e=>{ const ed=e.target.closest(".ed"); if(ed) ed.dataset.orig = ed.innerText.trim(); });
+$("regBody").addEventListener("paste", e=>{
+  const ed = e.target.closest(".ed"); if(!ed) return;
+  e.preventDefault();
+  const t = (e.clipboardData || window.clipboardData).getData("text/plain");
+  if (!document.execCommand("insertText", false, t)) ed.textContent += t;
+});
+$("regBody").addEventListener("focusout", e=>{
+  const ed = e.target.closest(".ed"); if(!ed) return;
+  const v = ed.innerText.replace(/ /g," ").replace(/\n{3,}/g,"\n\n").trim();
+  if (!ONLINE){ if (v !== (ed.dataset.orig||"").trim()){ ed.textContent = ed.dataset.orig||""; toast("ยังโหลดข้อมูลจากชีตไม่เสร็จ กรุณารอสักครู่แล้วแก้ไขใหม่"); } return; }
+  if (v === (ed.dataset.orig||"").trim()) return;
+  if (ed.dataset.f === "หัวข้อ" && !v){ ed.textContent = ed.dataset.orig; toast("หัวข้อต้องไม่ว่าง"); return; }
+  ed.textContent = v;
+  saveField(ed.dataset.no, ed.dataset.f, v, ed);
+});
+$("regBody").addEventListener("keydown", e=>{
+  const ed = e.target.closest(".ed"); if(!ed) return;
+  if (e.key === "Escape"){ ed.textContent = ed.dataset.orig||""; ed.blur(); }
+  if (e.key === "Enter" && !e.shiftKey && (ed.dataset.f==="หัวข้อ" || ed.dataset.f==="ความถี่")){ e.preventDefault(); ed.blur(); return; }
+  if (e.key === "Enter"){ e.preventDefault(); document.execCommand("insertLineBreak") || document.execCommand("insertText", false, "\n"); }
+});
+$("regBody").addEventListener("change", e=>{
+  const s = e.target.closest(".sevsel"); if(!s) return;
+  s.className = "sevsel " + sevClass(s.value);
+  saveField(s.dataset.no, "ระดับ", s.value, s);
+});
+$("regBody").addEventListener("click", e=>{
+  const eb = e.target.closest("[data-edit]"); if (eb){ openEdit(eb.dataset.edit); return; }
+  const b = e.target.closest("[data-del]"); if(b){
+    if(!ONLINE){ toast("ยังโหลดข้อมูลจากชีตไม่เสร็จ"); return; }
+    const tr = b.closest("tr"), no = b.dataset.del;
+    const r = ROWS.find(x=>String(x["ลำดับที่"])===String(no));
+    const c = document.createElement("tr"); c.className="confirm-row";
+    c.innerHTML = `<td colspan="10"><div class="cbox"><span>ยืนยันลบลำดับที่ ${esc(no)} “${esc(r?r["หัวข้อ"]:"")}” ออกจากชีต?</span>
+      <button type="button" class="btn small danger" data-yes>ลบ</button><button type="button" class="btn small" data-no>ไม่ลบ</button></div></td>`;
+    document.querySelectorAll(".confirm-row").forEach(x=>x.remove());
+    tr.after(c);
+    c.querySelector("[data-no]").onclick = ()=>c.remove();
+    c.querySelector("[data-yes]").onclick = async ()=>{
+      try{ setStatus("busy","กำลังลบ…"); applyData(await api('deleteRow', {no})); toast("ลบหัวข้อแล้ว"); }
+      catch(err){ toast("ลบไม่สำเร็จ: "+err.message); load(); }
+    };
+  }
+});
+$("btnAdd").addEventListener("click", async ()=>{
+  if(!ONLINE){ toast("ยังเชื่อมต่อชีตไม่ได้"); return; }
+  try{
+    setStatus("busy","กำลังเพิ่มหัวข้อ…");
+    applyData(await api('addRow', {row:{"หัวข้อ":"หัวข้อใหม่"}}));
+    const last = [...document.querySelectorAll('.ed[data-f="หัวข้อ"]')].pop();
+    if (last){ last.scrollIntoView({block:"center"}); last.focus(); document.getSelection().selectAllChildren(last); }
+  }catch(e){ toast("เพิ่มไม่สำเร็จ: "+e.message); }
+});
+$("btnReload").addEventListener("click", load);
+
+/* ---------- edit form (dialog) ---------- */
+let editingNo = null;
+function openEdit(no){
+  if(!ONLINE){ toast("ยังโหลดข้อมูลจากชีตไม่เสร็จ กรุณารอสักครู่"); return; }
+  const r = ROWS.find(x=>String(x["ลำดับที่"])===String(no)); if(!r) return;
+  editingNo = String(no);
+  $("dlgTitle").textContent = `แก้ไขรายการ ลำดับที่ ${no}`;
+  $("fTopic").value = r["หัวข้อ"]||""; $("fMeasure").value = r["มาตรการป้องกัน"]||"";
+  $("fKpi").value = r["ตัวชี้วัด"]||""; $("fFreq").value = r["ความถี่"]||"";
+  $("fSev").innerHTML = `<option value="">— ไม่ระบุ —</option>` + SEV.map(([c,t])=>`<option value="${c}">${c} — ${esc(t)}</option>`).join("");
+  $("fSev").value = String(r["ระดับ"]||"").trim().toUpperCase();
+  $("resFields").innerHTML = years3().map((y,i)=>`<div class="field"><label for="fRes${i}">ผลลัพธ์ ปีงบ ${y}</label><textarea id="fRes${i}" data-y="${y}">${esc(r[RES+y]||"")}</textarea></div>`).join("");
+  $("dlg").showModal(); $("fMeasure").focus();
+}
+$("frm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const topic = $("fTopic").value.trim(); if(!topic){ toast("หัวข้อต้องไม่ว่าง"); $("fTopic").focus(); return; }
+  const sev = $("fSev").value;
+  const row = {"ลำดับที่": editingNo, "หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(), "ความถี่": $("fFreq").value.trim(), "ระดับ": sev, "ผลกระทบ (C)": sev ? SEV2C[sev] : ""};
+  document.querySelectorAll("#resFields textarea").forEach(t=>row[RES+t.dataset.y]=t.value.trim());
+  const btn = $("btnSave"); btn.disabled = true; btn.textContent = "กำลังบันทึก…";
+  try{ applyData(await api('saveRow', {row})); $("dlg").close(); toast("บันทึกลงชีตเรียบร้อย"); }
+  catch(err){ toast("บันทึกไม่สำเร็จ: " + err.message); }
+  finally{ btn.disabled = false; btn.textContent = "บันทึกลงชีต"; }
+});
+$("btnCancel").addEventListener("click", ()=>$("dlg").close());
+$("btnClose").addEventListener("click", ()=>$("dlg").close());
+$("sevLegend").innerHTML = "ระดับ: " + [["A–B","var(--low)"],["C–D","var(--mod)"],["E","var(--high)"],["F–I","var(--ext)"]].map(([t,c])=>`<span><i style="background:${c}"></i>${t}</span>`).join("") + ` · ความหมายของระดับ A–I ดูที่ “เกณฑ์การให้คะแนน” ด้านล่าง`;
+
+/* ---------- init ---------- */
+buildMatrix(); buildSelects(); buildRefs(); buildLevels(); sync();
+renderRegister();
+load();
+</script>
+</body>
+</html>
