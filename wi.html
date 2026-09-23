@@ -22,9 +22,6 @@
     --line: rgba(184,137,44,.4);
     --surface:#ffffff;
     --surface-2: rgba(226,250,240,.65);
-    --wood-1:#c99b5e;
-    --wood-2:#a97a3f;
-    --wood-3:#7c5527;
   }
   html,body{margin:0;padding:0;}
   body{
@@ -86,89 +83,94 @@
   .search-box svg{width:15px;height:15px;color:var(--ink-faint);flex:none;}
   .search-box input{border:none;outline:none;font-family:'Sarabun',sans-serif;font-size:.86rem;width:100%;background:transparent;color:var(--ink);}
 
-  /* ---------- bookshelf room ---------- */
-  .room{display:flex;flex-direction:column;gap:26px;}
+  /* ---------- bookshelf room (โทนไม้สักทอง เหมือนหน้าผลงานวิชาการ) ---------- */
+  .room{
+    background:
+      repeating-linear-gradient(173deg, transparent 0px, transparent 9px, rgba(100,55,10,0.07) 9px, rgba(100,55,10,0.07) 10px, transparent 10px, transparent 19px, rgba(80,40,8,0.04) 19px, rgba(80,40,8,0.04) 20px),
+      repeating-linear-gradient(167deg, transparent 0px, transparent 22px, rgba(140,80,20,0.05) 22px, rgba(140,80,20,0.05) 23px),
+      linear-gradient(180deg, #D9A055 0%, #C4873A 25%, #B87428 50%, #C4873A 75%, #D9A055 100%);
+    border-radius:20px;
+    padding:20px 20px 4px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2), inset 0 2px 0 rgba(255,220,120,.35), inset 0 -6px 15px rgba(0,0,0,.18);
+    position:relative;overflow:hidden;
+  }
+  .room::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(to right,transparent,rgba(255,235,150,.4),transparent);border-radius:20px 20px 0 0;}
+
   .shelf-unit{position:relative;}
   .shelf-label{
-    display:flex;align-items:center;gap:9px;margin-bottom:10px;
+    display:flex;align-items:center;gap:9px;margin:0 2px 8px;padding-top:14px;
   }
-  .shelf-label .dot{width:9px;height:9px;border-radius:50%;flex:none;}
-  .shelf-label h3{font-size:1rem;color:var(--ink);margin:0;}
+  .shelf-unit:first-child .shelf-label{padding-top:2px;}
+  .shelf-label .dot{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.5);}
+  .shelf-label h3{font-size:.98rem;color:#402706;margin:0;text-shadow:0 1px 0 rgba(255,255,255,.25);}
   .shelf-label .count{
-    font-size:.76rem;color:var(--ink-faint);background:#fff;border:1px solid var(--line);
+    font-size:.74rem;color:#6b4413;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.5);
     border-radius:999px;padding:1px 10px;font-family:'Chakra Petch',sans-serif;
   }
 
-  .book-row{
-    display:flex;flex-wrap:wrap;gap:16px;
-    padding:18px 16px 26px;
-    border-radius:16px;
-    background:
-      linear-gradient(180deg, transparent 0%, transparent calc(100% - 16px), var(--wood-2) calc(100% - 16px), var(--wood-3) 100%),
-      linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0) 40%);
-    box-shadow: inset 0 0 0 1px var(--line);
+  .book-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; align-items:flex-end; padding:16px 4px 0; }
+  @media (max-width:500px){ .book-row{grid-template-columns:repeat(2,1fr);gap:8px;} }
+  @media (min-width:501px) and (max-width:820px){ .book-row{grid-template-columns:repeat(3,1fr);} }
+
+  .shelf-plank{
+    height:20px;background:linear-gradient(180deg,#E8A020 0%,#C8860A 20%,#A06808 50%,#C8860A 80%,#E8A020 100%);
+    border-radius:4px;box-shadow:0 8px 20px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,220,100,.4),inset 0 -2px 0 rgba(0,0,0,.3);
+    margin:16px 0 4px;
   }
-  .book-row::after{content:none;}
 
   .empty-note{
     color:var(--ink-faint);font-size:.86rem;padding:20px;text-align:center;
     background:#fff;border:1px dashed var(--line);border-radius:14px;
   }
 
-  /* ---------- book card ---------- */
-  .book{
-    position:relative;
-    width:172px;
-    min-height:212px;
-    border-radius:10px 10px 6px 6px;
-    padding:16px 14px 14px;
-    display:flex;flex-direction:column;
-    color:#fff;
-    cursor:pointer;
-    box-shadow:
-      inset 3px 0 0 rgba(255,255,255,.25),
-      inset -3px 0 0 rgba(0,0,0,.18),
-      0 14px 26px -14px rgba(13,60,45,.55);
-    transition:transform .22s ease, box-shadow .22s ease;
+  /* ---------- 3D book (เปิด/พลิกได้เหมือนหนังสือจริง เหมือนหน้าผลงานวิชาการ) ---------- */
+  .book-scene{
+    perspective:800px;display:flex;flex-direction:column;align-items:center;cursor:pointer;
+    -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
   }
-  .book:hover{
-    transform:translateY(-7px) rotate(-.6deg);
-    box-shadow:
-      inset 3px 0 0 rgba(255,255,255,.25),
-      inset -3px 0 0 rgba(0,0,0,.18),
-      0 24px 34px -14px rgba(13,60,45,.6);
+  .book-3d{
+    width:100%;max-width:130px;height:175px;position:relative;transform-style:preserve-3d;
+    transition:transform .4s cubic-bezier(.23,1,.32,1);
+    filter:drop-shadow(3px 6px 12px rgba(0,0,0,.45));
   }
-  .book .type-pill{
-    align-self:flex-start;
-    font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.04em;
-    background:rgba(255,255,255,.22);
-    padding:3px 10px;border-radius:999px;margin-bottom:10px;
-    backdrop-filter:blur(2px);
+  .book-scene:hover .book-3d{
+    transform:rotateY(-28deg) translateX(7px) translateY(-10px);
+    filter:drop-shadow(7px 14px 20px rgba(0,0,0,.55));
   }
-  .book .doc-icon{width:26px;height:26px;opacity:.85;margin-bottom:8px;}
-  .book .title{
-    font-size:.92rem;font-weight:600;line-height:1.4;flex:1;
+  .book-cover{
+    position:absolute;inset:0;border-radius:2px 10px 10px 2px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:12px 10px;text-align:center;color:#fff;font-size:13px;font-weight:600;line-height:1.4;
+    overflow:hidden;transform:translateZ(9px);
+  }
+  .book-cover .doc-icon{width:22px;height:22px;opacity:.35;margin-bottom:8px;flex:none;}
+  .book-cover .title{
     display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;
     text-shadow:0 1px 3px rgba(0,0,0,.15);
   }
-  .book .date{font-size:.7rem;opacity:.8;margin-top:8px;}
-  .book .actions{
-    position:absolute;top:8px;right:8px;display:flex;gap:5px;
-    opacity:0;transform:translateY(-4px);
-    transition:opacity .18s,transform .18s;
+  .book-cover::before{content:'';position:absolute;top:0;left:0;width:14px;height:100%;background:linear-gradient(to right,rgba(0,0,0,.42),rgba(0,0,0,.1),transparent);pointer-events:none;}
+  .book-cover::after{content:'';position:absolute;top:4px;right:-7px;width:8px;height:calc(100% - 8px);background:repeating-linear-gradient(180deg,#f0e6d0 0,#f0e6d0 1px,#ddd0b0 1px,#ddd0b0 2px);border-radius:0 3px 3px 0;box-shadow:2px 0 5px rgba(0,0,0,.18);pointer-events:none;}
+  .book-spine-face{
+    position:absolute;top:0;left:0;width:14px;height:175px;transform-origin:left center;
+    transform:rotateY(90deg) translateX(7px);border-radius:2px 0 0 2px;
+    display:flex;align-items:center;justify-content:center;padding:4px 2px;overflow:hidden;
   }
-  .book:hover .actions{opacity:1;transform:translateY(0);}
-  .book .act-btn{
-    width:26px;height:26px;border-radius:8px;border:none;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    background:rgba(255,255,255,.9);color:var(--ink);
-  }
-  .book .act-btn:hover{background:#fff;}
-  .book .act-btn svg{width:14px;height:14px;}
-  .book .act-btn.danger{color:#b91c1c;}
+  .book-spine-face span{writing-mode:vertical-rl;transform:rotate(180deg);color:rgba(255,255,255,.85);font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:140px;}
+
+  .book-actions{display:flex;gap:7px;margin-top:9px;opacity:0;transform:translateY(4px);transition:all .2s;pointer-events:none;}
+  .book-scene:hover .book-actions{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .bk-btn{width:26px;height:26px;border-radius:50%;background:#fff;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:all .15s;display:flex;align-items:center;justify-content:center;}
+  .bk-btn:hover{transform:scale(1.15);}
+  .bk-btn svg{width:13px;height:13px;}
+  .bk-edit{color:#2563eb;} .bk-del{color:#ef4444;}
 
   @media (max-width:640px){
-    .book{width:calc(50% - 8px);min-height:180px;}
+    .book-3d{max-width:150px;height:195px;}
+    .book-cover{font-size:15px !important;padding:16px;line-height:1.3;}
+    .book-cover .title{-webkit-line-clamp:6;}
+    .book-spine-face span{font-size:11px !important;}
+    .book-spine-face{height:195px;}
+    .book-actions{opacity:1;transform:none;pointer-events:auto;}
     .header-card{padding:15px 16px;}
   }
 
@@ -309,10 +311,12 @@ function callBackend(action, payload = {}) {
 var ALL_ITEMS = [];
 var CURRENT_CAT = '__all__';
 
+/* สีชุดเดียวกับหน้าผลงานวิชาการ (academic.html) เพื่อให้ทุกตู้หนังสือดูเป็นชุดเดียวกัน */
 var PALETTE = [
-  ['#0b8a61','#065f42'], ['#0a827d','#075652'], ['#b8892c','#8f6a1f'],
-  ['#3b6fb0','#254a7a'], ['#a15a3e','#7a4029'], ['#6d5aa8','#4a3c78'],
-  ['#c0577a','#8f3f59'], ['#4f9d8f','#356a61']
+  ['#047857','#022c22'],['#0369a1','#0c2d48'],['#6d28d9','#2e1065'],
+  ['#be185d','#500724'],['#b45309','#451a03'],['#b91c1c','#450a0a'],
+  ['#0e7490','#042f2e'],['#4338ca','#1e1b4b'],['#166534','#052e16'],
+  ['#92400e','#292524'],['#1d4ed8','#1e3a8a'],['#9d174d','#4a044e']
 ];
 function colorFor(cat){
   var str = String(cat||'').trim() || 'อื่นๆ';
@@ -385,7 +389,7 @@ function renderBooks(){
   });
 
   var html = '';
-  order.forEach(function(cat){
+  order.forEach(function(cat, gi){
     var col = colorFor(cat);
     html += '<div class="shelf-unit">';
     html += '<div class="shelf-label"><span class="dot" style="background:' + col[0] + '"></span><h3>' + escapeHtml(cat) + '</h3><span class="count">' + groups[cat].length + ' รายการ</span></div>';
@@ -393,18 +397,24 @@ function renderBooks(){
     groups[cat].forEach(function(it){
       var c = colorFor(cat);
       var link = it.link || '';
-      html += '<div class="book" style="background:linear-gradient(160deg,' + c[0] + ',' + c[1] + ')" onclick="openLink(' + "'" + escapeAttr(link).replace(/'/g,"\\'") + "'" + ')">';
-      html += '<div class="actions">';
-      html += '<button type="button" class="act-btn" title="แก้ไข" onclick="event.stopPropagation();editItem(' + it.rowIndex + ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>';
-      html += '<button type="button" class="act-btn danger" title="ลบ" onclick="event.stopPropagation();deleteItem(' + it.rowIndex + ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button>';
-      html += '</div>';
-      html += '<span class="type-pill">' + escapeHtml(cat) + '</span>';
-      html += docIconSvg();
-      html += '<div class="title">' + escapeHtml(it.title||'(ไม่มีชื่อเรื่อง)') + '</div>';
-      if (it.date) html += '<div class="date">' + escapeHtml(it.date) + '</div>';
+      var eLink = escapeAttr(link).replace(/'/g,"\\'");
+      var titleHtml = escapeHtml(it.title || '(ไม่มีชื่อเรื่อง)');
+      var typeHtml = escapeHtml((it.type || cat));
+
+      html += '<div class="book-scene">';
+      html +=   '<div class="book-3d" onclick="openLink(\'' + eLink + '\')">';
+      html +=     '<div class="book-spine-face" style="background:' + c[1] + ';"><span>' + typeHtml + '</span></div>';
+      html +=     '<div class="book-cover" style="background:linear-gradient(150deg,' + c[0] + ',' + c[1] + ');">' + docIconSvg() + '<span class="title">' + titleHtml + '</span></div>';
+      html +=   '</div>';
+      html +=   '<div class="book-actions">';
+      html +=     '<button type="button" class="bk-btn bk-edit" title="แก้ไข" onclick="event.stopPropagation();editItem(' + it.rowIndex + ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>';
+      html +=     '<button type="button" class="bk-btn bk-del" title="ลบ" onclick="event.stopPropagation();deleteItem(' + it.rowIndex + ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button>';
+      html +=   '</div>';
       html += '</div>';
     });
-    html += '</div></div>';
+    html += '</div>';
+    html += '<div class="shelf-plank"></div>';
+    html += '</div>';
   });
 
   room.innerHTML = html;
