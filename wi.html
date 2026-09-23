@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แนวปฏิบัติหน่วยไตเทียม (WI / SOP / CNPG)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  :root{
+    --bg:#f2f6f4;
+    --ink:#0d2b21;
+    --ink-soft:#456058;
+    --ink-faint:#7a9990;
+    --accent:#0b8a61;
+    --accent-bright:#065f42;
+    --accent-2:#0a827d;
+    --gold:#b8892c;
+    --gold-bright:#8f6a1f;
+    --line: rgba(184,137,44,.4);
+    --surface:#ffffff;
+    --surface-2: rgba(226,250,240,.65);
+    --wood-1:#c99b5e;
+    --wood-2:#a97a3f;
+    --wood-3:#7c5527;
+  }
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Sarabun',system-ui,sans-serif;
+    min-height:100vh;
+    padding:16px 16px 40px;
+  }
+  h1,h2,h3,.display{font-family:'Chakra Petch','Sarabun',sans-serif;font-weight:700;}
+
+  .wrap{max-width:1280px;margin:0 auto;}
+
+  /* ---------- header ---------- */
+  .header-card{
+    background:linear-gradient(160deg,#ffffff,var(--surface-2));
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:18px 22px;
+    box-shadow:0 20px 46px -30px rgba(13,60,45,.3);
+    margin-bottom:16px;
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+  }
+  .header-card h1{font-size:clamp(1.15rem,2.2vw,1.5rem);color:var(--accent-bright);margin:0 0 3px;}
+  .header-card p{margin:0;color:var(--ink-soft);font-size:.86rem;}
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.02em;
+    padding:10px 20px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:8px;
+    transition:transform .15s,box-shadow .15s;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-gold{
+    background:linear-gradient(90deg,var(--gold),var(--gold-bright));color:#fff;
+    box-shadow:0 10px 24px -10px rgba(184,137,44,.6);
+  }
+  .btn-gold:hover{box-shadow:0 12px 28px -8px rgba(184,137,44,.75);}
+  .btn svg{width:16px;height:16px;flex:none;}
+
+  /* ---------- filter / search bar ---------- */
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px;
+  }
+  .chip-row{display:flex;flex-wrap:wrap;gap:7px;flex:1;}
+  .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+    font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.8rem;
+    padding:6px 15px;border-radius:999px;cursor:pointer;
+    transition:background .2s,color .2s,border-color .2s;
+  }
+  .chip:hover{border-color:var(--gold);color:var(--gold-bright);}
+  .chip.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border-color:transparent;}
+  .search-box{
+    display:flex;align-items:center;gap:7px;
+    background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:7px 14px;min-width:200px;
+  }
+  .search-box svg{width:15px;height:15px;color:var(--ink-faint);flex:none;}
+  .search-box input{border:none;outline:none;font-family:'Sarabun',sans-serif;font-size:.86rem;width:100%;background:transparent;color:var(--ink);}
+
+  /* ---------- bookshelf room ---------- */
+  .room{display:flex;flex-direction:column;gap:26px;}
+  .shelf-unit{position:relative;}
+  .shelf-label{
+    display:flex;align-items:center;gap:9px;margin-bottom:10px;
+  }
+  .shelf-label .dot{width:9px;height:9px;border-radius:50%;flex:none;}
+  .shelf-label h3{font-size:1rem;color:var(--ink);margin:0;}
+  .shelf-label .count{
+    font-size:.76rem;color:var(--ink-faint);background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:1px 10px;font-family:'Chakra Petch',sans-serif;
+  }
+
+  .book-row{
+    display:flex;flex-wrap:wrap;gap:16px;
+    padding:18px 16px 26px;
+    border-radius:16px;
+    background:
+      linear-gradient(180deg, transparent 0%, transparent calc(100% - 16px), var(--wood-2) calc(100% - 16px), var(--wood-3) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0) 40%);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .book-row::after{content:none;}
+
+  .empty-note{
+    color:var(--ink-faint);font-size:.86rem;padding:20px;text-align:center;
+    background:#fff;border:1px dashed var(--line);border-radius:14px;
+  }
+
+  /* ---------- book card ---------- */
+  .book{
+    position:relative;
+    width:172px;
+    min-height:212px;
+    border-radius:10px 10px 6px 6px;
+    padding:16px 14px 14px;
+    display:flex;flex-direction:column;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:
+      inset 3px 0 0 rgba(255,255,255,.25),
+      inset -3px 0 0 rgba(0,0,0,.18),
+      0 14px 26px -14px rgba(13,60,45,.55);
+    transition:transform .22s ease, box-shadow .22s ease;
+  }
+  .book:hover{
+    transform:translateY(-7px) rotate(-.6deg);
+    box-shadow:
+      inset 3px 0 0 rgba(255,255,255,.25),
+      inset -3px 0 0 rgba(0,0,0,.18),
+      0 24px 34px -14px rgba(13,60,45,.6);
+  }
+  .book .type-pill{
+    align-self:flex-start;
+    font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:.68rem;letter-spacing:.04em;
+    background:rgba(255,255,255,.22);
+    padding:3px 10px;border-radius:999px;margin-bottom:10px;
+    backdrop-filter:blur(2px);
+  }
+  .book .doc-icon{width:26px;height:26px;opacity:.85;margin-bottom:8px;}
+  .book .title{
+    font-size:.92rem;font-weight:600;line-height:1.4;flex:1;
+    display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;
+    text-shadow:0 1px 3px rgba(0,0,0,.15);
+  }
+  .book .date{font-size:.7rem;opacity:.8;margin-top:8px;}
+  .book .actions{
+    position:absolute;top:8px;right:8px;display:flex;gap:5px;
+    opacity:0;transform:translateY(-4px);
+    transition:opacity .18s,transform .18s;
+  }
+  .book:hover .actions{opacity:1;transform:translateY(0);}
+  .book .act-btn{
+    width:26px;height:26px;border-radius:8px;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.9);color:var(--ink);
+  }
+  .book .act-btn:hover{background:#fff;}
+  .book .act-btn svg{width:14px;height:14px;}
+  .book .act-btn.danger{color:#b91c1c;}
+
+  @media (max-width:640px){
+    .book{width:calc(50% - 8px);min-height:180px;}
+    .header-card{padding:15px 16px;}
+  }
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(13,43,33,.45);
+    display:none;align-items:center;justify-content:center;padding:16px;z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:#fff;border-radius:18px;width:100%;max-width:440px;
+    padding:22px 22px 20px;box-shadow:0 30px 60px -20px rgba(0,0,0,.35);
+  }
+  .modal-box h3{margin:0 0 14px;font-size:1.05rem;color:var(--accent-bright);}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:.82rem;font-weight:600;color:var(--ink-soft);margin-bottom:5px;}
+  .field input, .field select{
+    width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+    font-family:'Sarabun',sans-serif;font-size:.9rem;color:var(--ink);outline:none;background:#fbfdfc;
+  }
+  .field input:focus, .field select:focus{border-color:var(--accent);}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+  .btn-ghost{background:#eef3f1;color:var(--ink-soft);}
+  .btn-ghost:hover{background:#e3ebe8;}
+  .btn-save{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;}
+  .btn-save:disabled{opacity:.6;cursor:not-allowed;}
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);
+    background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;
+    font-size:.86rem;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:200;
+    box-shadow:0 14px 30px -10px rgba(0,0,0,.4);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+  .toast.err{background:#7f1d1d;}
+
+  .loading-note{color:var(--ink-faint);font-size:.86rem;padding:20px;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="header-card">
+    <div>
+      <h1>คลังแนวปฏิบัติหน่วยไตเทียม</h1>
+      <p>รวบรวม WI · SOP · CNPG สำหรับหน่วยไตเทียม สถาบันบำราศนราดูร</p>
+    </div>
+    <button type="button" class="btn btn-gold" onclick="openForm('add')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      เพิ่มเอกสาร
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <div class="chip-row" id="chipRow">
+      <button type="button" class="chip active" data-cat="__all__" onclick="setCategory('__all__')">ทั้งหมด</button>
+    </div>
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="ค้นหาชื่อเรื่อง…" oninput="renderBooks()">
+    </div>
+  </div>
+
+  <div class="room" id="room">
+    <div class="loading-note">กำลังโหลดข้อมูล…</div>
+  </div>
+
+</div>
+
+<!-- ---------- Add/Edit Modal ---------- -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle">เพิ่มเอกสาร</h3>
+    <input type="hidden" id="fRowIndex">
+    <div class="field">
+      <label>ประเภท</label>
+      <input type="text" id="fType" list="typeList" placeholder="เช่น WI, SOP, CNPG">
+      <datalist id="typeList">
+        <option value="WI">
+        <option value="SOP">
+        <option value="CNPG">
+        <option value="อื่นๆ">
+      </datalist>
+    </div>
+    <div class="field">
+      <label>ชื่อเรื่อง <span style="color:#b91c1c">*</span></label>
+      <input type="text" id="fTitle" placeholder="ชื่อเอกสาร">
+    </div>
+    <div class="field">
+      <label>ลิงก์เอกสาร (Google Drive / URL)</label>
+      <input type="url" id="fLink" placeholder="https://drive.google.com/...">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" onclick="closeForm()">ยกเลิก</button>
+      <button type="button" class="btn btn-save" id="saveBtn" onclick="submitForm()">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================== BACKEND CONFIG ====================
+   ใช้ GAS_URL เดียวกับหน้า "ผลงานวิชาการ" (academic.html)
+   เพราะข้อมูล WI จะถูกเก็บในสเปรดชีตเดียวกัน แต่คนละชีต (sheet)
+   ========================================================== */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbygfy7yad290Ox_Kdat3HqLPZm_2HhsiSwsFPl7SEZm6M3UXz604LT1hK9LvYMkhWuDYw/exec';
+
+function callBackend(action, payload = {}) {
+  return new Promise(function(resolve, reject) {
+    if (typeof google !== 'undefined' && google.script) {
+      if (action === 'getWI') { google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).getWI(); }
+      else if (action === 'saveWI') { google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).saveWI(payload); }
+      else if (action === 'deleteWI') { google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).deleteWI(payload.rowIndex); }
+    } else {
+      var maxTry = (action === 'getWI') ? 4 : 1;
+      var body = JSON.stringify(payload);
+      (function attempt(n) {
+        fetch(GAS_URL + "?action=" + action, { method: "POST", body: body, headers: { "Content-Type": "text/plain;charset=utf-8" }
+        }).then(function(res) { return res.text(); }).then(function(txt) {
+          var data;
+          try { data = JSON.parse(txt); }
+          catch (e) { throw new Error(/^\s*</.test(txt) ? 'HTML' : txt.slice(0, 80)); }
+          if (data && (data.error || data.success === false)) reject(new Error(data.error || data.message)); else resolve(data);
+        }).catch(function(err) {
+          if (n < maxTry) { setTimeout(function() { attempt(n + 1); }, 700 * n); return; }
+          if (err.message === 'HTML') err = new Error('เซิร์ฟเวอร์ (Google) ตอบกลับไม่ทัน/ไม่ใช่ข้อมูล — ลองกดอีกครั้ง หากเป็นบ่อยให้ตรวจการ Deploy และสิทธิ์ "ทุกคน" ของ Apps Script');
+          reject(err);
+        });
+      })(1);
+    }
+  });
+}
+
+/* ==================== STATE ==================== */
+var ALL_ITEMS = [];
+var CURRENT_CAT = '__all__';
+
+var PALETTE = [
+  ['#0b8a61','#065f42'], ['#0a827d','#075652'], ['#b8892c','#8f6a1f'],
+  ['#3b6fb0','#254a7a'], ['#a15a3e','#7a4029'], ['#6d5aa8','#4a3c78'],
+  ['#c0577a','#8f3f59'], ['#4f9d8f','#356a61']
+];
+function colorFor(cat){
+  var str = String(cat||'').trim() || 'อื่นๆ';
+  var h = 0;
+  for (var i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) >>> 0; }
+  return PALETTE[h % PALETTE.length];
+}
+function docIconSvg(){
+  return '<svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M7 3.5C7 2.7 7.7 2 8.5 2H14l5 5v13.5a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 6 20.5v-17Z"/>' +
+    '<path d="M14 2v5h5"/><path d="M9 13h6M9 16.5h6M9 9.5h2"/></svg>';
+}
+
+/* ==================== LOAD & RENDER ==================== */
+function loadBooks(){
+  var room = document.getElementById('room');
+  callBackend('getWI').then(function(data){
+    ALL_ITEMS = Array.isArray(data) ? data : [];
+    buildCategoryChips();
+    renderBooks();
+  }).catch(function(err){
+    room.innerHTML = '<div class="empty-note">โหลดข้อมูลไม่สำเร็จ: ' + escapeHtml(err.message||String(err)) + '</div>';
+  });
+}
+
+function buildCategoryChips(){
+  var cats = [];
+  ALL_ITEMS.forEach(function(it){
+    var c = (it.type || 'อื่นๆ').trim() || 'อื่นๆ';
+    if (cats.indexOf(c) === -1) cats.push(c);
+  });
+  var row = document.getElementById('chipRow');
+  var html = '<button type="button" class="chip ' + (CURRENT_CAT==='__all__'?'active':'') + '" data-cat="__all__" onclick="setCategory(\'__all__\')">ทั้งหมด</button>';
+  cats.forEach(function(c){
+    html += '<button type="button" class="chip ' + (CURRENT_CAT===c?'active':'') + '" data-cat="' + escapeAttr(c) + '" onclick="setCategory(\'' + escapeAttr(c).replace(/'/g,"\\'") + '\')">' + escapeHtml(c) + '</button>';
+  });
+  row.innerHTML = html;
+}
+
+function setCategory(cat){
+  CURRENT_CAT = cat;
+  document.querySelectorAll('.chip').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-cat') === cat);
+  });
+  renderBooks();
+}
+
+function renderBooks(){
+  var room = document.getElementById('room');
+  var q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+  var filtered = ALL_ITEMS.filter(function(it){
+    var cat = (it.type || 'อื่นๆ').trim() || 'อื่นๆ';
+    if (CURRENT_CAT !== '__all__' && cat !== CURRENT_CAT) return false;
+    if (q && (it.title||'').toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  });
+
+  if (filtered.length === 0){
+    room.innerHTML = '<div class="empty-note">ยังไม่มีเอกสารในหมวดนี้ — กด "เพิ่มเอกสาร" เพื่อเริ่มต้น</div>';
+    return;
+  }
+
+  var groups = {};
+  var order = [];
+  filtered.forEach(function(it){
+    var cat = (it.type || 'อื่นๆ').trim() || 'อื่นๆ';
+    if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+    groups[cat].push(it);
+  });
+
+  var html = '';
+  order.forEach(function(cat){
+    var col = colorFor(cat);
+    html += '<div class="shelf-unit">';
+    html += '<div class="shelf-label"><span class="dot" style="background:' + col[0] + '"></span><h3>' + escapeHtml(cat) + '</h3><span class="count">' + groups[cat].length + ' รายการ</span></div>';
+    html += '<div class="book-row">';
+    groups[cat].forEach(function(it){
+      var c = colorFor(cat);
+      var link = it.link || '';
+      html += '<div class="book" style="background:linear-gradient(160deg,' + c[0] + ',' + c[1] + ')" onclick="openLink(' + "'" + escapeAttr(link).replace(/'/g,"\\'") + "'" + ')">';
+      html += '<div class="actions">';
+      html += '<button type="button" class="act-btn" title="แก้ไข" onclick="event.stopPropagation();editItem(' + it.rowIndex + ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>';
+      html += '<button type="button" class="act-btn danger" title="ลบ" onclick="event.stopPropagation();deleteItem(' + it.rowIndex + ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button>';
+      html += '</div>';
+      html += '<span class="type-pill">' + escapeHtml(cat) + '</span>';
+      html += docIconSvg();
+      html += '<div class="title">' + escapeHtml(it.title||'(ไม่มีชื่อเรื่อง)') + '</div>';
+      if (it.date) html += '<div class="date">' + escapeHtml(it.date) + '</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  room.innerHTML = html;
+}
+
+function openLink(link){
+  if (!link) { showToast('เอกสารนี้ยังไม่มีลิงก์แนบ', true); return; }
+  window.open(link, '_blank', 'noopener');
+}
+
+/* ==================== ADD / EDIT / DELETE ==================== */
+function openForm(mode, item){
+  document.getElementById('modalTitle').textContent = (mode === 'edit') ? 'แก้ไขเอกสาร' : 'เพิ่มเอกสาร';
+  document.getElementById('fRowIndex').value = item ? item.rowIndex : '';
+  document.getElementById('fType').value = item ? (item.type||'') : '';
+  document.getElementById('fTitle').value = item ? (item.title||'') : '';
+  document.getElementById('fLink').value = item ? (item.link||'') : '';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeForm(){
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+function editItem(rowIndex){
+  var item = ALL_ITEMS.find(function(it){ return it.rowIndex === rowIndex; });
+  if (item) openForm('edit', item);
+}
+function submitForm(){
+  var rowIndex = document.getElementById('fRowIndex').value;
+  var type = document.getElementById('fType').value.trim();
+  var title = document.getElementById('fTitle').value.trim();
+  var link = document.getElementById('fLink').value.trim();
+
+  if (!title){ showToast('กรุณาระบุชื่อเรื่อง', true); return; }
+
+  var payload = { type: type, title: title, link: link };
+  if (rowIndex) payload.rowIndex = parseInt(rowIndex, 10);
+
+  var btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = 'กำลังบันทึก…';
+
+  callBackend('saveWI', payload).then(function(){
+    showToast('บันทึกข้อมูลสำเร็จ');
+    closeForm();
+    loadBooks();
+  }).catch(function(err){
+    showToast('บันทึกไม่สำเร็จ: ' + (err.message||err), true);
+  }).finally(function(){
+    btn.disabled = false; btn.textContent = 'บันทึก';
+  });
+}
+function deleteItem(rowIndex){
+  if (!confirm('ยืนยันการลบเอกสารนี้หรือไม่?')) return;
+  callBackend('deleteWI', { rowIndex: rowIndex }).then(function(){
+    showToast('ลบข้อมูลสำเร็จ');
+    loadBooks();
+  }).catch(function(err){
+    showToast('ลบไม่สำเร็จ: ' + (err.message||err), true);
+  });
+}
+
+/* ==================== HELPERS ==================== */
+function showToast(msg, isErr){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  clearTimeout(showToast._tm);
+  showToast._tm = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+document.getElementById('modalOverlay').addEventListener('click', function(e){
+  if (e.target === this) closeForm();
+});
+
+loadBooks();
+</script>
+</body>
+</html>
