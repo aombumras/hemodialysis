@@ -508,6 +508,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-7M21 19H3"/></svg>
       KPI
     </button>
+    <button type="button" data-tab="risk" onclick="switchTab('risk')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4.5M12 17.2v.3"/></svg>
+      Risk Profile
+    </button>
     <button type="button" data-tab="ro" onclick="switchTab('ro')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.2 7 8.4 7 12a7 7 0 0 1-14 0c0-3.6 3.5-7.8 7-12Z"/></svg>
       ระบบน้ำ RO
@@ -702,6 +706,13 @@
   <div id="tab-kpi" class="tab-panel">
     <div class="embed-wrap">
       <iframe class="embed-frame" data-src="kpi.html" title="Dashboard KPI & Risk-profile หน่วยไตเทียม"></iframe>
+    </div>
+  </div>
+
+  <!-- ============ TAB: Risk Profile ============ -->
+  <div id="tab-risk" class="tab-panel">
+    <div class="embed-wrap">
+      <iframe class="embed-frame" data-src="risk.html" title="Risk Profile หน่วยไตเทียม"></iframe>
     </div>
   </div>
 
