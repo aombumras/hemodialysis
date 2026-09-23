@@ -191,22 +191,6 @@ dialog::backdrop{background:rgba(10,20,26,.55)}
   .sum .tile b{font-size:1.35rem}
   .fchip{padding:4px 10px;font-size:.8rem}
   .toolbar .right .btn,.toolbar .right a.btn{flex:1 1 auto;justify-content:center;text-align:center}
-  /* register table -> cards */
-  .panel.scroll:has(table.reg){background:transparent;border:0;overflow:visible}
-  table.reg{min-width:0}
-  table.reg thead{display:none}
-  table.reg,table.reg tbody{display:block}
-  table.reg tr{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
-  table.reg tr:hover td{background:transparent}
-  table.reg td{border:0;padding:0;min-width:0}
-  table.reg td.no{grid-column:1;grid-row:1;width:auto;text-align:left;font-size:1.05rem}
-  table.reg td.topic{grid-column:2;grid-row:1;min-width:0;font-size:1rem}
-  table.reg td.act{grid-column:3;grid-row:1}
-  table.reg td.lvl{grid-column:1 / -1;grid-row:2;margin-block:4px}
-  table.reg td.long,table.reg td.freq{grid-column:1 / -1;min-width:0}
-  table.reg td[data-label]:not(.no):not(.topic):not(.lvl)::before{content:attr(data-label);display:block;font-size:.76rem;font-weight:600;color:var(--muted);letter-spacing:.02em}
-  table.reg td.empty{grid-column:1 / -1}
-  .badge{flex-direction:row;gap:8px}
   /* matrix + reference */
   .matrix th,.matrix td{padding:6px 5px;font-size:.78rem}
   .matrix .lk-txt{white-space:normal;min-width:84px}
@@ -237,6 +221,65 @@ dialog::backdrop{background:rgba(10,20,26,.55)}
   .sum{grid-template-columns:repeat(3,1fr)}
   .tabs a{padding:5px 10px;font-size:.84rem}
 }
+
+.reg thead th{position:static}
+.reg thead tr:first-child th[rowspan]{vertical-align:bottom}
+.reg th.res-h{text-align:center;border-bottom:1px solid rgba(255,255,255,.35)}
+.reg thead tr+tr th{background:var(--accent);font-size:.82rem;text-align:center}
+.reg th small{font-weight:500;opacity:.85}
+.reg td.res{min-width:150px;white-space:pre-wrap}
+.ysel{display:inline-flex;align-items:center;gap:6px;font-size:.88rem;font-weight:600;color:var(--muted)}
+.ysel select{padding:7px 10px}
+.badge .sev{font-size:1.05rem}
+.resset{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0}
+.resset legend{font-weight:600;font-size:.92rem;padding:0 6px}
+.resgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.resgrid label{font-size:.85rem;font-weight:600}
+@media (max-width:760px){ table.reg td.res{grid-column:1 / -1;min-width:0} .ysel{flex:1 1 100%} .ysel select{flex:1} }
+
+/* ---------- editable register table ---------- */
+.reg-wrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:78vh}
+table.reg{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;font-size:.9rem}
+.reg thead th{position:sticky;top:0;z-index:3;background:var(--accent);color:#fff;font-weight:600;padding:9px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.22);border-bottom:1px solid rgba(255,255,255,.22);white-space:nowrap}
+.reg thead tr+tr th{top:39px;font-size:.88rem}
+.reg td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0;vertical-align:top;background:var(--surface)}
+.reg td.no{text-align:center;font-weight:700;color:var(--accent);padding:10px 6px;width:56px;font-variant-numeric:tabular-nums}
+.reg th.c-no,.reg td.no{position:sticky;left:0;z-index:2}
+.reg thead th.c-no{z-index:4}
+.reg tbody tr:hover td{background:var(--surface-2)}
+.ed{min-height:42px;padding:10px 9px;white-space:pre-wrap;word-break:break-word;outline:none;line-height:1.5;border-radius:4px;transition:background .15s}
+.ed:empty::before{content:"—";color:var(--muted)}
+.ed:focus{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--focus)}
+.ed.saving,.sevsel.saving{background:var(--mod-soft)}
+.ed.saved,.sevsel.saved{background:var(--low-soft)}
+.ed.err,.sevsel.err{background:var(--ext-soft)}
+.reg td.topic .ed{font-weight:600;min-width:210px}
+.reg td.w-l .ed{min-width:190px}
+.reg td.w-m .ed{min-width:110px}
+.reg td.res .ed{min-width:130px}
+.reg td.lv{width:92px;padding:6px;text-align:center;vertical-align:middle}
+.sevsel{font:inherit;font-weight:700;width:100%;min-width:64px;padding:6px 4px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-align:center;cursor:pointer}
+.sevsel.s1{background:var(--low);color:var(--low-ink);border-color:var(--low)}
+.sevsel.s2{background:var(--mod);color:var(--mod-ink);border-color:var(--mod)}
+.sevsel.s3{background:var(--high);color:var(--high-ink);border-color:var(--high)}
+.sevsel.s4,.sevsel.s5{background:var(--ext);color:var(--ext-ink);border-color:var(--ext)}
+.sevsel:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.reg td.act{width:40px;text-align:center;vertical-align:middle;padding:4px}
+.delbtn{font:inherit;border:0;background:transparent;color:var(--muted);cursor:pointer;border-radius:6px;padding:4px 7px;font-size:1rem;line-height:1}
+.delbtn:hover{color:var(--ext);background:var(--ext-soft)}
+.delbtn:focus-visible{outline:3px solid var(--focus)}
+.confirm-row td{background:var(--ext-soft)!important}
+.confirm-row .cbox{padding:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.help{font-size:.86rem;color:var(--muted)}
+.legend-sev{display:flex;flex-wrap:wrap;gap:6px;font-size:.8rem;color:var(--muted);align-items:center}
+.legend-sev i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:3px}
+@media (max-width:760px){
+  table.reg{min-width:860px;font-size:.84rem}
+  .reg-wrap{max-height:none}
+  .reg td.topic .ed{min-width:170px}
+  .reg td.w-l .ed{min-width:160px}
+  .reg td.res .ed{min-width:110px}
+}
 </style>
 </head>
 <body>
@@ -258,27 +301,30 @@ dialog::backdrop{background:rgba(10,20,26,.55)}
   <section id="register">
     <div class="sec-head">
       <h2>ตาราง Risk Profile หน่วยไตเทียม</h2>
-      <p>ข้อมูลอ่านและบันทึกลงชีต “Risk Profile” โดยตรง กดปุ่ม “แก้ไข” เพื่อกรอกมาตรการป้องกัน ตัวชี้วัด ความถี่ ระดับ และผลลัพธ์ ความถี่ที่เกิดจริงนับอัตโนมัติจากชีต “บันทึกข้อมูล” ตามปีงบประมาณ</p>
+      <p>คลิกที่ช่องในตารางเพื่อพิมพ์แก้ไข ระบบบันทึกลงชีต “Risk Profile” ทันทีเมื่อคลิกออกจากช่อง ช่องระดับเลือกระดับความรุนแรง A–I ผลลัพธ์แสดงปีงบประมาณปัจจุบันเทียบย้อนหลัง 3 ปีเสมอ ส่วนในชีตเก็บผลลัพธ์ทุกปี</p>
     </div>
-    <div class="sum" id="summary"></div>
     <div class="toolbar">
-      <div class="left" id="filters" role="group" aria-label="กรองตามระดับ"></div>
+      <div class="left">
+        <div class="status" id="status"><span class="dot busy"></span><span>กำลังโหลดข้อมูลจากชีต…</span></div>
+      </div>
       <div class="right">
-        <input type="search" class="search" id="q" placeholder="ค้นหาหัวข้อ มาตรการ ตัวชี้วัด" aria-label="ค้นหา">
         <a class="btn hrms" href="https://bidi.thai-nrls.org/" target="_blank" rel="noopener">รายงานความเสี่ยงในโปรแกรม HRMS (สรพ.) ↗</a>
         <button type="button" class="btn" id="btnReload">โหลดข้อมูลใหม่</button>
         <button type="button" class="btn primary" id="btnAdd">+ เพิ่มหัวข้อ</button>
       </div>
     </div>
-    <div class="status" id="status"><span class="dot busy"></span><span>กำลังโหลดข้อมูลจากชีต…</span></div>
-    <div class="panel scroll" style="padding:0">
+    <div class="reg-wrap" role="region" aria-label="ตาราง Risk Profile" tabindex="0">
       <table class="reg">
-        <thead><tr>
-          <th>ลำดับที่</th><th>หัวข้อ</th><th>มาตรการป้องกัน</th><th>ตัวชี้วัด</th><th>ความถี่</th><th>ระดับ</th><th>ผลลัพธ์</th><th></th>
-        </tr></thead>
+        <thead>
+          <tr>
+            <th rowspan="2" class="c-no">ลำดับที่</th><th rowspan="2">หัวข้อ</th><th rowspan="2">มาตรการป้องกัน</th><th rowspan="2">ตัวชี้วัด</th><th rowspan="2">ความถี่</th><th rowspan="2">ระดับ</th><th colspan="3">ผลลัพธ์</th><th rowspan="2" aria-label="ลบ"></th>
+          </tr>
+          <tr id="resYears"></tr>
+        </thead>
         <tbody id="regBody"></tbody>
       </table>
     </div>
+    <div class="legend-sev" id="sevLegend"></div>
   </section>
 
   <div class="explain-head" id="explain">
@@ -345,35 +391,6 @@ dialog::backdrop{background:rgba(10,20,26,.55)}
   <footer>อ้างอิง: ตาราง Risk Matrix ฉบับปรับใหม่ หน่วยไตเทียม · ระดับความรุนแรงของอุบัติการณ์ A–I (ศูนย์พัฒนาคุณภาพ โรงพยาบาลค่ายวชิราวุธ)</footer>
 </div>
 
-<dialog id="dlg" aria-labelledby="dlgTitle">
-  <form class="dlg" id="frm" method="dialog">
-    <header><h3 id="dlgTitle">แก้ไขความเสี่ยง</h3><button type="button" class="btn small" id="btnClose" aria-label="ปิด">ปิด</button></header>
-    <div class="content">
-      <div class="field"><label for="fTopic">หัวข้อ</label><input type="text" id="fTopic" required></div>
-      <div class="field"><label for="fMeasure">มาตรการป้องกัน</label><textarea id="fMeasure" placeholder="เช่น ตรวจสอบสารตกค้างด้วยแถบทดสอบก่อนใช้ตัวกรองทุกครั้ง"></textarea></div>
-      <div class="field"><label for="fKpi">ตัวชี้วัด</label><textarea id="fKpi" placeholder="เช่น อุบัติการณ์ตัวกรองมีสารตกค้างถึงผู้ป่วย = 0"></textarea></div>
-      <div class="field"><label for="fFreq">ความถี่</label><input type="text" id="fFreq" placeholder="เช่น 3 ครั้ง/ปี">
-        <div class="hint" id="freqHint"></div></div>
-      <div class="grid2">
-        <div class="field"><label for="fL">โอกาสเกิด (L)</label><select id="fL"></select></div>
-        <div class="field"><label for="fC">ผลกระทบ (C)</label><select id="fC"></select></div>
-      </div>
-      <div class="lvprev" id="lvPrev"></div>
-      <div class="field"><label for="fResult">ผลลัพธ์</label><textarea id="fResult" placeholder="ผลการดำเนินงาน / ผลการติดตามตัวชี้วัด"></textarea></div>
-      <div class="field"><label for="fBy">ผู้บันทึก</label><input type="text" id="fBy" placeholder="ชื่อผู้บันทึก"></div>
-      <div class="muted" id="fUpdated" style="font-size:.84rem;color:var(--muted)"></div>
-    </div>
-    <footer>
-      <div class="confirm" id="delWrap">
-        <button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>
-      </div>
-      <div class="r">
-        <button type="button" class="btn" id="btnCancel">ยกเลิก</button>
-        <button type="submit" class="btn primary" id="btnSave">บันทึกลงชีต</button>
-      </div>
-    </footer>
-  </form>
-</dialog>
 <div class="toast" id="toast" hidden></div>
 <script>
 // ===== ตั้งค่า: URL ของ Apps Script Web App (โครงการ "Risk Profile") =====
@@ -427,9 +444,14 @@ const DEFAULT_TOPICS = ['ข้อร้องเรียนจากผู้�
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
 let selL = 3, selC = 3;
-let ROWS = [], COUNTS = {}, FY = null, ONLINE = false;
-let fLevel = "all", fCell = null, editing = null;
+let ROWS = [], ONLINE = false, CUR_FY = null;
+const RES = "ผลลัพธ์ ปีงบ ";
+const SEV2C = {A:1,B:1,C:2,D:2,E:3,F:4,G:4,H:5,I:5};
+const TEXT_FIELDS = ["หัวข้อ","มาตรการป้องกัน","ตัวชี้วัด","ความถี่"];
+function curFyLocal(){ const d=new Date(); return d.getFullYear()+543+(d.getMonth()>=9?1:0); }
+function years3(){ const b = CUR_FY || curFyLocal(); return [b-2, b-1, b]; }
 
 /* ---------- server ---------- */
 async function api(action, payload){
@@ -443,11 +465,11 @@ async function api(action, payload){
 }
 function setStatus(kind, text){ $("status").innerHTML = `<span class="dot ${kind}"></span><span>${esc(text)}</span>`; }
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 2600); }
-function applyData(d){
-  ROWS = d.rows || []; COUNTS = d.counts || {}; FY = d.fy; ONLINE = true;
+function applyData(d, rerender){
+  ROWS = d.rows || []; ONLINE = true; CUR_FY = d.fy || curFyLocal();
   const t = new Date();
-  setStatus("ok", `เชื่อมต่อชีต Risk Profile แล้ว · ${ROWS.length} หัวข้อ · ความถี่เกิดจริงปีงบ ${FY} · อัปเดต ${t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`);
-  renderAll();
+  setStatus("ok", `เชื่อมต่อชีตแล้ว · ${ROWS.length} หัวข้อ · ปีงบปัจจุบัน ${CUR_FY} · อัปเดต ${t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`);
+  if (rerender !== false) renderRegister();
 }
 async function load(){
   setStatus("busy", "กำลังโหลดข้อมูลจากชีต…");
@@ -455,24 +477,9 @@ async function load(){
   catch(e){
     ONLINE = false;
     if (!ROWS.length) ROWS = DEFAULT_TOPICS.map((t,i)=>({"ลำดับที่":String(i+1),"หัวข้อ":t}));
-    setStatus("err", "เชื่อมต่อชีตไม่สำเร็จ: " + e.message + " (แสดงรายการหัวข้อ แก้ไขไม่ได้จนกว่าจะเชื่อมต่อ)");
-    renderAll();
+    setStatus("err", "เชื่อมต่อชีตไม่สำเร็จ: " + e.message + " (แก้ไขไม่ได้จนกว่าจะเชื่อมต่อ)");
+    renderRegister();
   }
-}
-
-/* ---------- helpers ---------- */
-function rowLevelKey(r){
-  const L = +r["โอกาสเกิด (L)"], C = +r["ผลกระทบ (C)"];
-  if (L>=1 && L<=5 && C>=1 && C<=5) return MAP[L][C];
-  return TH2KEY[String(r["ระดับ"]||"").trim()] || null;
-}
-function suggestL(n){ if (n==null) return null; if (n>=40) return 5; if (n>=31) return 4; if (n>=24) return 3; if (n>=16) return 2; return 1; }
-function badge(r){
-  const k = rowLevelKey(r);
-  if (!k) return `<span class="badge none">ยังไม่ประเมิน</span>`;
-  const lv = LEVELS[k], L = r["โอกาสเกิด (L)"], C = r["ผลกระทบ (C)"];
-  const sc = (L && C) ? `<small>${L}×${C} = ${L*C}</small>` : "";
-  return `<span class="badge ${lv.cls}">${lv.th}${sc}</span>`;
 }
 
 /* ---------- matrix / calc / refs / levels ---------- */
@@ -489,7 +496,7 @@ function buildMatrix(){
       const lv = LEVELS[MAP[l.n][c.n]];
       h += `<td class="pad"><button type="button" class="cell ${lv.cls}" data-l="${l.n}" data-c="${c.n}"
         aria-label="โอกาสเกิด ${l.n} ผลกระทบ ${c.n} คะแนน ${l.n*c.n} ระดับ${lv.th}" aria-pressed="false">
-        <b>${l.n*c.n}</b><span>(${lv.th} - ${lv.en})</span><span class="pins" id="pin-${l.n}-${c.n}"></span></button></td>`;
+        <b>${l.n*c.n}</b><span>(${lv.th} - ${lv.en})</span></button></td>`;
     });
     h += `</tr>`;
   });
@@ -500,25 +507,12 @@ function buildMatrix(){
   $("matrixTable").addEventListener("click", e=>{
     const b = e.target.closest(".cell"); if(!b) return;
     selL = +b.dataset.l; selC = +b.dataset.c; sync();
-    const key = selL+"-"+selC;
-    fCell = (fCell === key) ? null : key; fLevel = "all";
-    renderRegister();
-    if (fCell) document.getElementById("register").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
-  });
-}
-function renderPins(){
-  document.querySelectorAll(".pins").forEach(p=>p.innerHTML="");
-  ROWS.forEach(r=>{
-    const L=+r["โอกาสเกิด (L)"], C=+r["ผลกระทบ (C)"];
-    if (L && C){ const p=$(`pin-${L}-${C}`); if(p) p.insertAdjacentHTML("beforeend", `<em title="${esc(r["หัวข้อ"])}">${esc(r["ลำดับที่"])}</em>`); }
   });
 }
 function optsL(){ return LIKE.map(l=>`<option value="${l.n}">${l.n} — ${l.year} (${l.q})</option>`).join(""); }
 function optsC(){ return CONS.map(c=>`<option value="${c.n}">${c.n} — ระดับ ${c.sev} / ${c.money} บาท</option>`).join(""); }
 function buildSelects(){
   $("selL").innerHTML = optsL(); $("selC").innerHTML = optsC();
-  $("fL").innerHTML = `<option value="">— ยังไม่ประเมิน —</option>` + optsL();
-  $("fC").innerHTML = `<option value="">— ยังไม่ประเมิน —</option>` + optsC();
   $("selL").addEventListener("change", e=>{selL=+e.target.value; sync()});
   $("selC").addEventListener("change", e=>{selC=+e.target.value; sync()});
 }
@@ -556,121 +550,95 @@ function buildLevels(){
   }).join("");
 }
 
-/* ---------- register ---------- */
-function renderSummary(){
-  const n = {ext:0,high:0,mod:0,low:0,none:0};
-  ROWS.forEach(r=>{ const k=rowLevelKey(r); n[k||"none"]++; });
-  $("summary").innerHTML = `
-    <div class="tile t-ext"><b>${n.ext}</b><span>สูงมาก</span></div>
-    <div class="tile t-high"><b>${n.high}</b><span>สูง</span></div>
-    <div class="tile t-mod"><b>${n.mod}</b><span>ปานกลาง</span></div>
-    <div class="tile t-low"><b>${n.low}</b><span>ต่ำ</span></div>
-    <div class="tile"><b>${n.none}</b><span>ยังไม่ประเมิน</span></div>`;
-  const opts = [["all","ทั้งหมด",""],["ext","สูงมาก","var(--ext)"],["high","สูง","var(--high)"],["mod","ปานกลาง","var(--mod)"],["low","ต่ำ","var(--low)"],["none","ยังไม่ประเมิน","var(--line)"]];
-  $("filters").innerHTML = opts.map(([k,t,c])=>`<button type="button" class="fchip" data-f="${k}" aria-pressed="${fLevel===k && !fCell}">${c?`<i style="background:${c}"></i>`:""}${t}</button>`).join("")
-    + (fCell ? `<button type="button" class="fchip" data-f="clearcell" aria-pressed="true">ช่อง ${fCell.replace("-","×")} ✕</button>` : "");
+
+/* ---------- editable register ---------- */
+function sevClass(v){ const c = SEV2C[v]; return c ? "s"+c : ""; }
+function edCell(r, field, cls){
+  const v = r[field] || "";
+  return `<td class="${cls}"><div class="ed" ${ONLINE?'contenteditable="plaintext-only"':''} role="textbox" aria-multiline="true" aria-label="${esc(field)} ลำดับที่ ${esc(r["ลำดับที่"])}" data-no="${esc(r["ลำดับที่"])}" data-f="${esc(field)}">${esc(v)}</div></td>`;
 }
 function renderRegister(){
-  renderSummary();
-  const q = $("q").value.trim().toLowerCase();
-  const list = ROWS.filter(r=>{
-    const k = rowLevelKey(r) || "none";
-    if (fCell && `${r["โอกาสเกิด (L)"]}-${r["ผลกระทบ (C)"]}` !== fCell) return false;
-    if (!fCell && fLevel!=="all" && k!==fLevel) return false;
-    if (q && !["หัวข้อ","มาตรการป้องกัน","ตัวชี้วัด","ผลลัพธ์"].some(h=>String(r[h]||"").toLowerCase().includes(q))) return false;
-    return true;
-  });
-  const cell = (v)=> v ? esc(v) : `<span class="empty">—</span>`;
-  $("regBody").innerHTML = list.length ? list.map(r=>{
-    const cnt = ONLINE ? (COUNTS[r["หัวข้อ"]] ?? 0) : null;
-    return `<tr>
-      <td class="no" data-label="ลำดับที่">${esc(r["ลำดับที่"])}</td>
-      <td class="topic" data-label="หัวข้อ">${esc(r["หัวข้อ"])}</td>
-      <td class="long" data-label="มาตรการป้องกัน">${cell(r["มาตรการป้องกัน"])}</td>
-      <td class="long" data-label="ตัวชี้วัด">${cell(r["ตัวชี้วัด"])}</td>
-      <td class="freq" data-label="ความถี่">${cell(r["ความถี่"])}${cnt!=null && ONLINE ? `<div class="muted">เกิดจริงปีงบ ${FY}: ${cnt} ครั้ง</div>`:""}</td>
-      <td class="lvl" data-label="ระดับ">${badge(r)}</td>
-      <td class="long" data-label="ผลลัพธ์">${cell(r["ผลลัพธ์"])}</td>
-      <td class="act"><button type="button" class="btn small" data-edit="${esc(r["ลำดับที่"])}" ${ONLINE?"":"disabled"}>แก้ไข</button></td>
-    </tr>`;}).join("") : `<tr><td colspan="8" class="empty" style="text-align:center;padding:24px">ไม่พบรายการตามเงื่อนไข</td></tr>`;
+  const ys = years3();
+  $("resYears").innerHTML = ys.map(y=>`<th title="ผลลัพธ์ ปีงบประมาณ ${y}">${String(y).slice(-2)}</th>`).join("");
+  $("regBody").innerHTML = ROWS.map(r=>{
+    const sev = String(r["ระดับ"]||"").trim().toUpperCase();
+    const opts = `<option value="">–</option>` + SEV.map(([c,t])=>`<option value="${c}" ${c===sev?"selected":""} title="${esc(t)}">${c}</option>`).join("");
+    return `<tr data-no="${esc(r["ลำดับที่"])}">
+      <td class="no">${esc(r["ลำดับที่"])}</td>
+      ${edCell(r,"หัวข้อ","topic")}
+      ${edCell(r,"มาตรการป้องกัน","w-l")}
+      ${edCell(r,"ตัวชี้วัด","w-l")}
+      ${edCell(r,"ความถี่","w-m")}
+      <td class="lv"><select class="sevsel ${sevClass(sev)}" data-no="${esc(r["ลำดับที่"])}" aria-label="ระดับ ลำดับที่ ${esc(r["ลำดับที่"])}" ${ONLINE?"":"disabled"}>${opts}</select></td>
+      ${ys.map(y=>edCell(r, RES+y, "res")).join("")}
+      <td class="act"><button type="button" class="delbtn" data-del="${esc(r["ลำดับที่"])}" aria-label="ลบลำดับที่ ${esc(r["ลำดับที่"])}" ${ONLINE?"":"disabled"}>✕</button></td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="10" class="help" style="padding:20px;text-align:center">ยังไม่มีรายการ</td></tr>`;
 }
-function renderAll(){ renderPins(); renderRegister(); }
-
-/* ---------- dialog ---------- */
-function updPrev(){
-  const L=+$("fL").value, C=+$("fC").value, p=$("lvPrev");
-  if (L && C){ const lv=LEVELS[MAP[L][C]]; p.className="lvprev "+lv.cls; p.textContent=`ระดับ${lv.th} (${lv.en}) · คะแนน ${L}×${C} = ${L*C}`; }
-  else { p.className="lvprev badge none"; p.style.display="block"; p.textContent="ยังไม่ประเมินระดับ เลือกโอกาสเกิดและผลกระทบ"; }
+function flash(el, cls){ el.classList.remove("saving","saved","err"); if(cls) el.classList.add(cls); if(cls==="saved") setTimeout(()=>el.classList.remove("saved"),1200); }
+const queue = {};
+function saveField(no, field, value, el){
+  const row = {"ลำดับที่": no}; row[field] = value;
+  if (field === "ระดับ") row["ผลกระทบ (C)"] = value ? SEV2C[value] : "";
+  flash(el, "saving");
+  const prev = queue[no] || Promise.resolve();
+  queue[no] = prev.then(()=>api('saveRow', {row})).then(d=>{
+    applyData(d, false);
+    const r = ROWS.find(x=>String(x["ลำดับที่"])===String(no));
+    if (r) Object.assign(r, row);
+    flash(el, "saved");
+  }).catch(e=>{ flash(el, "err"); toast("บันทึกไม่สำเร็จ: " + e.message); });
 }
-function openEdit(no){
-  const r = no==null ? {} : ROWS.find(x=>String(x["ลำดับที่"])===String(no));
-  if (!r) return;
-  editing = no==null ? null : String(no);
-  $("dlgTitle").textContent = editing ? `แก้ไขความเสี่ยง ลำดับที่ ${editing}` : "เพิ่มหัวข้อความเสี่ยง";
-  $("fTopic").value = r["หัวข้อ"]||""; $("fMeasure").value = r["มาตรการป้องกัน"]||"";
-  $("fKpi").value = r["ตัวชี้วัด"]||""; $("fFreq").value = r["ความถี่"]||"";
-  $("fL").value = r["โอกาสเกิด (L)"]||""; $("fC").value = r["ผลกระทบ (C)"]||"";
-  $("fResult").value = r["ผลลัพธ์"]||"";
-  let by = r["ผู้บันทึก"]||""; if(!by){ try{ by = localStorage.getItem("rp_by")||""; }catch(e){} }
-  $("fBy").value = by;
-  $("fUpdated").textContent = r["ปรับปรุงล่าสุด"] ? "ปรับปรุงล่าสุด " + r["ปรับปรุงล่าสุด"] : "";
-  const cnt = ONLINE && r["หัวข้อ"] ? (COUNTS[r["หัวข้อ"]] ?? 0) : null, sug = suggestL(cnt);
-  $("freqHint").innerHTML = cnt!=null
-    ? `เกิดจริงปีงบ ${FY} จากชีตบันทึกข้อมูล: <strong>${cnt} ครั้ง</strong> → โอกาสเกิดที่แนะนำ ${sug} <button type="button" class="btn small" id="useCnt">ใช้ค่านี้</button>`
-    : (editing ? `ไม่พบคอลัมน์ชื่อนี้ในชีตบันทึกข้อมูล กรอกความถี่เอง` : "");
-  const u = $("useCnt"); if(u) u.onclick = ()=>{ $("fFreq").value = `${cnt} ครั้ง/ปีงบ ${FY}`; $("fL").value = sug; updPrev(); };
-  $("delWrap").innerHTML = editing ? `<button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>` : "";
-  if (editing) $("btnDel").onclick = askDelete;
-  updPrev();
-  $("dlg").showModal();
-}
-function askDelete(){
-  $("delWrap").innerHTML = `<span>ยืนยันลบลำดับที่ ${esc(editing)} ออกจากชีต?</span>
-    <button type="button" class="btn danger" id="delYes">ลบ</button><button type="button" class="btn" id="delNo">ไม่ลบ</button>`;
-  $("delNo").onclick = ()=>{ $("delWrap").innerHTML = `<button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>`; $("btnDel").onclick = askDelete; };
-  $("delYes").onclick = async ()=>{
-    try{ busy(true); applyData(await api('deleteRow', {no: editing})); $("dlg").close(); toast("ลบหัวข้อแล้ว"); }
-    catch(e){ toast("ลบไม่สำเร็จ: "+e.message); } finally{ busy(false); }
-  };
-}
-function busy(on){ ["btnSave","btnCancel"].forEach(id=>$(id).disabled=on); $("btnSave").textContent = on ? "กำลังบันทึก…" : "บันทึกลงชีต"; }
-async function save(e){
-  e.preventDefault();
-  const topic = $("fTopic").value.trim();
-  if (!topic){ $("fTopic").focus(); toast("กรุณาระบุหัวข้อ"); return; }
-  const L = $("fL").value, C = $("fC").value;
-  const row = {
-    "หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(),
-    "ความถี่": $("fFreq").value.trim(), "ผลลัพธ์": $("fResult").value.trim(),
-    "โอกาสเกิด (L)": L, "ผลกระทบ (C)": C, "ระดับ": (L && C) ? LEVELS[MAP[L][C]].th : "",
-    "ผู้บันทึก": $("fBy").value.trim()
-  };
-  try{ localStorage.setItem("rp_by", row["ผู้บันทึก"]); }catch(x){}
+$("regBody").addEventListener("focusin", e=>{ const ed=e.target.closest(".ed"); if(ed) ed.dataset.orig = ed.textContent; });
+$("regBody").addEventListener("focusout", e=>{
+  const ed = e.target.closest(".ed"); if(!ed || !ONLINE) return;
+  const v = ed.textContent.replace(/ /g," ").trim();
+  if (v === (ed.dataset.orig||"").trim()) return;
+  if (ed.dataset.f === "หัวข้อ" && !v){ ed.textContent = ed.dataset.orig; toast("หัวข้อต้องไม่ว่าง"); return; }
+  ed.textContent = v;
+  saveField(ed.dataset.no, ed.dataset.f, v, ed);
+});
+$("regBody").addEventListener("keydown", e=>{
+  const ed = e.target.closest(".ed"); if(!ed) return;
+  if (e.key === "Escape"){ ed.textContent = ed.dataset.orig||""; ed.blur(); }
+  if (e.key === "Enter" && !e.shiftKey && (ed.dataset.f==="หัวข้อ" || ed.dataset.f==="ความถี่")){ e.preventDefault(); ed.blur(); }
+});
+$("regBody").addEventListener("change", e=>{
+  const s = e.target.closest(".sevsel"); if(!s) return;
+  s.className = "sevsel " + sevClass(s.value);
+  saveField(s.dataset.no, "ระดับ", s.value, s);
+});
+$("regBody").addEventListener("click", e=>{
+  const b = e.target.closest("[data-del]"); if(b){
+    const tr = b.closest("tr"), no = b.dataset.del;
+    const r = ROWS.find(x=>String(x["ลำดับที่"])===String(no));
+    const c = document.createElement("tr"); c.className="confirm-row";
+    c.innerHTML = `<td colspan="10"><div class="cbox"><span>ยืนยันลบลำดับที่ ${esc(no)} “${esc(r?r["หัวข้อ"]:"")}” ออกจากชีต?</span>
+      <button type="button" class="btn small danger" data-yes>ลบ</button><button type="button" class="btn small" data-no>ไม่ลบ</button></div></td>`;
+    document.querySelectorAll(".confirm-row").forEach(x=>x.remove());
+    tr.after(c);
+    c.querySelector("[data-no]").onclick = ()=>c.remove();
+    c.querySelector("[data-yes]").onclick = async ()=>{
+      try{ setStatus("busy","กำลังลบ…"); applyData(await api('deleteRow', {no})); toast("ลบหัวข้อแล้ว"); }
+      catch(err){ toast("ลบไม่สำเร็จ: "+err.message); load(); }
+    };
+  }
+});
+$("btnAdd").addEventListener("click", async ()=>{
+  if(!ONLINE){ toast("ยังเชื่อมต่อชีตไม่ได้"); return; }
   try{
-    busy(true);
-    if (editing){ row["ลำดับที่"] = editing; applyData(await api('saveRow', {row})); }
-    else applyData(await api('addRow', {row}));
-    $("dlg").close(); toast("บันทึกลงชีตเรียบร้อย");
-  }catch(err){ toast("บันทึกไม่สำเร็จ: " + err.message); }
-  finally{ busy(false); }
-}
+    setStatus("busy","กำลังเพิ่มหัวข้อ…");
+    applyData(await api('addRow', {row:{"หัวข้อ":"หัวข้อใหม่"}}));
+    const last = [...document.querySelectorAll('.ed[data-f="หัวข้อ"]')].pop();
+    if (last){ last.scrollIntoView({block:"center"}); last.focus(); document.getSelection().selectAllChildren(last); }
+  }catch(e){ toast("เพิ่มไม่สำเร็จ: "+e.message); }
+});
+$("btnReload").addEventListener("click", load);
+$("sevLegend").innerHTML = "ระดับ: " + [["A–B","var(--low)"],["C–D","var(--mod)"],["E","var(--high)"],["F–I","var(--ext)"]].map(([t,c])=>`<span><i style="background:${c}"></i>${t}</span>`).join("") + ` · ความหมายของระดับ A–I ดูที่ “เกณฑ์การให้คะแนน” ด้านล่าง`;
 
 /* ---------- init ---------- */
 buildMatrix(); buildSelects(); buildRefs(); buildLevels(); sync();
-$("filters").addEventListener("click", e=>{
-  const b = e.target.closest(".fchip"); if(!b) return;
-  if (b.dataset.f==="clearcell") fCell = null; else { fLevel = b.dataset.f; fCell = null; }
-  renderRegister();
-});
-$("q").addEventListener("input", renderRegister);
-$("regBody").addEventListener("click", e=>{ const b=e.target.closest("[data-edit]"); if(b) openEdit(b.dataset.edit); });
-$("btnAdd").addEventListener("click", ()=>{ if(!ONLINE){ toast("ยังเชื่อมต่อชีตไม่ได้"); return; } openEdit(null); });
-$("btnReload").addEventListener("click", load);
-$("fL").addEventListener("change", updPrev); $("fC").addEventListener("change", updPrev);
-$("frm").addEventListener("submit", save);
-$("btnCancel").addEventListener("click", ()=>$("dlg").close());
-$("btnClose").addEventListener("click", ()=>$("dlg").close());
-renderAll();
+renderRegister();
 load();
 </script>
 </body>
