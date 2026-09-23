@@ -264,7 +264,16 @@ table.reg{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;f
 .sevsel.s3{background:var(--high);color:var(--high-ink);border-color:var(--high)}
 .sevsel.s4,.sevsel.s5{background:var(--ext);color:var(--ext-ink);border-color:var(--ext)}
 .sevsel:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
-.reg td.act{width:40px;text-align:center;vertical-align:middle;padding:4px}
+.reg td.act{width:118px;text-align:center;vertical-align:middle;padding:4px;white-space:nowrap}
+.editbtn{font:inherit;font-size:.82rem;font-weight:600;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);border-radius:7px;padding:5px 9px;cursor:pointer;margin-right:4px}
+.editbtn:hover{background:var(--accent);color:#fff}
+.editbtn:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.ed{cursor:text}
+.ed:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.reg-wrap.loading{opacity:.55;pointer-events:none}
+.resset{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0}
+.resset legend{font-weight:600;font-size:.92rem;padding:0 6px}
+.resgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
 .delbtn{font:inherit;border:0;background:transparent;color:var(--muted);cursor:pointer;border-radius:6px;padding:4px 7px;font-size:1rem;line-height:1}
 .delbtn:hover{color:var(--ext);background:var(--ext-soft)}
 .delbtn:focus-visible{outline:3px solid var(--focus)}
@@ -301,7 +310,7 @@ table.reg{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;f
   <section id="register">
     <div class="sec-head">
       <h2>ตาราง Risk Profile หน่วยไตเทียม</h2>
-      <p>คลิกที่ช่องในตารางเพื่อพิมพ์แก้ไข ระบบบันทึกลงชีต “Risk Profile” ทันทีเมื่อคลิกออกจากช่อง ช่องระดับเลือกระดับความรุนแรง A–I ผลลัพธ์แสดงปีงบประมาณปัจจุบันเทียบย้อนหลัง 3 ปีเสมอ ส่วนในชีตเก็บผลลัพธ์ทุกปี</p>
+      <p>แก้ไขได้ 2 วิธี คือคลิกที่ช่องในตารางแล้วพิมพ์ได้ทันที (บันทึกเมื่อคลิกออกจากช่อง) หรือกดปุ่ม “✎ แก้ไข” ท้ายแถวเพื่อแก้ทั้งแถวในแบบฟอร์ม ข้อมูลบันทึกลงชีต “Risk Profile” ช่องระดับเลือกระดับความรุนแรง A–I ผลลัพธ์แสดงปีงบประมาณปัจจุบันเทียบย้อนหลัง 3 ปีเสมอ ส่วนในชีตเก็บผลลัพธ์ทุกปี</p>
     </div>
     <div class="toolbar">
       <div class="left">
@@ -317,7 +326,7 @@ table.reg{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;f
       <table class="reg">
         <thead>
           <tr>
-            <th rowspan="2" class="c-no">ลำดับที่</th><th rowspan="2">หัวข้อ</th><th rowspan="2">มาตรการป้องกัน</th><th rowspan="2">ตัวชี้วัด</th><th rowspan="2">ความถี่</th><th rowspan="2">ระดับ</th><th colspan="3">ผลลัพธ์</th><th rowspan="2" aria-label="ลบ"></th>
+            <th rowspan="2" class="c-no">ลำดับที่</th><th rowspan="2">หัวข้อ</th><th rowspan="2">มาตรการป้องกัน</th><th rowspan="2">ตัวชี้วัด</th><th rowspan="2">ความถี่</th><th rowspan="2">ระดับ</th><th colspan="3">ผลลัพธ์</th><th rowspan="2">จัดการ</th>
           </tr>
           <tr id="resYears"></tr>
         </thead>
@@ -391,6 +400,22 @@ table.reg{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;f
   <footer>อ้างอิง: ตาราง Risk Matrix ฉบับปรับใหม่ หน่วยไตเทียม · ระดับความรุนแรงของอุบัติการณ์ A–I (ศูนย์พัฒนาคุณภาพ โรงพยาบาลค่ายวชิราวุธ)</footer>
 </div>
 
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <form class="dlg" id="frm" method="dialog">
+    <header><h3 id="dlgTitle">แก้ไขรายการ</h3><button type="button" class="btn small" id="btnClose">ปิด</button></header>
+    <div class="content">
+      <div class="field"><label for="fTopic">หัวข้อ</label><input type="text" id="fTopic"></div>
+      <div class="field"><label for="fMeasure">มาตรการป้องกัน</label><textarea id="fMeasure"></textarea></div>
+      <div class="field"><label for="fKpi">ตัวชี้วัด</label><textarea id="fKpi"></textarea></div>
+      <div class="grid2">
+        <div class="field"><label for="fFreq">ความถี่</label><input type="text" id="fFreq"></div>
+        <div class="field"><label for="fSev">ระดับ (A–I)</label><select id="fSev"></select></div>
+      </div>
+      <fieldset class="resset"><legend>ผลลัพธ์</legend><div id="resFields" class="resgrid"></div></fieldset>
+    </div>
+    <footer><span></span><div class="r"><button type="button" class="btn" id="btnCancel">ยกเลิก</button><button type="submit" class="btn primary" id="btnSave">บันทึกลงชีต</button></div></footer>
+  </form>
+</dialog>
 <div class="toast" id="toast" hidden></div>
 <script>
 // ===== ตั้งค่า: URL ของ Apps Script Web App (โครงการ "Risk Profile") =====
@@ -472,9 +497,11 @@ function applyData(d, rerender){
   if (rerender !== false) renderRegister();
 }
 async function load(){
-  setStatus("busy", "กำลังโหลดข้อมูลจากชีต…");
-  try { applyData(await api('list')); }
+  setStatus("busy", "กำลังโหลดข้อมูลจากชีต… (ใช้เวลาประมาณ 5–10 วินาที)");
+  document.querySelector(".reg-wrap").classList.add("loading");
+  try { applyData(await api('list')); document.querySelector(".reg-wrap").classList.remove("loading"); }
   catch(e){
+    document.querySelector(".reg-wrap").classList.remove("loading");
     ONLINE = false;
     if (!ROWS.length) ROWS = DEFAULT_TOPICS.map((t,i)=>({"ลำดับที่":String(i+1),"หัวข้อ":t}));
     setStatus("err", "เชื่อมต่อชีตไม่สำเร็จ: " + e.message + " (แก้ไขไม่ได้จนกว่าจะเชื่อมต่อ)");
@@ -555,7 +582,7 @@ function buildLevels(){
 function sevClass(v){ const c = SEV2C[v]; return c ? "s"+c : ""; }
 function edCell(r, field, cls){
   const v = r[field] || "";
-  return `<td class="${cls}"><div class="ed" ${ONLINE?'contenteditable="plaintext-only"':''} role="textbox" aria-multiline="true" aria-label="${esc(field)} ลำดับที่ ${esc(r["ลำดับที่"])}" data-no="${esc(r["ลำดับที่"])}" data-f="${esc(field)}">${esc(v)}</div></td>`;
+  return `<td class="${cls}"><div class="ed" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="${esc(field)} ลำดับที่ ${esc(r["ลำดับที่"])}" data-no="${esc(r["ลำดับที่"])}" data-f="${esc(field)}">${esc(v)}</div></td>`;
 }
 function renderRegister(){
   const ys = years3();
@@ -571,7 +598,7 @@ function renderRegister(){
       ${edCell(r,"ความถี่","w-m")}
       <td class="lv"><select class="sevsel ${sevClass(sev)}" data-no="${esc(r["ลำดับที่"])}" aria-label="ระดับ ลำดับที่ ${esc(r["ลำดับที่"])}" ${ONLINE?"":"disabled"}>${opts}</select></td>
       ${ys.map(y=>edCell(r, RES+y, "res")).join("")}
-      <td class="act"><button type="button" class="delbtn" data-del="${esc(r["ลำดับที่"])}" aria-label="ลบลำดับที่ ${esc(r["ลำดับที่"])}" ${ONLINE?"":"disabled"}>✕</button></td>
+      <td class="act"><button type="button" class="editbtn" data-edit="${esc(r["ลำดับที่"])}" aria-label="แก้ไขลำดับที่ ${esc(r["ลำดับที่"])}">✎ แก้ไข</button><button type="button" class="delbtn" data-del="${esc(r["ลำดับที่"])}" aria-label="ลบลำดับที่ ${esc(r["ลำดับที่"])}" title="ลบหัวข้อ">✕</button></td>
     </tr>`;
   }).join("") || `<tr><td colspan="10" class="help" style="padding:20px;text-align:center">ยังไม่มีรายการ</td></tr>`;
 }
@@ -589,10 +616,17 @@ function saveField(no, field, value, el){
     flash(el, "saved");
   }).catch(e=>{ flash(el, "err"); toast("บันทึกไม่สำเร็จ: " + e.message); });
 }
-$("regBody").addEventListener("focusin", e=>{ const ed=e.target.closest(".ed"); if(ed) ed.dataset.orig = ed.textContent; });
+$("regBody").addEventListener("focusin", e=>{ const ed=e.target.closest(".ed"); if(ed) ed.dataset.orig = ed.innerText.trim(); });
+$("regBody").addEventListener("paste", e=>{
+  const ed = e.target.closest(".ed"); if(!ed) return;
+  e.preventDefault();
+  const t = (e.clipboardData || window.clipboardData).getData("text/plain");
+  if (!document.execCommand("insertText", false, t)) ed.textContent += t;
+});
 $("regBody").addEventListener("focusout", e=>{
-  const ed = e.target.closest(".ed"); if(!ed || !ONLINE) return;
-  const v = ed.textContent.replace(/ /g," ").trim();
+  const ed = e.target.closest(".ed"); if(!ed) return;
+  const v = ed.innerText.replace(/\u00a0/g," ").replace(/\n{3,}/g,"\n\n").trim();
+  if (!ONLINE){ if (v !== (ed.dataset.orig||"").trim()){ ed.textContent = ed.dataset.orig||""; toast("ยังโหลดข้อมูลจากชีตไม่เสร็จ กรุณารอสักครู่แล้วแก้ไขใหม่"); } return; }
   if (v === (ed.dataset.orig||"").trim()) return;
   if (ed.dataset.f === "หัวข้อ" && !v){ ed.textContent = ed.dataset.orig; toast("หัวข้อต้องไม่ว่าง"); return; }
   ed.textContent = v;
@@ -601,7 +635,8 @@ $("regBody").addEventListener("focusout", e=>{
 $("regBody").addEventListener("keydown", e=>{
   const ed = e.target.closest(".ed"); if(!ed) return;
   if (e.key === "Escape"){ ed.textContent = ed.dataset.orig||""; ed.blur(); }
-  if (e.key === "Enter" && !e.shiftKey && (ed.dataset.f==="หัวข้อ" || ed.dataset.f==="ความถี่")){ e.preventDefault(); ed.blur(); }
+  if (e.key === "Enter" && !e.shiftKey && (ed.dataset.f==="หัวข้อ" || ed.dataset.f==="ความถี่")){ e.preventDefault(); ed.blur(); return; }
+  if (e.key === "Enter"){ e.preventDefault(); document.execCommand("insertLineBreak") || document.execCommand("insertText", false, "\n"); }
 });
 $("regBody").addEventListener("change", e=>{
   const s = e.target.closest(".sevsel"); if(!s) return;
@@ -609,7 +644,9 @@ $("regBody").addEventListener("change", e=>{
   saveField(s.dataset.no, "ระดับ", s.value, s);
 });
 $("regBody").addEventListener("click", e=>{
+  const eb = e.target.closest("[data-edit]"); if (eb){ openEdit(eb.dataset.edit); return; }
   const b = e.target.closest("[data-del]"); if(b){
+    if(!ONLINE){ toast("ยังโหลดข้อมูลจากชีตไม่เสร็จ"); return; }
     const tr = b.closest("tr"), no = b.dataset.del;
     const r = ROWS.find(x=>String(x["ลำดับที่"])===String(no));
     const c = document.createElement("tr"); c.className="confirm-row";
@@ -634,6 +671,34 @@ $("btnAdd").addEventListener("click", async ()=>{
   }catch(e){ toast("เพิ่มไม่สำเร็จ: "+e.message); }
 });
 $("btnReload").addEventListener("click", load);
+
+/* ---------- edit form (dialog) ---------- */
+let editingNo = null;
+function openEdit(no){
+  if(!ONLINE){ toast("ยังโหลดข้อมูลจากชีตไม่เสร็จ กรุณารอสักครู่"); return; }
+  const r = ROWS.find(x=>String(x["ลำดับที่"])===String(no)); if(!r) return;
+  editingNo = String(no);
+  $("dlgTitle").textContent = `แก้ไขรายการ ลำดับที่ ${no}`;
+  $("fTopic").value = r["หัวข้อ"]||""; $("fMeasure").value = r["มาตรการป้องกัน"]||"";
+  $("fKpi").value = r["ตัวชี้วัด"]||""; $("fFreq").value = r["ความถี่"]||"";
+  $("fSev").innerHTML = `<option value="">— ไม่ระบุ —</option>` + SEV.map(([c,t])=>`<option value="${c}">${c} — ${esc(t)}</option>`).join("");
+  $("fSev").value = String(r["ระดับ"]||"").trim().toUpperCase();
+  $("resFields").innerHTML = years3().map((y,i)=>`<div class="field"><label for="fRes${i}">ผลลัพธ์ ปีงบ ${y}</label><textarea id="fRes${i}" data-y="${y}">${esc(r[RES+y]||"")}</textarea></div>`).join("");
+  $("dlg").showModal(); $("fMeasure").focus();
+}
+$("frm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const topic = $("fTopic").value.trim(); if(!topic){ toast("หัวข้อต้องไม่ว่าง"); $("fTopic").focus(); return; }
+  const sev = $("fSev").value;
+  const row = {"ลำดับที่": editingNo, "หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(), "ความถี่": $("fFreq").value.trim(), "ระดับ": sev, "ผลกระทบ (C)": sev ? SEV2C[sev] : ""};
+  document.querySelectorAll("#resFields textarea").forEach(t=>row[RES+t.dataset.y]=t.value.trim());
+  const btn = $("btnSave"); btn.disabled = true; btn.textContent = "กำลังบันทึก…";
+  try{ applyData(await api('saveRow', {row})); $("dlg").close(); toast("บันทึกลงชีตเรียบร้อย"); }
+  catch(err){ toast("บันทึกไม่สำเร็จ: " + err.message); }
+  finally{ btn.disabled = false; btn.textContent = "บันทึกลงชีต"; }
+});
+$("btnCancel").addEventListener("click", ()=>$("dlg").close());
+$("btnClose").addEventListener("click", ()=>$("dlg").close());
 $("sevLegend").innerHTML = "ระดับ: " + [["A–B","var(--low)"],["C–D","var(--mod)"],["E","var(--high)"],["F–I","var(--ext)"]].map(([t,c])=>`<span><i style="background:${c}"></i>${t}</span>`).join("") + ` · ความหมายของระดับ A–I ดูที่ “เกณฑ์การให้คะแนน” ด้านล่าง`;
 
 /* ---------- init ---------- */
