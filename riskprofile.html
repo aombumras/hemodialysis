@@ -804,7 +804,8 @@ function incCounts(no){
 function numOf(v){ const m = String(v==null?'':v).replace(/,/g,'').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : 0; }
 function yearSum(r){ return Object.keys(r||{}).filter(k=>k.indexOf(RES)===0).reduce((s,k)=>s+numOf(r[k]),0); }
 function chipClass(k){ return /^[A-I]$/.test(k) ? sevClass(k) : (/^[1-5]$/.test(k) ? "s"+k : ""); }
-function applyData(d, rerender){
+function applyData(d, rerender, fromCache){
+  if (!fromCache) cacheSet('list', d);
   ROWS = d.rows || []; ONLINE = true; CUR_FY = d.fy || curFyLocal(); YEARS = d.years || [];
   if (d.links) setLinks(d.links);
   if (window.INC) INC.refreshStats();
@@ -812,12 +813,23 @@ function applyData(d, rerender){
   setStatus("ok", `เชื่อมต่อชีตแล้ว · ${ROWS.length} หัวข้อ · ปีงบปัจจุบัน ${CUR_FY} · อัปเดต ${t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`);
   if (rerender !== false) renderRegister();
 }
+/* ---------- แคชในเบราว์เซอร์: แสดงข้อมูลล่าสุดทันที แล้วค่อยอัปเดตจากชีต ---------- */
+function cacheGet(k){ try { const v = localStorage.getItem('rp_cache_' + k); return v ? JSON.parse(v) : null; } catch(e){ return null; } }
+function cacheSet(k, v){ try { localStorage.setItem('rp_cache_' + k, JSON.stringify({t: Date.now(), d: v})); } catch(e){} }
+function ago(t){ const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'เมื่อสักครู่' : m < 60 ? m + ' นาทีที่แล้ว' : Math.round(m/60) + ' ชั่วโมงที่แล้ว'; }
+window.cacheGet = cacheGet; window.cacheSet = cacheSet; window.ago = ago;
+
 async function load(){
-  setStatus("busy", "กำลังโหลดข้อมูลจากชีต… (ใช้เวลาประมาณ 5–10 วินาที)");
-  document.querySelector(".reg-wrap").classList.add("loading");
-  try { applyData(await api('list')); document.querySelector(".reg-wrap").classList.remove("loading"); }
+  const c = cacheGet('list');
+  if (c && c.d && !ROWS.length) {
+    applyData(c.d, true, true);
+    setStatus("busy", "แสดงข้อมูลที่บันทึกไว้ (" + ago(c.t) + ") · กำลังอัปเดตจากชีต…");
+  }
+  if (!(c && c.d)) { setStatus("busy", "กำลังโหลดข้อมูลจากชีต… (ครั้งแรกอาจใช้เวลา 10–30 วินาที)"); document.querySelector(".reg-wrap").classList.add("loading"); }
+  try { const d = await api('list'); applyData(d); document.querySelector(".reg-wrap").classList.remove("loading"); }
   catch(e){
     document.querySelector(".reg-wrap").classList.remove("loading");
+    if (c && c.d) { setStatus("err", "อัปเดตจากชีตไม่สำเร็จ แสดงข้อมูลที่บันทึกไว้ (" + ago(c.t) + ") · กด “โหลดข้อมูลใหม่” อีกครั้ง"); return; }
     ONLINE = false;
     if (!ROWS.length) ROWS = DEFAULT_TOPICS.map((t,i)=>({"ลำดับที่":String(i+1),"หัวข้อ":t}));
     if (window.INC) INC.refreshStats();
@@ -1065,7 +1077,8 @@ load();
   // ---------- ตัวเลือกดรอปดาวน์ (HRMS) ----------
   const fillSelect = (id, items, ph) => $(id).innerHTML = `<option value="">${ph || '-- เลือก --'}</option>` + items.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
   const fillList = (id, items) => $(id).innerHTML = items.map(x => `<option value="${esc(x)}"></option>`).join('');
-  api('options').then(o => {
+  const optC = cacheGet('incOpt');
+  const applyOpt = o => {
     OPT = o;
     fillSelect('selPlace', o.placeType);
     fillSelect('selAff', o.affected);
@@ -1078,7 +1091,10 @@ load();
       `<optgroup label="ด้านคลินิก (A–I)">${o.severity.filter(x => /^[A-I]$/.test(x)).map(opt).join('')}</optgroup>` +
       `<optgroup label="ด้านทั่วไป (1–5)">${o.severity.filter(x => !/^[A-I]$/.test(x)).map(opt).join('')}</optgroup>`;
     if (editing) fillForm(editing);
-  }).catch(e => toast('โหลดตัวเลือกไม่สำเร็จ: ' + e.message, false));
+  };
+  if (optC && optC.d) applyOpt(optC.d);
+  api('options').then(o => { cacheSet('incOpt', o); applyOpt(o); })
+    .catch(e => { if (!(optC && optC.d)) toast('โหลดตัวเลือกไม่สำเร็จ: ' + e.message, false); });
 
   $('selSev').addEventListener('change', e => $('sevHint').textContent = ((OPT && OPT.severityNotes) || {})[e.target.value] || '');
   const inTopic = $('inTopic');
@@ -1185,8 +1201,10 @@ load();
   // ---------- ข้อมูล / สถิติ / ตาราง ----------
   async function loadData(){
     $('reloadIc').classList.add('spin');
-    try { DATA = await api('data'); renderStats(); renderTable(); if (window.RP) RP.render(); }
-    catch (e) { $('tableBox').className = 'empty'; $('tableBox').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; }
+    const c = cacheGet('incData');
+    if (c && c.d && !DATA.rows.length) { DATA = c.d; renderStats(); renderTable(); $('statSrc').textContent += ' · ข้อมูลที่บันทึกไว้ ' + ago(c.t) + ' กำลังอัปเดต…'; }
+    try { DATA = await api('data'); cacheSet('incData', DATA); renderStats(); renderTable(); if (window.RP) RP.render(); }
+    catch (e) { if (c && c.d) { toast('อัปเดตทะเบียนความเสี่ยงไม่สำเร็จ แสดงข้อมูลที่บันทึกไว้', false); } else { $('tableBox').className = 'empty'; $('tableBox').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; } }
     finally { $('reloadIc').classList.remove('spin'); }
   }
   function statCard(key, count){
