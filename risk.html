@@ -6,6 +6,8 @@
 <title>Risk Profile หน่วยไตเทียม - สถาบันบำราศนราดูร</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 :root{
   --bg:#f3f6f8; --surface:#ffffff; --surface-2:#e8eef2; --ink:#16232b; --muted:#566771; --line:#cfd9df;
@@ -335,6 +337,125 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
 .addyear input{width:110px}
 .dlg .field{min-width:0} .dlg input,.dlg select,.dlg textarea{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
 .cur-tag{font-size:.72rem;color:var(--accent);font-weight:600}
+
+/* ================= ทะเบียนความเสี่ยง (อุบัติการณ์) — scoped under .inc ================= */
+.inc{
+  --pri:#0f766e; --pri2:#115e59; --pri-soft:#ccfbf1;
+  --card:#fff; --iline:#e2e8f0; --txt:#1e293b; --mut:#64748b; --err:#be123c;
+  --r:18px; --shadow:0 4px 18px rgba(15,23,42,.06);
+  font-family:'Sarabun',sans-serif;font-size:16px;line-height:1.5;display:block;color:var(--txt)
+}
+.inc h2,.inc h3{font-family:'Prompt','Sarabun',sans-serif;font-weight:600}
+.inc .sec-title{display:flex;align-items:center;gap:8px;margin:18px 2px 10px;font-size:1.05rem;color:var(--ink);font-family:'Prompt','Sarabun',sans-serif;font-weight:600}
+.inc .sec-title:first-child{margin-top:0}
+.inc .sec-title small{color:var(--muted);font-weight:400;font-family:'Sarabun'}
+.inc .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.inc .stat{position:relative;border-radius:var(--r);padding:14px 14px 12px;background:var(--c);box-shadow:var(--shadow);cursor:pointer;transition:transform .15s,box-shadow .15s;overflow:hidden;border:2px solid transparent;min-height:118px}
+.inc .stat:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,23,42,.1)}
+.inc .stat.on{border-color:var(--d)}
+.inc .stat .ic{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,.75);display:grid;place-items:center;color:var(--d);font-size:19px}
+.inc .stat .num{font-family:'Prompt';font-size:1.9rem;line-height:1;color:var(--d);margin-top:10px}
+.inc .stat .num span{font-size:.85rem;font-family:'Sarabun';color:#475569;margin-left:4px}
+.inc .stat .lb{font-weight:700;color:#334155;margin-top:4px}
+.inc .stat .ds{font-size:.8rem;color:#475569}
+.inc .stat .lv{position:absolute;right:10px;top:6px;font-family:'Prompt';font-size:2.4rem;color:var(--d);opacity:.14}
+@media(max-width:480px){.inc .stats{grid-template-columns:repeat(2,1fr);gap:10px}.inc .stat{min-height:108px;padding:12px}.inc .stat .num{font-size:1.6rem}}
+
+.inc .card{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.inc .card + .card{margin-top:18px}
+.inc .card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.inc .card-h h2{margin:0;font-size:1.1rem;color:var(--pri2);display:flex;align-items:center;gap:8px}
+.inc .editbar{display:none;align-items:center;gap:10px;background:#fef3c7;color:#92400e;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-weight:600}
+.inc .editbar.show{display:flex}
+.inc .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.inc .full{grid-column:1/-1}
+.inc .grid > div{min-width:0}
+@media(max-width:720px){.inc .grid{grid-template-columns:1fr}}
+.inc label{display:block;font-weight:600;margin-bottom:5px;font-size:.95rem}
+.inc label .no{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--pri-soft);color:var(--pri2);font-size:.78rem;margin-right:6px}
+.inc label .req{color:var(--err)}
+.inc input,.inc select,.inc textarea{width:100%;max-width:100%;padding:10px 12px;border:1.5px solid var(--iline);border-radius:12px;font:inherit;background:#fff;color:var(--txt)}
+.inc textarea{min-height:92px;resize:vertical}
+.inc input:focus,.inc select:focus,.inc textarea:focus,.inc input:focus-visible,.inc select:focus-visible,.inc textarea:focus-visible{outline:none;border-color:#5eead4;box-shadow:0 0 0 4px #ccfbf1}
+.inc .hint{display:block;color:var(--mut);font-size:.85rem;margin-top:4px}
+.inc .drop{border:2px dashed #cbd5e1;border-radius:14px;padding:16px;text-align:center;cursor:pointer;color:var(--mut);background:#fafafa}
+.inc .drop:hover{border-color:#5eead4;color:var(--pri);background:#f0fdfa}
+.inc .drop i{font-size:1.3rem;display:block;margin-bottom:4px}
+.inc .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.inc .thumb{position:relative;width:88px;height:88px;border-radius:12px;overflow:hidden;border:1px solid var(--iline);background:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:.72rem;text-align:center;padding:4px;word-break:break-all}
+.inc .thumb img{width:100%;height:100%;object-fit:cover}
+.inc .thumb button{position:absolute;top:3px;right:3px;border:0;background:rgba(15,23,42,.65);color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px}
+.inc .thumb.old{outline:2px solid #fde68a}
+.inc .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:13px 18px;font:inherit;font-weight:700;cursor:pointer;background:#fff;color:#334155}
+.inc .btn-pri{background:linear-gradient(135deg,#14b8a6,#0f766e);color:#fff;width:100%;font-size:1.05rem}
+.inc .btn-pri:hover{background:linear-gradient(135deg,#14b8a6,#0f766e);filter:brightness(1.05)}
+.inc .btn-pri:disabled{opacity:.6;cursor:wait}
+.inc .btn-ghost{background:#fff;border:1.5px solid var(--iline);color:#334155;padding:9px 14px}
+.inc .btn-ghost:hover{background:#fff;border-color:#5eead4;color:var(--pri)}
+.inc .hide{display:none!important}
+
+.inc .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inc .search{position:relative;max-width:none}
+.inc .search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--mut)}
+.inc .search input{padding-left:36px;width:230px}
+.inc .chip{display:inline-flex;align-items:center;gap:6px;background:var(--pri-soft);color:var(--pri2);border:0;border-radius:999px;padding:5px 12px;font-size:.88rem;font-weight:600}
+.inc .chip button{border:0;background:none;color:inherit;cursor:pointer;padding:0}
+.inc table{width:100%;border-collapse:separate;border-spacing:0}
+.inc th{background:#f0fdfa;color:var(--pri2);text-align:left;padding:11px 12px;font-family:'Prompt';font-weight:500;font-size:.93rem;white-space:nowrap}
+.inc th:first-child{border-top-left-radius:12px} .inc th:last-child{border-top-right-radius:12px}
+.inc td{padding:12px;border-bottom:1px solid var(--iline);vertical-align:top}
+.inc tr:hover td{background:#fafcff}
+.inc td.date{white-space:nowrap;width:120px;color:#334155;font-weight:600}
+.inc td.unit{width:150px}
+.inc td.det .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.inc td.det .topic{color:var(--mut);font-size:.85rem;margin-top:3px}
+.inc td.act{width:150px;white-space:nowrap;text-align:center}
+.inc .sev{display:inline-grid;place-items:center;min-width:26px;height:22px;padding:0 7px;border-radius:8px;font-weight:700;font-size:.8rem;margin-right:6px;background:var(--c,#eee);color:var(--d,#333);vertical-align:1px}
+.inc .ib{width:36px;height:36px;border-radius:12px;border:0;cursor:pointer;font-size:15px;margin:0 2px;transition:transform .12s}
+.inc .ib:hover{transform:scale(1.08)}
+.inc .ib.v{background:#e0f2fe;color:#0369a1} .inc .ib.e{background:#fef3c7;color:#b45309} .inc .ib.d{background:#ffe4e6;color:#be123c}
+.inc tr.new td{background:#fefce8}
+.inc .empty{padding:28px;text-align:center;color:var(--mut);font-style:normal}
+.inc .more{display:flex;justify-content:center;margin-top:14px}
+@media(max-width:680px){
+  .inc .search input{width:100%}
+  .inc .search{flex:1}
+  .inc thead{display:none}
+  .inc table,.inc tbody,.inc tr,.inc td{display:block;width:100%}
+  .inc tr{border:1px solid var(--iline);border-radius:16px;margin-bottom:10px;padding:6px 4px;background:#fff}
+  .inc td{border:0;padding:6px 10px}
+  .inc td.date,.inc td.unit,.inc td.act{width:auto}
+  .inc td.date,.inc td.unit{display:inline-block;width:auto;padding-bottom:2px}
+  .inc td.date::before{content:"\f133";font-family:"Font Awesome 6 Free";font-weight:900;margin-right:6px;color:var(--pri)}
+  .inc td.unit::before{content:"\f1ad";font-family:"Font Awesome 6 Free";font-weight:900;margin-right:6px;color:var(--pri)}
+  .inc td.act{text-align:right;border-top:1px dashed var(--iline);margin-top:4px;padding-top:8px}
+}
+
+.inc .modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.inc .modal.show{display:flex}
+.inc .mbox{background:#fff;color:var(--txt);border-radius:22px;width:100%;max-width:720px;max-height:90vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.2);animation:incpop .18s ease-out}
+.inc .mbox.sm{max-width:400px}
+@keyframes incpop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.inc .mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--iline);position:sticky;top:0;background:#fff;z-index:1}
+.inc .mhead h3{margin:0;font-size:1.08rem;color:var(--pri2);display:flex;gap:8px;align-items:center}
+.inc .mclose{border:0;background:#f1f5f9;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px}
+.inc .mbody{padding:18px 20px}
+.inc .dl{display:grid;grid-template-columns:200px 1fr;gap:0}
+.inc .dl div{padding:9px 4px;border-bottom:1px solid #f1f5f9}
+.inc .dl .k{color:var(--mut);font-size:.9rem}
+.inc .dl .v{white-space:pre-wrap;word-break:break-word}
+@media(max-width:560px){.inc .dl{grid-template-columns:1fr}.inc .dl .k{border-bottom:0;padding-bottom:0}}
+.inc .dl img{max-width:100%;max-height:320px;border-radius:12px;display:block}
+.inc .dl a{color:var(--pri)}
+.inc .mfoot{display:flex;gap:10px;justify-content:flex-end;padding:0 20px 18px}
+.inc .lock{width:64px;height:64px;border-radius:20px;background:#ffe4e6;color:#be123c;display:grid;place-items:center;font-size:26px;margin:0 auto 10px}
+.inc .btn-del{background:#e11d48;color:#fff}
+.inc .btn-del:hover{background:#be123c}
+
+.inc .itoast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;opacity:0;transition:.25s;z-index:60;display:flex;gap:10px;align-items:center;max-width:92vw;pointer-events:none}
+.inc .itoast.show{opacity:1;transform:translateX(-50%)}
+.inc .itoast.ok i{color:#5eead4} .inc .itoast.bad i{color:#fda4af}
+.inc .spin{animation:incsp 1s linear infinite} @keyframes incsp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -342,9 +463,11 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
   <header>
     <div class="eyebrow">สถาบันบำราศนราดูร · กลุ่มการพยาบาล</div>
     <h1>ระบบ Risk Profile หน่วยไตเทียม</h1>
-    <p class="sub">ประเมินความเสี่ยงจากโอกาสเกิด (Likelihood) และผลกระทบ (Consequence) ตาม Risk Matrix ฉบับปรับใหม่ บันทึกทะเบียนความเสี่ยงลงชีต Risk Profile ให้การจัดการความเสี่ยงเป็นไปอย่างทันท่วงที ปลอดภัย และเหมาะสม</p>
     <nav class="tabs" aria-label="ส่วนของหน้า">
+      <a href="#incStats">สถิติ</a>
       <a href="#register">ตาราง Risk Profile</a>
+      <a href="#incForm">บันทึกความเสี่ยง</a>
+      <a href="#tableCard">ทะเบียนความเสี่ยง</a>
       <a href="#matrix">Risk Matrix</a>
       <a href="#calc">ประเมินความเสี่ยง</a>
       <a href="#criteria">เกณฑ์การให้คะแนน</a>
@@ -353,10 +476,18 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
     <div><a class="btn hrms" href="https://bidi.thai-nrls.org/" target="_blank" rel="noopener">รายงานความเสี่ยงในโปรแกรม HRMS (สรพ.) ↗</a></div>
   </header>
 
+  <section id="incStats" class="inc" aria-label="สถิติความเสี่ยง">
+    <div class="sec-title"><i class="fa-solid fa-chart-simple" style="color:#0f766e"></i> สถิติตามระดับความรุนแรง <small>(แตะการ์ดเพื่อกรองตารางทะเบียนความเสี่ยง)</small></div>
+    <div class="stats" id="statsTotal"></div>
+    <div class="sec-title"><i class="fa-solid fa-user-nurse" style="color:#0369a1"></i> ด้านคลินิก <small>ระดับ A–I</small></div>
+    <div class="stats" id="statsClin"></div>
+    <div class="sec-title"><i class="fa-solid fa-building-shield" style="color:#7c3aed"></i> ด้านทั่วไป <small>ระดับ 1–5</small></div>
+    <div class="stats" id="statsGen"></div>
+  </section>
+
   <section id="register">
     <div class="sec-head">
       <h2>ตาราง Risk Profile หน่วยไตเทียม</h2>
-      <p>กดไอคอนรูปตาหรือคลิกที่แถว เพื่อดูรายละเอียดและแก้ไขในการ์ด ผลลัพธ์ในตารางแสดงปีงบประมาณปัจจุบันเทียบย้อนหลัง 3 ปี ส่วนในการ์ดดูและเพิ่มปีอื่นได้ ข้อมูลบันทึกลงชีต “Risk Profile”</p>
     </div>
     <div class="toolbar">
       <div class="left">
@@ -373,7 +504,7 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
         <colgroup><col class="w-no"><col class="w-topic"><col class="w-meas c-meas"><col class="w-kpi c-kpi"><col class="w-freq c-freq"><col class="w-lv"><col class="w-res"><col class="w-res"><col class="w-res"><col class="w-act"></colgroup>
         <thead>
           <tr>
-            <th rowspan="2" class="c-no">ลำดับ</th><th rowspan="2">หัวข้อ</th><th rowspan="2" class="c-meas">มาตรการป้องกัน</th><th rowspan="2" class="c-kpi">ตัวชี้วัด</th><th rowspan="2" class="c-freq">ความถี่</th><th rowspan="2">ระดับ</th><th colspan="3">ผลลัพธ์</th><th rowspan="2" aria-label="ดูรายละเอียด">ดู</th>
+            <th rowspan="2" class="c-no">ลำดับ</th><th rowspan="2">หัวข้อ</th><th rowspan="2" class="c-meas">มาตรการป้องกัน</th><th rowspan="2" class="c-kpi">ตัวชี้วัด</th><th rowspan="2" class="c-freq">ความถี่</th><th rowspan="2">ระดับ</th><th colspan="3">ผลลัพธ์</th><th rowspan="2">แก้ไข</th>
           </tr>
           <tr id="resYears"></tr>
         </thead>
@@ -382,6 +513,98 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
     </div>
     <div class="legend-sev" id="sevLegend"></div>
   </section>
+
+  <div id="incMain" class="inc">
+  <!-- ========== แบบฟอร์มบันทึกความเสี่ยง ========== -->
+  <form id="incForm" class="card" onsubmit="INC.send(event)" autocomplete="off">
+    <div class="card-h"><h2><i class="fa-solid fa-pen-to-square"></i> <span id="formTitle">บันทึกรายงานอุบัติการณ์</span></h2></div>
+    <div class="editbar" id="editBar"><i class="fa-solid fa-pencil"></i> <span id="editText">กำลังแก้ไข</span>
+      <button type="button" class="btn btn-ghost" style="margin-left:auto" onclick="INC.cancelEdit()"><i class="fa-solid fa-xmark"></i> ยกเลิก</button></div>
+    <div class="grid">
+      <div><label><span class="no">1</span>วันที่บันทึกรายงานอุบัติการณ์ <span class="req">*</span></label>
+        <input type="date" name="reportDate" required></div>
+      <div><label><span class="no">2</span>หน่วยงานที่ค้นพบ/บันทึกรายงาน <span class="req">*</span></label>
+        <input name="unit" value="ไตเทียม 4/2" required></div>
+      <div class="full"><label><span class="no">3</span>ประเภทสถานที่ <span class="req">*</span></label>
+        <select name="placeType" id="selPlace" required></select></div>
+      <div class="full"><label><span class="no">4</span>รายละเอียดการเกิดเหตุ <span class="req">*</span></label>
+        <textarea name="details" required></textarea>
+        <div class="hint">กรณีเป็นความเสี่ยงด้านยา ให้ระบุชื่อยาที่เกิดปัญหาด้วย</div></div>
+      <div class="full"><label><span class="no">5</span>รูปภาพ</label>
+        <div class="drop" onclick="document.getElementById('inImg').click()"><i class="fa-solid fa-camera"></i>แตะเพื่อถ่ายรูปหรือเลือกรูป (เลือกได้หลายรูป)</div>
+        <input id="inImg" type="file" accept="image/*" multiple class="hide" onchange="INC.addImages(this.files);this.value=''">
+        <div id="imgBox" class="thumbs"></div></div>
+      <div class="full"><label><span class="no">6</span>เป็นอุบัติการณ์เรื่องใด <span class="req">*</span></label>
+        <input name="topic" id="inTopic" list="dlTopic" required placeholder="พิมพ์รหัสหรือคำค้น เช่น CPP405, ตกเตียง, เข็ม, ยา">
+        <datalist id="dlTopic"></datalist></div>
+      <div><label><span class="no">7</span>ระดับความรุนแรง <span class="req">*</span></label>
+        <select name="severity" id="selSev" required></select>
+        <div class="hint" id="sevHint"></div></div>
+      <div><label><span class="no">8</span>ผู้ที่ได้รับผลกระทบ <span class="req">*</span></label>
+        <select name="affected" id="selAff" required></select></div>
+      <div><label><span class="no">9</span>วันที่เกิดอุบัติการณ์ <span class="req">*</span></label>
+        <input type="date" name="eventDate" required></div>
+      <div><label><span class="no">10</span>วันที่ค้นพบว่าเกิดอุบัติการณ์ <span class="req">*</span></label>
+        <input type="date" name="foundDate" required></div>
+      <div><label><span class="no">11</span>ช่วงเวลาที่เกิดอุบัติการณ์ เวร</label>
+        <select name="shift" id="selShift"></select></div>
+      <div><label><span class="no">12</span>หรือ เวลา</label>
+        <input type="time" name="time"></div>
+      <div class="full"><label><span class="no">13</span>แหล่งที่มา/วิธีการค้นพบอุบัติการณ์ <span class="req">*</span></label>
+        <input name="source" list="dlSource" required placeholder="เลือกหรือพิมพ์">
+        <datalist id="dlSource"></datalist></div>
+      <div class="full"><label><span class="no">14</span>การจัดการเบื้องต้น <span class="req">*</span></label>
+        <textarea name="action" required></textarea></div>
+      <div class="full"><label><span class="no">15</span>แนบไฟล์</label>
+        <div class="drop" onclick="document.getElementById('inFile').click()"><i class="fa-solid fa-paperclip"></i>แตะเพื่อเลือกไฟล์ (PDF, Word, Excel ฯลฯ)</div>
+        <input id="inFile" type="file" multiple class="hide" onchange="INC.addFiles(this.files);this.value=''">
+        <div id="fileBox" class="thumbs"></div></div>
+    </div>
+    <div style="margin-top:18px"><button id="incBtn" class="btn btn-pri" type="submit"><i class="fa-solid fa-floppy-disk"></i> <span>บันทึกข้อมูล</span></button></div>
+  </form>
+
+  <!-- ========== ตารางทะเบียนความเสี่ยง ========== -->
+  <div class="card" id="tableCard">
+    <div class="card-h">
+      <h2><i class="fa-solid fa-table-list"></i> ทะเบียนความเสี่ยง <span class="chip" id="countChip">0 เรื่อง</span></h2>
+      <div class="tools">
+        <span class="chip hide" id="filterChip"></span>
+        <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="incQ" placeholder="ค้นหารายละเอียด/หน่วยงาน"></div>
+        <button class="btn btn-ghost" type="button" onclick="INC.loadData()" title="รีเฟรช"><i class="fa-solid fa-rotate" id="reloadIc"></i></button>
+      </div>
+    </div>
+    <div id="tableBox" class="empty"><i class="fa-solid fa-spinner spin"></i> กำลังโหลด...</div>
+    <div class="more hide" id="moreBox"><button class="btn btn-ghost" type="button" onclick="INC.more()">แสดงเพิ่ม <i class="fa-solid fa-chevron-down"></i></button></div>
+  </div>
+
+  <!-- หน้าต่างดูรายละเอียด -->
+  <div class="modal" id="mView" onclick="if(event.target===this)INC.closeM('mView')">
+    <div class="mbox">
+      <div class="mhead"><h3><i class="fa-solid fa-file-lines"></i> รายละเอียดอุบัติการณ์</h3><button type="button" class="mclose" onclick="INC.closeM('mView')"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="mbody"><div class="dl" id="viewBody"></div></div>
+      <div class="mfoot"><button type="button" class="btn btn-ghost" id="viewEdit"><i class="fa-solid fa-pen"></i> แก้ไข</button></div>
+    </div>
+  </div>
+
+  <!-- หน้าต่างลบ (ใส่รหัสผ่าน) -->
+  <div class="modal" id="mDel" onclick="if(event.target===this)INC.closeM('mDel')">
+    <div class="mbox sm">
+      <div class="mbody" style="text-align:center;padding-top:24px">
+        <div class="lock"><i class="fa-solid fa-lock"></i></div>
+        <h3 style="margin:0 0 6px">ยืนยันการลบรายการ</h3>
+        <p style="margin:0 0 14px;color:var(--mut)" id="delText"></p>
+        <input type="password" id="delPass" placeholder="ใส่รหัสผ่านเพื่อลบ" inputmode="numeric" style="text-align:center">
+        <div class="hint" id="delErr" style="color:var(--err);min-height:1.2em"></div>
+      </div>
+      <div class="mfoot" style="justify-content:center">
+        <button type="button" class="btn btn-ghost" onclick="INC.closeM('mDel')">ยกเลิก</button>
+        <button type="button" class="btn btn-del" id="delBtn" onclick="INC.doDelete()"><i class="fa-solid fa-trash"></i> ลบรายการ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="itoast" id="incToast"><i class="fa-solid fa-circle-check"></i><span></span></div>
+  </div>
 
   <div class="explain-head" id="explain">
     <div class="eyebrow">คำอธิบาย</div>
@@ -533,10 +756,18 @@ function years3(){ const b = CUR_FY || curFyLocal(); return [b-2, b-1, b]; }
 /* ---------- server ---------- */
 async function api(action, payload){
   if (!API_URL || !API_URL.startsWith('https://')) throw new Error('ยังไม่ได้ตั้งค่า URL ของ Apps Script');
-  let res;
-  if (action === 'list') res = await fetch(API_URL + '?action=list', {redirect:'follow'});
-  else res = await fetch(API_URL, {method:'POST', redirect:'follow', body: JSON.stringify(Object.assign({action}, payload||{}))});
-  const data = await res.json();
+  let res, lastErr;
+  const tries = action === 'list' ? 3 : 1;
+  for (let i=0; i<tries; i++){
+    try {
+      if (action === 'list') res = await fetch(API_URL + '?action=list&t=' + Date.now(), {redirect:'follow', cache:'no-store'});
+      else res = await fetch(API_URL, {method:'POST', redirect:'follow', body: JSON.stringify(Object.assign({action}, payload||{}))});
+      lastErr = null; break;
+    } catch(e){ lastErr = e; if (i < tries-1) await new Promise(r=>setTimeout(r, 1500*(i+1))); }
+  }
+  if (lastErr) throw new Error('ติดต่อ Apps Script ไม่ได้ (ตรวจสอบอินเทอร์เน็ต หรือเครือข่ายที่บล็อก script.google.com)');
+  let data;
+  try { data = await res.json(); } catch(e){ throw new Error('Apps Script ตอบกลับไม่ถูกต้อง (อาจต้อง Deploy ใหม่แบบ "ทุกคน")'); }
   if (!data.ok) throw new Error(data.error || 'บันทึกไม่สำเร็จ');
   return data;
 }
@@ -632,7 +863,7 @@ function buildLevels(){
 
 /* ---------- register (compact table + modal) ---------- */
 let YEARS = [];
-const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 12S5.5 4.5 12 4.5 22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/><path d="M14.5 5.5l3 3"/></svg>';
 function sevClass(v){ const c = SEV2C[v]; return c ? "s"+c : ""; }
 function txt(v){ return v ? `<div class="clamp">${esc(v)}</div>` : `<span class="empty">—</span>`; }
 function renderRegister(){
@@ -648,7 +879,7 @@ function renderRegister(){
       <td class="c-freq">${txt(r["ความถี่"])}</td>
       <td class="lv">${sev?`<span class="sevchip ${sevClass(sev)}" title="${esc((SEV.find(x=>x[0]===sev)||["",""])[1])}">${sev}</span>`:`<span class="empty">—</span>`}</td>
       ${ys.map(y=>`<td class="res">${txt(r[RES+y])}</td>`).join("")}
-      <td class="act"><button type="button" class="eyebtn" data-open="${no}" aria-label="ดูรายละเอียดลำดับที่ ${no}" title="ดูรายละเอียด / แก้ไข">${EYE}</button></td>
+      <td class="act"><button type="button" class="eyebtn" data-open="${no}" aria-label="แก้ไขลำดับที่ ${no}" title="แก้ไข">${EYE}</button></td>
     </tr>`;
   }).join("") || `<tr><td colspan="10" class="help" style="padding:20px;text-align:center">ยังไม่มีรายการ</td></tr>`;
 }
@@ -669,7 +900,7 @@ function openEdit(no){
   if(!ONLINE){ toast("ยังโหลดข้อมูลจากชีตไม่เสร็จ กรุณารอสักครู่"); return; }
   const r = no==null ? {} : ROWS.find(x=>String(x["ลำดับที่"])===String(no)); if(!r) return;
   editingNo = no==null ? null : String(no);
-  $("dlgTitle").textContent = editingNo ? `รายละเอียด ลำดับที่ ${no}` : "เพิ่มหัวข้อใหม่";
+  $("dlgTitle").textContent = editingNo ? `แก้ไข ลำดับที่ ${no}` : "เพิ่มหัวข้อใหม่";
   $("fTopic").value = r["หัวข้อ"]||""; $("fMeasure").value = r["มาตรการป้องกัน"]||"";
   $("fKpi").value = r["ตัวชี้วัด"]||""; $("fFreq").value = r["ความถี่"]||"";
   $("fSev").innerHTML = `<option value="">— ไม่ระบุ —</option>` + SEV.map(([c,t])=>`<option value="${c}">${c} — ${esc(t)}</option>`).join("");
@@ -723,6 +954,309 @@ $("sevLegend").innerHTML = "ระดับ: " + [["A–B","var(--low)"],["C–D
 buildMatrix(); buildSelects(); buildRefs(); buildLevels(); sync();
 renderRegister();
 load();
+
+/* ================= ทะเบียนความเสี่ยง (อุบัติการณ์) ================= */
+(function(){
+  // ===== ลิงก์ Web App ของ Google Apps Script (ทะเบียนความเสี่ยง) =====
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwfN-mxXMo0l4yTOxRj0T8YxnoNGVrOCB8ppcIh5qZNbctWCWgCXYAz7sH9K254TNk/exec';
+  const MAX_SIDE = 1600, MAX_FILE_MB = 20, PAGE_SIZE = 20;
+
+  // ระดับความรุนแรง: สีพาสเทล ไอคอน และคำจำง่ายตาม สรพ.
+  const LEVELS = {
+    A:{c:'#d1fae5',d:'#047857',i:'fa-seedling',     t:'เกิดที่นี่'},
+    B:{c:'#ccfbf1',d:'#0f766e',i:'fa-leaf',         t:'เกิดที่ไกล'},
+    C:{c:'#e0f2fe',d:'#0369a1',i:'fa-face-smile',   t:'เกิดกับใคร'},
+    D:{c:'#e0e7ff',d:'#4338ca',i:'fa-eye',          t:'ให้ระวัง'},
+    E:{c:'#fef9c3',d:'#a16207',i:'fa-kit-medical',  t:'ต้องรักษา'},
+    F:{c:'#ffedd5',d:'#c2410c',i:'fa-bandage',      t:'เยียวยานาน'},
+    G:{c:'#fce7f3',d:'#be185d',i:'fa-wheelchair',   t:'ต้องพิการ'},
+    H:{c:'#ffe4e6',d:'#be123c',i:'fa-heart-pulse',  t:'ต้องการปั๊ม'},
+    I:{c:'#f3e8ff',d:'#7e22ce',i:'fa-dove',         t:'จำใจลา'},
+    '1':{c:'#dcfce7',d:'#15803d',i:'fa-circle-check',       t:'ไม่มีผลกระทบ'},
+    '2':{c:'#e0f2fe',d:'#0369a1',i:'fa-hand-holding-heart', t:'ควบคุมได้'},
+    '3':{c:'#fef9c3',d:'#a16207',i:'fa-screwdriver-wrench', t:'ต้องแก้ไข'},
+    '4':{c:'#ffedd5',d:'#c2410c',i:'fa-triangle-exclamation',t:'ไม่บรรลุผล'},
+    '5':{c:'#ffe4e6',d:'#be123c',i:'fa-fire-flame-curved',  t:'เสียหายร้ายแรง'}
+  };
+
+  let OPT = null, DATA = {columns:[], rows:[]}, filterSev = '', page = 1;
+  let images = [], files = [], editing = null, delTarget = null, highlightRow = null;
+  const $ = id => document.getElementById(id);
+  const f = $('incForm');
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+  const setDates = () => ['reportDate','eventDate','foundDate'].forEach(n => f[n].value = today());
+  const thDate = iso => { if (!iso) return ''; const [y,m,d] = iso.split('-').map(Number);
+    return new Date(y, m-1, d).toLocaleDateString('th-TH', {day:'numeric', month:'short', year:'2-digit'}); };
+  setDates();
+
+  // ---------- เรียก API ----------
+  async function api(action, data){
+    let res, lastErr;
+    const tries = data === undefined ? 3 : 1;
+    for (let i = 0; i < tries; i++) {
+      try {
+        res = data === undefined
+          ? await fetch(API_URL + '?action=' + action + '&t=' + Date.now(), {cache:'no-store'})
+          : await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({action, data})});
+        lastErr = null; break;
+      } catch (e) { lastErr = e; if (i < tries-1) await new Promise(r => setTimeout(r, 1500*(i+1))); }
+    }
+    if (lastErr) throw new Error('ติดต่อ Apps Script ไม่ได้ (ตรวจสอบอินเทอร์เน็ต)');
+    const j = await res.json();
+    if (!j.ok) throw new Error(j.error || 'เกิดข้อผิดพลาด');
+    return j.data;
+  }
+  function toast(text, ok = true){
+    const t = $('incToast'); t.className = 'itoast show ' + (ok ? 'ok' : 'bad');
+    t.querySelector('i').className = 'fa-solid ' + (ok ? 'fa-circle-check' : 'fa-circle-exclamation');
+    t.querySelector('span').textContent = text;
+    clearTimeout(t._h); t._h = setTimeout(() => t.className = 'itoast', 3500);
+  }
+
+  // ---------- ตัวเลือกดรอปดาวน์ (HRMS) ----------
+  const fillSelect = (id, items, ph) => $(id).innerHTML = `<option value="">${ph || '-- เลือก --'}</option>` + items.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  const fillList = (id, items) => $(id).innerHTML = items.map(x => `<option value="${esc(x)}"></option>`).join('');
+  api('options').then(o => {
+    OPT = o;
+    fillSelect('selPlace', o.placeType);
+    fillSelect('selAff', o.affected);
+    fillSelect('selShift', o.shift, '-- เลือกเวร (หรือระบุเวลาในช่อง 12) --');
+    fillList('dlSource', o.source);
+    fillList('dlTopic', o.topic);
+    const n = o.severityNotes || {};
+    const opt = x => `<option value="${esc(x)}">${esc(x)}${n[x] ? ' : ' + esc(n[x]) : ''}</option>`;
+    $('selSev').innerHTML = '<option value="">-- เลือก --</option>' +
+      `<optgroup label="ด้านคลินิก (A–I)">${o.severity.filter(x => /^[A-I]$/.test(x)).map(opt).join('')}</optgroup>` +
+      `<optgroup label="ด้านทั่วไป (1–5)">${o.severity.filter(x => !/^[A-I]$/.test(x)).map(opt).join('')}</optgroup>`;
+    if (editing) fillForm(editing);
+  }).catch(e => toast('โหลดตัวเลือกไม่สำเร็จ: ' + e.message, false));
+
+  $('selSev').addEventListener('change', e => $('sevHint').textContent = ((OPT && OPT.severityNotes) || {})[e.target.value] || '');
+  const inTopic = $('inTopic');
+  inTopic.addEventListener('input', () => {
+    const ok = !inTopic.value || !OPT || OPT.topic.includes(inTopic.value) || (editing && editing.topic === inTopic.value);
+    inTopic.setCustomValidity(ok ? '' : 'กรุณาเลือกเรื่องอุบัติการณ์จากรายการของ HRMS');
+  });
+
+  // ---------- รูปภาพ / ไฟล์ ----------
+  function shrink(file){
+    return new Promise((res, rej) => {
+      const img = new Image(), url = URL.createObjectURL(file);
+      img.onload = () => {
+        const s = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width*s); c.height = Math.round(img.height*s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        const dataUrl = c.toDataURL('image/jpeg', 0.85);
+        res({name: file.name.replace(/\.[^.]+$/, '') + '.jpg', mimeType: 'image/jpeg', data: dataUrl.split(',')[1], preview: dataUrl});
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('อ่านรูปไม่ได้: ' + file.name)); };
+      img.src = url;
+    });
+  }
+  const readRaw = file => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res({name: file.name, mimeType: file.type || 'application/octet-stream', data: String(r.result).split(',')[1]});
+    r.onerror = () => rej(new Error('อ่านไฟล์ไม่ได้: ' + file.name));
+    r.readAsDataURL(file);
+  });
+  async function addImages(list){ for (const x of list) { try { images.push(await shrink(x)); } catch(e){ toast(e.message, false); } } renderThumbs(); }
+  async function addFiles(list){
+    for (const x of list) {
+      if (x.size > MAX_FILE_MB*1024*1024) { toast(x.name + ' มีขนาดเกิน ' + MAX_FILE_MB + ' MB', false); continue; }
+      try { files.push(await readRaw(x)); } catch(e){ toast(e.message, false); }
+    }
+    renderThumbs();
+  }
+  function renderThumbs(){
+    const oldImg = (editing && editing.image && !images.length) ? `<div class="thumb old" title="รูปเดิม"><img src="${esc(editing.image)}"></div>` : '';
+    $('imgBox').innerHTML = oldImg + images.map((x,i) => `<div class="thumb"><img src="${x.preview}"><button type="button" onclick="INC.rmImg(${i})"><i class="fa-solid fa-xmark"></i></button></div>`).join('');
+    $('fileBox').innerHTML = files.map((x,i) => `<div class="thumb">${esc(x.name)}<button type="button" onclick="INC.rmFile(${i})"><i class="fa-solid fa-xmark"></i></button></div>`).join('');
+  }
+
+  // ---------- บันทึก / แก้ไข ----------
+  async function send(e){
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(f).entries());
+    data.images = images.map(({name, mimeType, data}) => ({name, mimeType, data}));
+    data.attachments = files;
+    if (editing) { data._row = editing._row; data._sig = editing.details; }
+    const btn = $('incBtn'); btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> <span>กำลังบันทึก...</span>';
+    try {
+      const r = await api(editing ? 'update' : 'submit', data);
+      toast(editing ? 'แก้ไขเรียบร้อยแล้ว' : `บันทึกเรียบร้อย · รูป ${r.images} · ไฟล์ ${r.files}`);
+      highlightRow = r.row;
+      resetForm();
+      await loadData();
+      $('tableCard').scrollIntoView({behavior:'smooth'});
+    } catch (err) {
+      toast('บันทึกไม่สำเร็จ: ' + err.message, false);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>${editing ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูล'}</span>`;
+    }
+  }
+  function resetForm(){
+    f.reset(); setDates(); editing = null; images = []; files = [];
+    $('sevHint').textContent = ''; $('editBar').classList.remove('show');
+    $('formTitle').textContent = 'บันทึกรายงานอุบัติการณ์';
+    $('incBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>บันทึกข้อมูล</span>';
+    inTopic.setCustomValidity(''); renderThumbs();
+  }
+  const cancelEdit = () => resetForm();
+
+  function fillForm(r){
+    const setv = (n, v) => { if (f[n]) f[n].value = v || ''; };
+    ['unit','placeType','details','topic','severity','affected','shift','source','action'].forEach(k => {
+      const el = f[k];
+      if (el && el.tagName === 'SELECT' && r[k] && ![...el.options].some(o => o.value === r[k])) el.add(new Option(r[k], r[k]));
+      setv(k, r[k]);
+    });
+    ['reportDate','eventDate','foundDate'].forEach(k => setv(k, r[k + 'Iso']));
+    setv('time', (r.time || '').slice(0,5));
+    $('sevHint').textContent = ((OPT && OPT.severityNotes) || {})[r.severity] || '';
+  }
+  function startEdit(row){
+    const r = DATA.rows.find(x => x._row === row); if (!r) return;
+    closeM('mView');
+    editing = r; images = []; files = [];
+    fillForm(r); renderThumbs();
+    $('formTitle').textContent = 'แก้ไขรายงานอุบัติการณ์';
+    $('editText').textContent = 'กำลังแก้ไขรายการวันที่ ' + (thDate(r.reportDateIso) || r.reportDate) + ' · เพิ่มรูปใหม่จะแทนรูปเดิม';
+    $('editBar').classList.add('show');
+    $('incBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>บันทึกการแก้ไข</span>';
+    f.scrollIntoView({behavior:'smooth'});
+  }
+
+  // ---------- ข้อมูล / สถิติ / ตาราง ----------
+  async function loadData(){
+    $('reloadIc').classList.add('spin');
+    try { DATA = await api('data'); renderStats(); renderTable(); }
+    catch (e) { $('tableBox').className = 'empty'; $('tableBox').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; }
+    finally { $('reloadIc').classList.remove('spin'); }
+  }
+  function statCard(key, count){
+    const L = LEVELS[key];
+    return `<div class="stat ${filterSev === key ? 'on' : ''}" style="--c:${L.c};--d:${L.d}" onclick="INC.setFilter('${key}')">
+      <div class="lv">${key}</div><div class="ic"><i class="fa-solid ${L.i}"></i></div>
+      <div class="num">${count}<span>เรื่อง</span></div>
+      <div class="lb">ระดับ ${key}</div><div class="ds">${L.t}</div></div>`;
+  }
+  function renderStats(){
+    const cnt = {}; DATA.rows.forEach(r => { const k = String(r.severity || '').trim().toUpperCase(); cnt[k] = (cnt[k] || 0) + 1; });
+    const clin = 'ABCDEFGHI'.split('').reduce((s,k) => s + (cnt[k] || 0), 0);
+    const gen = '12345'.split('').reduce((s,k) => s + (cnt[k] || 0), 0);
+    const mini = (icon, label, n, bg, fg, key) => `<div class="stat ${filterSev === key ? 'on' : ''}" style="--c:${bg};--d:${fg}" onclick="INC.setFilter('${key}')">
+      <div class="ic"><i class="fa-solid ${icon}"></i></div><div class="num">${n}<span>เรื่อง</span></div><div class="lb">${label}</div></div>`;
+    $('statsTotal').innerHTML =
+      mini('fa-layer-group', 'ทั้งหมด', DATA.rows.length, 'linear-gradient(135deg,#ccfbf1,#e0f2fe)', '#0f766e', '') +
+      mini('fa-user-nurse', 'ด้านคลินิก (A–I)', clin, 'linear-gradient(135deg,#e0f2fe,#e0e7ff)', '#0369a1', 'CLIN') +
+      mini('fa-building-shield', 'ด้านทั่วไป (1–5)', gen, 'linear-gradient(135deg,#f3e8ff,#fce7f3)', '#7e22ce', 'GEN') +
+      mini('fa-triangle-exclamation', 'รุนแรง (E–I, 3–5)', 'EFGHI345'.split('').reduce((s,k) => s + (cnt[k] || 0), 0), 'linear-gradient(135deg,#ffe4e6,#ffedd5)', '#be123c', 'HIGH');
+    $('statsClin').innerHTML = 'ABCDEFGHI'.split('').map(k => statCard(k, cnt[k] || 0)).join('');
+    $('statsGen').innerHTML = '12345'.split('').map(k => statCard(k, cnt[k] || 0)).join('');
+  }
+  const FILTER_LABEL = {CLIN:'ด้านคลินิก', GEN:'ด้านทั่วไป', HIGH:'รุนแรง (E–I, 3–5)'};
+  function setFilter(k){
+    filterSev = (filterSev === k) ? '' : k; page = 1;
+    renderStats(); renderTable();
+    if (filterSev) $('tableCard').scrollIntoView({behavior:'smooth'});
+  }
+  function matchSev(sev){
+    const s = String(sev || '').toUpperCase();
+    if (!filterSev) return true;
+    if (filterSev === 'CLIN') return /^[A-I]$/.test(s);
+    if (filterSev === 'GEN') return /^[1-5]$/.test(s);
+    if (filterSev === 'HIGH') return /^[E-I3-5]$/.test(s);
+    return s === filterSev;
+  }
+  $('incQ').addEventListener('input', () => { page = 1; renderTable(); });
+
+  function renderTable(){
+    const q = $('incQ').value.trim().toLowerCase();
+    const rows = DATA.rows.filter(r => matchSev(r.severity) &&
+      (!q || [r.details, r.unit, r.topic, r.action].join(' ').toLowerCase().includes(q)));
+    $('countChip').textContent = rows.length + ' เรื่อง';
+    const fc = $('filterChip');
+    if (filterSev) { fc.classList.remove('hide'); fc.innerHTML = `<i class="fa-solid fa-filter"></i> ${FILTER_LABEL[filterSev] || 'ระดับ ' + filterSev} <button type="button" onclick="INC.setFilter('${filterSev}')"><i class="fa-solid fa-xmark"></i></button>`; }
+    else fc.classList.add('hide');
+
+    const box = $('tableBox');
+    if (!rows.length) { box.className = 'empty'; box.innerHTML = '<i class="fa-regular fa-folder-open" style="font-size:1.6rem"></i><br>ไม่มีรายการ'; $('moreBox').classList.add('hide'); return; }
+    const shown = rows.slice(0, page * PAGE_SIZE);
+    box.className = '';
+    box.innerHTML = `<table><thead><tr><th>วันที่</th><th>หน่วยงาน</th><th>รายละเอียดการเกิดเหตุ</th><th style="text-align:center">จัดการ</th></tr></thead><tbody>` +
+      shown.map(r => {
+        const L = LEVELS[String(r.severity || '').toUpperCase()];
+        const sev = r.severity ? `<span class="sev" style="${L ? `--c:${L.c};--d:${L.d}` : ''}">${esc(r.severity)}</span>` : '';
+        return `<tr class="${r._row === highlightRow ? 'new' : ''}">
+          <td class="date">${esc(thDate(r.reportDateIso) || r.reportDate)}</td>
+          <td class="unit">${esc(r.unit)}</td>
+          <td class="det"><div class="txt">${sev}${esc(r.details)}</div>${r.topic ? `<div class="topic">${esc(r.topic)}</div>` : ''}</td>
+          <td class="act">
+            <button type="button" class="ib v" title="ดู" onclick="INC.viewRow(${r._row})"><i class="fa-solid fa-eye"></i></button>
+            <button type="button" class="ib e" title="แก้ไข" onclick="INC.startEdit(${r._row})"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="ib d" title="ลบ" onclick="INC.askDelete(${r._row})"><i class="fa-solid fa-trash"></i></button>
+          </td></tr>`;
+      }).join('') + '</tbody></table>';
+    $('moreBox').classList.toggle('hide', shown.length >= rows.length);
+    if (highlightRow) setTimeout(() => { highlightRow = null; document.querySelectorAll('#tableBox tr.new').forEach(t => t.classList.remove('new')); }, 4000);
+  }
+
+  // ---------- ดูรายละเอียด ----------
+  const openM = id => $(id).classList.add('show');
+  const closeM = id => $(id).classList.remove('show');
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeM('mView'); closeM('mDel'); } });
+  function viewRow(row){
+    const r = DATA.rows.find(x => x._row === row); if (!r) return;
+    $('viewBody').innerHTML = DATA.columns.map(c => {
+      let v = esc(r[c.key]);
+      if (c.key === 'image') v = r.image ? `<a href="${esc(r.image)}" target="_blank"><img src="${esc(r.image)}" alt="รูปภาพ"></a>` : '-';
+      else if (c.key === 'attachment') v = String(r.attachment || '').split(/\n+/).filter(Boolean).map((u,i) => `<a href="${esc(u)}" target="_blank"><i class="fa-solid fa-paperclip"></i> ไฟล์ ${i+1}</a>`).join('<br>') || '-';
+      else if (/Date$/.test(c.key)) v = esc(thDate(r[c.key + 'Iso']) || r[c.key]) || '-';
+      else if (c.key === 'severity' && r.severity) { const L = LEVELS[String(r.severity).toUpperCase()]; v = `<span class="sev" style="${L ? `--c:${L.c};--d:${L.d}` : ''}">${esc(r.severity)}</span>${L ? esc(L.t) : ''}`; }
+      return `<div class="k">${esc(c.title)}</div><div class="v">${v || '-'}</div>`;
+    }).join('');
+    $('viewEdit').onclick = () => startEdit(row);
+    openM('mView');
+  }
+
+  // ---------- ลบ (ใส่รหัสผ่าน) ----------
+  function askDelete(row){
+    const r = DATA.rows.find(x => x._row === row); if (!r) return;
+    delTarget = r;
+    $('delText').textContent = (thDate(r.reportDateIso) || r.reportDate) + ' · ' + String(r.details || '').slice(0, 60);
+    $('delPass').value = ''; $('delErr').textContent = '';
+    openM('mDel'); setTimeout(() => $('delPass').focus(), 50);
+  }
+  $('delPass').addEventListener('keydown', e => { if (e.key === 'Enter') doDelete(); });
+  async function doDelete(){
+    const pw = $('delPass').value;
+    if (!pw) { $('delErr').textContent = 'กรุณาใส่รหัสผ่าน'; return; }
+    const b = $('delBtn'); b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner spin"></i> กำลังลบ...';
+    try {
+      await api('delete', {_row: delTarget._row, _sig: delTarget.details, password: pw});
+      closeM('mDel'); toast('ลบรายการเรียบร้อยแล้ว');
+      if (editing && editing._row === delTarget._row) resetForm();
+      await loadData();
+    } catch (e) {
+      $('delErr').textContent = e.message;
+    } finally {
+      b.disabled = false; b.innerHTML = '<i class="fa-solid fa-trash"></i> ลบรายการ';
+    }
+  }
+
+  window.INC = {
+    send, cancelEdit, addImages, addFiles, loadData, closeM, doDelete, setFilter, viewRow, startEdit, askDelete,
+    rmImg: i => { images.splice(i,1); renderThumbs(); },
+    rmFile: i => { files.splice(i,1); renderThumbs(); },
+    more: () => { page++; renderTable(); }
+  };
+  loadData();
+})();
 </script>
 </body>
 </html>
