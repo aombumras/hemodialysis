@@ -3,826 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard KPI ระบบน้ำ RO</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- SweetAlert2 -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
+    <title>ระบบติดตามน้ำบริสุทธิ์ RO - สถาบันบำราศนราดูร</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- Flatpickr (ระบบปฏิทิน) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/th.js"></script>
+    <!-- Marked.js สำหรับแปลง Markdown เป็น HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
-        :root {
-            --purple-primary: #9b7fd4;
-            --purple-secondary: #c3b1e1;
-            --purple-light: #ede7f6;
-            --purple-dark: #7e57c2;
-            --purple-gradient: linear-gradient(135deg, #9b7fd4 0%, #7e57c2 100%);
-        }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
+        .card-custom { background-color: #1e293b; border-radius: 20px; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); padding: 20px; }
+        .header-title { background: linear-gradient(90deg, #1e293b, #0f172a); border-radius: 20px; border-left: 5px solid #38bdf8; }
+        
+        .digital-value { font-size: 2rem; font-weight: bold; color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .digital-sm { font-size: 1.5rem; font-weight: bold; color: #f8fafc; }
+        .digital-xl { font-size: 2.5rem; font-weight: bold; }
+        
+        /* 3D Thermometer */
+        .thermo-container { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .thermo-glass { width: 25px; height: 100px; background: linear-gradient(to right, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.2) 30%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%); border: 2px solid #475569; border-radius: 15px; position: relative; box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.8); }
+        .thermo-fluid { position: absolute; bottom: 2px; left: 2px; right: 2px; background: linear-gradient(to top, #3b82f6, #ef4444); border-radius: 10px; transition: height 1s; }
+        .thermo-bulb { width: 36px; height: 36px; background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb); border-radius: 50%; position: absolute; bottom: -20px; left: -7px; border: 2px solid #475569; box-shadow: inset -3px -3px 6px rgba(0,0,0,0.5); }
+        
+        /* 3D Rotameter */
+        .rotameter-wrapper { display: flex; align-items: center; justify-content: center; position: relative; }
+        .rotameter-scale { display: flex; flex-direction: column; justify-content: space-between; height: 200px; font-size: 0.75rem; color: #94a3b8; text-align: right; padding-right: 4px; font-weight: bold; }
+        .rotameter { width: 45px; height: 200px; background: linear-gradient(to right, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.2) 20%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.05) 100%); border: 2px solid #475569; border-radius: 20px; position: relative; display: flex; justify-content: center; box-shadow: inset 0px 0px 15px rgba(0,0,0,0.9), 3px 3px 10px rgba(0,0,0,0.5); }
+        .rotameter::after { content: ''; position: absolute; top: 2%; left: 15%; width: 15%; height: 96%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); border-radius: 20px; pointer-events: none; }
+        .rotameter::before { content: ''; position: absolute; left: 10px; height: 100%; width: 5px; border-left: 1px dashed #64748b; }
+        .float-bob { width: 26px; height: 26px; border-radius: 50%; position: absolute; z-index: 2; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5), 0 4px 6px rgba(0,0,0,0.6); transition: bottom 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        .gauge-chart { width: 100%; height: 200px; }
+        .col-label { font-size: 0.8rem; color: #94a3b8; margin-top: -10px; text-align: center; display: block; line-height: 1.2;}
+        .table-dark-custom { background-color: #0f172a; color: #cbd5e1; border-color: #334155; }
+        .table-dark-custom th { background-color: #1e293b; color: #38bdf8; position: sticky; top: 0; z-index: 10;}
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-        body {
-            background-color: #f8f9fa;
-            font-size: 0.85rem;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .dashboard-container {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-            padding: 1.25rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .header {
-            background: var(--purple-gradient);
-            color: white;
-            border-radius: 10px;
-            padding: 1.25rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.6rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .kpi-card {
-            background-color: var(--purple-light);
-            border-radius: 10px;
-            padding: 0.9rem;
-            height: 100%;
-            transition: transform 0.3s;
-            border-left: 4px solid var(--purple-primary);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .kpi-card .icon {
-            font-size: 1.8rem;
-            color: var(--purple-dark);
-            margin-bottom: 0.4rem;
-        }
-
-        .kpi-card .value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .kpi-card .title {
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 0;
-        }
-
-        .filter-section {
-            background-color: var(--purple-light);
-            border-radius: 10px;
-            padding: 0.9rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .btn-purple {
-            background: var(--purple-gradient);
-            border: none;
-            color: white;
-        }
-
-        .btn-purple:hover {
-            background: linear-gradient(135deg, #7e57c2 0%, #9b7fd4 100%);
-            color: white;
-        }
-
-        .chart-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 0.9rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            height: 280px;
-        }
-
-        .chart-container h5 {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .table-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 0.9rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            overflow-x: auto;
-        }
-
-        .table-container h5 {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .table {
-            font-size: 0.8rem;
-        }
-
-        .table thead {
-            background-color: var(--purple-light);
-        }
-
-        .table thead th {
-            border-bottom: none;
-            color: #333;
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-
-        .action-btn {
-            padding: 0.2rem 0.4rem;
-            font-size: 0.75rem;
-        }
-
-        .status-good {
-            color: #28a745;
-        }
-
-        .status-warning {
-            color: #ffc107;
-        }
-
-        .status-danger {
-            color: #dc3545;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 1rem;
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 1rem;
-        }
-
-        .footer img {
-            max-height: 40px;
-            margin-bottom: 0.5rem;
-        }
-
-        .cute-icon {
-            font-size: 1rem;
-            margin-right: 0.3rem;
-            color: var(--purple-primary);
-        }
-
-        /* Improved responsiveness for mobile */
-        @media (max-width: 768px) {
-            body {
-                font-size: 0.8rem;
-            }
-
-            .container-fluid {
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            .header {
-                padding: 1rem;
-            }
-
-            .header h1 {
-                font-size: 1.3rem;
-            }
-
-            .kpi-card {
-                padding: 0.7rem;
-            }
-
-            .kpi-card .value {
-                font-size: 1.3rem;
-            }
-
-            .kpi-card .icon {
-                font-size: 1.3rem;
-            }
-
-            .chart-container {
-                height: 220px;
-                padding: 0.7rem;
-            }
-
-            .chart-container h5 {
-                font-size: 0.85rem;
-            }
-
-            .table {
-                font-size: 0.7rem;
-            }
-
-            .table thead th {
-                font-size: 0.7rem;
-            }
-
-            .action-btn {
-                padding: 0.15rem 0.3rem;
-                font-size: 0.7rem;
-            }
-        }
-
-        /* Extra small devices */
-        @media (max-width: 576px) {
-            .header h1 {
-                font-size: 1.1rem;
-            }
-
-            .kpi-card .value {
-                font-size: 1.1rem;
-            }
-
-            .kpi-card .icon {
-                font-size: 1.1rem;
-            }
-
-            .chart-container {
-                height: 200px;
-            }
-        }
+        .flatpickr-calendar { font-family: 'Segoe UI', sans-serif; }
+        .flatpickr-day.has-data { color: #10b981 !important; font-weight: bold; }
+        .flatpickr-day.no-data-past { color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1); }
+        
+        .analysis-box { background: rgba(255,255,255,0.02); border-radius: 15px; border: 1px dashed #475569; padding: 15px; min-height: 120px; }
+        .ai-result-box { display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid #38bdf8; border-radius: 15px; padding: 15px; margin-top: 15px; }
     </style>
 </head>
-<body>
-    <div class="container-fluid py-3">
-        <!-- Header -->
-        <div class="header">
-            <h1><i class="bi bi-droplet-fill"></i> Dashboard KPI ระบบน้ำ RO</h1>
-        </div>
+<body class="p-3 p-md-4">
 
-        <!-- KPI Overview Cards -->
-        <div class="dashboard-container">
-            <div class="row g-3">
-                <div class="col-md-3 col-sm-6">
-                    <div class="kpi-card">
-                        <div class="icon"><i class="bi bi-lightning-charge-fill"></i></div>
-                        <div class="value" id="orp-value">--</div>
-                        <p class="title">ORP (mV)</p>
-                    </div>
+    <!-- Loading Screen -->
+    <div id="loadingOverlay">
+        <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h4 class="mt-3 text-info">กำลังโหลดข้อมูลระบบน้ำ...</h4>
+    </div>
+
+    <!-- Header & Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="header-title p-3 p-md-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center shadow gap-3">
+                <div>
+                    <h3 class="m-0 text-white"><i class="fas fa-microscope text-info me-3"></i>Dashboard ระบบน้ำบริสุทธิ์ RO</h3>
+                    <h6 class="text-secondary mt-2 mb-0">สถาบันบำราศนราดูร (Hemodialysis RO System)</h6>
                 </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="kpi-card">
-                        <div class="icon"><i class="bi bi-droplet"></i></div>
-                        <div class="value" id="chlorine-value">--</div>
-                        <p class="title">Chlorine (ppm)</p>
+                <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center">
+                    <div class="input-group" style="width: 280px;">
+                        <span class="input-group-text bg-dark text-info border-secondary"><i class="fas fa-calendar-alt"></i></span>
+                        <input type="text" id="dateFilter" class="form-control bg-dark text-white border-secondary" placeholder="คลิกเลือกวันที่...">
                     </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="kpi-card">
-                        <div class="icon"><i class="bi bi-filter-square-fill"></i></div>
-                        <div class="value" id="salt-rejection-value">--</div>
-                        <p class="title">% Salt Rejection</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="kpi-card">
-                        <div class="icon"><i class="bi bi-recycle"></i></div>
-                        <div class="value" id="recovery-value">--</div>
-                        <p class="title">% Recovery</p>
+                    <div class="text-lg-end min-w-150">
+                        <span class="badge bg-success mb-1"><i class="fas fa-check-circle"></i> ข้อมูลอัปเดต</span><br>
+                        <small class="text-muted">ผู้ตรวจสอบ: <span id="valOperator" class="text-info fw-bold">-</span></small>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-4 col-sm-6">
-                    <label for="month-select" class="form-label">เลือกเดือน</label>
-                    <select class="form-select form-select-sm" id="month-select">
-                        <option value="all">ทั้งหมด</option>
-                        <option value="1">มกราคม</option>
-                        <option value="2">กุมภาพันธ์</option>
-                        <option value="3">มีนาคม</option>
-                        <option value="4">เมษายน</option>
-                        <option value="5">พฤษภาคม</option>
-                        <option value="6">มิถุนายน</option>
-                        <option value="7">กรกฎาคม</option>
-                        <option value="8">สิงหาคม</option>
-                        <option value="9">กันยายน</option>
-                        <option value="10">ตุลาคม</option>
-                        <option value="11">พฤศจิกายน</option>
-                        <option value="12">ธันวาคม</option>
-                    </select>
+    <!-- ปลั๊กอินวิเคราะห์ (TRT Rules + AI) -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card-custom border-info">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary">
+                    <h5 class="text-info m-0"><i class="fas fa-robot me-2"></i>ปลั๊กอินวิเคราะห์ระบบน้ำ (TRT Analysis)</h5>
+                    <button class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="callAI()"><i class="fas fa-magic me-1"></i> ให้ AI วิเคราะห์เชิงลึก</button>
                 </div>
-                <div class="col-md-4 col-sm-6">
-                    <label for="year-select" class="form-label">เลือกปี</label>
-                    <select class="form-select form-select-sm" id="year-select">
-                        <!-- Will be populated dynamically -->
-                    </select>
+                <div id="analysisResult" class="analysis-box"></div>
+                <div id="aiResultBox" class="ai-result-box">
+                    <h6 class="text-info fw-bold mb-2"><i class="fas fa-brain me-2"></i>ความเห็นจาก AI (Deep Analysis)</h6>
+                    <div id="aiText" style="font-size: 0.95rem;"></div>
                 </div>
-                <div class="col-md-4 col-sm-12 mt-md-4 mt-2">
-                    <button id="load-data-btn" class="btn btn-purple btn-sm w-100">
-                        <i class="bi bi-search"></i> แสดงข้อมูล
-                    </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- โซนที่ 1: คุณภาพน้ำ (Water Quality) -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3 col-lg-2"><div class="card-custom text-center h-100"><small class="text-secondary">ORP น้ำเข้า</small><div class="digital-sm text-warning mt-1"><span id="valOrp">0</span> <span class="fs-6">mV</span></div></div></div>
+        <div class="col-6 col-md-3 col-lg-2"><div class="card-custom text-center h-100"><small class="text-secondary">Chlorine น้ำดิบ {0.3-0.5}</small><div class="digital-sm text-warning mt-1"><span id="valCl">-</span> <span class="fs-6">ppm</span></div></div></div>
+        <div class="col-6 col-md-3 col-lg-2"><div class="card-custom text-center h-100"><small class="text-secondary">RAW Cond {< 500}</small><div class="digital-sm text-warning mt-1"><span id="valCondRaw">0</span> <span class="fs-6">µS</span></div></div></div>
+        <div class="col-6 col-md-3 col-lg-3"><div class="card-custom text-center border-info h-100"><small class="text-info fw-bold">Conductivity RO {< 10}</small><div class="digital-value mt-1"><span id="valCondRo">0.00</span> <span class="fs-5">µS/cm</span></div></div></div>
+        <div class="col-12 col-lg-3">
+            <div class="card-custom h-100 d-flex flex-column justify-content-center">
+                <small class="text-secondary text-center d-block">TEMP. B/T {< 35 c}</small>
+                <div class="thermo-container mt-2">
+                    <div class="thermo-glass"><div id="thermoFluid" class="thermo-fluid" style="height: 0%;"></div><div class="thermo-bulb"></div></div>
+                    <div><div class="digital-sm text-white"><span id="valTemp">0</span><span class="fs-6">°C</span></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- โซนที่ 2: แรงดันระบบก่อนกรอง -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card-custom">
+                <h6 class="text-secondary mb-3"><i class="fas fa-filter me-2"></i>แรงดันระบบกรองเบื้องต้น (Pre-Treatment)</h6>
+                <div class="row g-2">
+                    <div class="col-6 col-md-4 col-lg-2"><div id="gFeed" class="gauge-chart"></div><span class="col-label">Feed pump Pressure<br>{> 40 psi}</span></div>
+                    <div class="col-6 col-md-4 col-lg-2"><div id="gSand" class="gauge-chart"></div><span class="col-label">Sand pressure<br>{psi}</span></div>
+                    <div class="col-6 col-md-4 col-lg-2"><div id="gC1" class="gauge-chart"></div><span class="col-label">Carbon 1 Pressure<br>{psi}</span></div>
+                    <div class="col-6 col-md-4 col-lg-2"><div id="gC2" class="gauge-chart"></div><span class="col-label">Carbon 2 Pressure<br>{psi}</span></div>
+                    <div class="col-6 col-md-4 col-lg-2"><div id="gSoft" class="gauge-chart"></div><span class="col-label">Softener pressure<br>{psi}</span></div>
+                    <div class="col-6 col-md-4 col-lg-2"><div id="gCart" class="gauge-chart"></div><span class="col-label">Cartridge Filter<br>{psi}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- โซนที่ 3: ระบบ RO, อัตราการไหล และ ประสิทธิภาพ -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-5">
+            <div class="card-custom h-100 d-flex flex-column">
+                <h6 class="text-secondary mb-3"><i class="fas fa-tachometer-alt me-2"></i>แรงดันระบบ RO</h6>
+                <div class="row flex-grow-1 align-items-center">
+                    <div class="col-6 col-md-4"><div id="gRoPump" class="gauge-chart"></div><span class="col-label text-info">RO Pressure Pump</span></div>
+                    <div class="col-6 col-md-4"><div id="gConcPress" class="gauge-chart"></div><span class="col-label text-warning">Concentrate Pressure<br>{80-180 psi}</span></div>
+                    <div class="col-12 col-md-4"><div id="gPermPress" class="gauge-chart"></div><span class="col-label text-success">Permeate Pressure<br>{80-180 psi}</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card-custom h-100">
+                <h6 class="text-secondary mb-3"><i class="fas fa-water me-2"></i>อัตราการไหล (LPM)</h6>
+                <div class="d-flex justify-content-around align-items-center mt-2">
+                    <div class="text-center">
+                        <div class="rotameter-wrapper">
+                            <div class="rotameter-scale"><span>40-</span><span>30-</span><span>20-</span><span>10-</span><span>0-</span></div>
+                            <div class="rotameter"><div id="bobPermeate" class="float-bob" style="background: radial-gradient(circle at 30% 30%, #38bdf8, #0369a1); bottom: 0%;"></div></div>
+                        </div>
+                        <span class="col-label mt-2">Permeate Flow<br>{18-35 LPM}</span>
+                        <h4 class="mt-1 text-info"><span id="valPermFlow">0</span></h4>
+                    </div>
+                    <div class="text-center">
+                        <div class="rotameter-wrapper">
+                            <div class="rotameter-scale"><span>40-</span><span>30-</span><span>20-</span><span>10-</span><span>0-</span></div>
+                            <div class="rotameter"><div id="bobReject" class="float-bob" style="background: radial-gradient(circle at 30% 30%, #fcd34d, #b45309); bottom: 0%;"></div></div>
+                        </div>
+                        <span class="col-label mt-2">Concentrate Flow<br>{18-35 LPM}</span>
+                        <h4 class="mt-1 text-warning"><span id="valConcFlow">0</span></h4>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="chart-container">
-                    <h5 class="mb-2">ORP Trend</h5>
-                    <canvas id="orp-chart"></canvas>
-                </div>
+        <div class="col-lg-3 d-flex flex-column gap-3">
+            <div class="card-custom text-center h-50 d-flex flex-column justify-content-center">
+                <small class="text-secondary">% Salt Rejection {> 90%}</small>
+                <div class="digital-xl text-success mt-2"><span id="valRej">0.00</span>%</div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="chart-container">
-                    <h5 class="mb-2">% Salt Rejection Trend</h5>
-                    <canvas id="salt-rejection-chart"></canvas>
-                </div>
+            <div class="card-custom text-center h-50 d-flex flex-column justify-content-center">
+                <small class="text-secondary">% Recovery {45-55%}</small>
+                <div class="digital-xl text-warning mt-2"><span id="valRec">0.00</span>%</div>
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="chart-container">
-                    <h5 class="mb-2">Chlorine (ในน้ำปะปา) Trend</h5>
-                    <canvas id="chlorine-chart"></canvas>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="chart-container">
-                    <h5 class="mb-2">% Recovery Trend</h5>
-                    <canvas id="recovery-chart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data Table -->
-        <div class="table-container">
-            <h5 class="mb-2">
-                <i class="bi bi-table cute-icon"></i>
-                ข้อมูลรายละเอียด
-            </h5>
-            <div class="table-responsive">
-                <table class="table table-hover" id="data-table">
-                    <thead>
-                        <tr>
-                            <th><i class="bi bi-calendar-date cute-icon"></i>วันที่</th>
-                            <th><i class="bi bi-lightning cute-icon"></i>ORP</th>
-                            <th><i class="bi bi-droplet cute-icon"></i>Chlorine (ppm)</th>
-                            <th><i class="bi bi-filter cute-icon"></i>% Salt Rejection</th>
-                            <th><i class="bi bi-recycle cute-icon"></i>% Recovery</th>
-                            <th><i class="bi bi-person cute-icon"></i>ผู้ตรวจสอบ</th>
-                            <th><i class="bi bi-gear cute-icon"></i>การจัดการ</th>
-                        </tr>
-                    </thead>
+    <!-- โซนที่ 4: สถานะ & กราฟ -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-4">
+            <div class="card-custom h-100">
+                <h6 class="text-secondary mb-3"><i class="fas fa-clipboard-check me-2"></i>การทำงาน & สารเคมี</h6>
+                <table class="table table-dark table-sm table-borderless align-middle m-0" style="font-size: 0.9rem;">
                     <tbody>
-                        <!-- Data will be loaded here -->
+                        <tr><td class="text-secondary">Sand Clock</td><td class="text-end"><span id="valSandClk" class="badge bg-success">-</span></td></tr>
+                        <tr><td class="text-secondary">Carbon 1 Clock</td><td class="text-end"><span id="valC1Clk" class="badge bg-success">-</span></td></tr>
+                        <tr><td class="text-secondary">Carbon 1 Chlorine test {<0.1}</td><td class="text-end"><span id="valC1Cl" class="text-white">-</span></td></tr>
+                        <tr><td class="text-secondary">Carbon 2 Clock</td><td class="text-end"><span id="valC2Clk" class="badge bg-success">-</span></td></tr>
+                        <tr><td class="text-secondary">Carbon 2 Chlorine test {<0.1}</td><td class="text-end"><span id="valC2Cl" class="text-white">-</span></td></tr>
+                        <tr><td class="text-secondary">Softener Clock</td><td class="text-end"><span id="valSoftClk" class="badge bg-success">-</span></td></tr>
+                        <tr><td class="text-secondary">Softener Brine Tank (12.5 kg)</td><td class="text-end text-info fw-bold" id="valBrine">-</td></tr>
+                        <tr><td class="text-secondary">Softener Aquadur test {<17.1}</td><td class="text-end"><span id="valAqua" class="text-white">-</span></td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <!-- Hospital logo as SVG -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7e57c2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-            </svg>
-            <p>สถาบันบำราศนราดูร</p>
+        <div class="col-lg-8">
+            <div class="card-custom h-100 d-flex flex-column">
+                <h6 class="text-secondary mb-3"><i class="fas fa-chart-line me-2"></i>กราฟแนวโน้ม Conductivity RO (ตลอดทั้งเดือน)</h6>
+                <div id="monthlyChart" class="flex-grow-1" style="min-height: 250px;"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- โซนที่ 5: ตารางย้อนหลัง RO -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card-custom">
+                <h6 class="text-secondary mb-3"><i class="fas fa-table me-2"></i>ประวัติตรวจเช็คระบบน้ำ RO (ตลอดทั้งเดือน)</h6>
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table table-bordered table-hover table-dark-custom text-center align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>วัน-เวลา</th>
+                                <th>Cond RO</th>
+                                <th>% Rejection</th>
+                                <th>% Recovery {45-55%}</th>
+                                <th>Flow (Perm/Conc)</th>
+                                <th>ผู้ตรวจ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- โซนที่ 6: ผลเพาะเชื้อระบบน้ำ (ขนาดกะทัดรัด พร้อมฟิลเตอร์เดือนปี) -->
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="card-custom border-success p-3 p-md-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+                    <div>
+                        <h5 class="text-white m-0"><i class="fa-solid fa-microscope text-success me-2"></i>ผลเพาะเชื้อระบบน้ำ</h5>
+                        <small class="text-muted">คลิกเลือกโฟลเดอร์เพื่อดูรายงาน PDF รายเดือน</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <!-- Dropdown Filter เลือกเดือนปี -->
+                        <select id="csMonthFilter" class="form-select form-select-sm bg-dark text-white border-secondary rounded-pill px-3" style="width: 180px;">
+                            <option value="all">-- ทุกเดือน/ปี --</option>
+                        </select>
+                        <!-- ช่องค้นหาข้อความ -->
+                        <input type="text" id="csSearchInput" placeholder="🔍 ค้นหาโฟลเดอร์..." class="form-control form-control-sm bg-dark text-white border-secondary rounded-pill px-3" style="width: 160px;" />
+                    </div>
+                </div>
+
+                <div id="csLoader" class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                    <span class="text-success ms-2 font-monospace">กำลังโหลดโฟลเดอร์...</span>
+                </div>
+                
+                <!-- พื้นที่แสดงโฟลเดอร์แบบเรียงชิด ประหยัดพื้นที่ -->
+                <div id="csFolderGroups" class="row g-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับแสดงไฟล์ PDF ภายในโฟลเดอร์ -->
+    <div class="modal fade" id="csFileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark text-white border border-secondary shadow-lg rounded-4">
+                <div class="modal-header border-bottom border-secondary bg-success bg-opacity-10 py-2">
+                    <h6 class="modal-title text-success fw-bold m-0" id="csModalTitle"><i class="fa-solid fa-folder-open me-2"></i>รายการรายงาน</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-3" style="max-height: 60vh; overflow-y: auto;">
+                    <div id="csModalLoading" class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                        <p class="text-muted mt-1 small">กำลังดึงรายการไฟล์...</p>
+                    </div>
+                    <div id="csFileList" class="list-group list-group-flush bg-transparent"></div>
+                    <div id="csNoFiles" class="text-center py-4 text-muted hidden">
+                        <i class="fa-solid fa-folder-open fa-2x mb-2 text-secondary"></i>
+                        <p class="small">ไม่พบไฟล์เอกสารในโฟลเดอร์นี้</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script รวมการทำงานทั้งหมด -->
     <script>
-        // Global variables
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxF6PWMVdAHOQcJMhcPHSY8kZImhznGBWiKWVWH1YltpBXoiiHNvDlbdTmKe5jr_bO/exec';
-        let allData = [];
-        let filteredData = [];
-        let charts = {};
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6SFIkKLSar147bqNZ0LFcu_7RnJBTTtvL9SZoCYjS1cMMAkvhCAiR2jeujwKz7J1c/exec";
+        const CS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw1T2I9jBaUVQqRA-pnmqxAqZlTKZRI212-moZ_LpviGI3yILCekDVyAeaeKjP38tUw/exec";
+        
+        let globalData = [];
+        let currentDayData = null;
+        let availableDates = [];
+        let gauges = {};
+        let monthlyChart;
+        let allCSFolders = [];
+        const csMonthNamesFull = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 
-        // Initialize the dashboard
-        $(document).ready(function() {
-            populateYearDropdown();
-            setupEventListeners();
-            loadData();
-        });
-
-        // Populate year dropdown with current year and 2 years back
-        function populateYearDropdown() {
-            const currentYear = new Date().getFullYear();
-            const yearSelect = $('#year-select');
-
-            for (let i = 0; i < 3; i++) {
-                const year = currentYear - i;
-                yearSelect.append(`<option value="${year}">${year}</option>`);
-            }
-        }
-
-        // Set up event listeners
-        function setupEventListeners() {
-            // Load data button click
-            $('#load-data-btn').click(function() {
-                filterAndDisplayData();
+        function createGauge(elementId, maxVal, isRO) {
+            let colorStops = isRO ? [[0.4, '#38bdf8'], [0.8, '#f59e0b'], [1, '#ef4444']] : [[0.5, '#10b981'], [0.8, '#f59e0b'], [1, '#ef4444']];
+            let chart = echarts.init(document.getElementById(elementId));
+            chart.setOption({
+                series: [{ type: 'gauge', startAngle: 210, endAngle: -30, min: 0, max: maxVal, splitNumber: 4, itemStyle: { color: '#ef4444' }, progress: { show: true, roundCap: true, width: 8 }, pointer: { length: '65%', width: 5, itemStyle: { color: '#ef4444' } }, axisLine: { lineStyle: { width: 8, color: colorStops } }, axisTick: { distance: -10, length: 4, lineStyle: { color: '#fff', width: 1 } }, splitLine: { distance: -15, length: 8, lineStyle: { color: '#fff', width: 2 } }, axisLabel: { color: '#94a3b8', distance: 15, fontSize: 9 }, detail: { valueAnimation: true, formatter: '{value}', color: '#fff', fontSize: 14, offsetCenter: [0, '60%'] }, data: [{ value: 0 }] }]
             });
+            gauges[elementId] = chart;
         }
 
-        // Load data from Google Sheet
-        function loadData() {
-            showLoading('กำลังโหลดข้อมูล...');
+        function extractNum(val) {
+            if(val === null || val === undefined || val === '') return 0;
+            let n = parseFloat(val);
+            return isNaN(n) ? 0 : n;
+        }
 
-            $.ajax({
-                url: SCRIPT_URL,
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    action: 'getData'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        allData = response.data;
-                        processData();
-                        hideLoading();
-                    } else {
-                        showError('เกิดข้อผิดพลาด: ' + response.message);
+        function parseRobustDate(rawStr) {
+            let str = String(rawStr || "").trim();
+            if (!str) return null;
+            let parts = str.split(/[\s,]+/); 
+            let datePart = parts[0]; 
+            let timePart = parts[1] || "00:00"; 
+            let dParts = datePart.split('/');
+            if (dParts.length !== 3) dParts = datePart.split('-');
+            if (dParts.length === 3) {
+                let day = dParts[0]; let month = dParts[1]; let year = dParts[2];
+                if (year.length < 4 && dParts[0].length === 4) { year = dParts[0]; month = dParts[1]; day = dParts[2]; }
+                let y = String(year); let m = String(month).padStart(2, '0'); let d = String(day).padStart(2, '0');
+                let tParts = timePart.split(':'); let h = String(tParts[0] || '0').padStart(2, '0'); let min = String(tParts[1] || '0').padStart(2, '0');
+                return { dateStr: `${y}-${m}-${d}`, monthStr: `${y}-${m}`, dayNum: parseInt(d, 10), timeDisplay: `${d}/${m}/${y} ${h}:${min}` };
+            }
+            return null;
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                
+                globalData = data.map(row => {
+                    let mapped = {};
+                    for (let k in row) {
+                        let lk = k.toLowerCase().replace(/\s+/g, ' '); 
+                        let val = row[k];
+                        if(lk.includes('ประทับเวลา')) mapped.timestamp_raw = val;
+                        else if(lk === 'orp') mapped.orp = extractNum(val);
+                        else if(lk.includes('chlorine ในน้ำดิบ')) mapped.cl_raw = val;
+                        else if(lk.includes('feed pump')) mapped.press_feed = extractNum(val);
+                        else if(lk.includes('sand pressure')) mapped.press_sand = extractNum(val);
+                        else if(lk.includes('sand clock')) mapped.clk_sand = val;
+                        else if(lk.includes('softener pressure')) mapped.press_soft = extractNum(val);
+                        else if(lk.includes('softener clock')) mapped.clk_soft = val;
+                        else if(lk.includes('brine')) mapped.brine = extractNum(val);
+                        else if(lk.includes('aquadur')) mapped.aqua = val;
+                        else if(lk.includes('carbon 1 pressure')) mapped.press_c1 = extractNum(val);
+                        else if(lk.includes('carbon 1 clock')) mapped.clk_c1 = val;
+                        else if(lk.includes('carbon 1 chlorine')) mapped.cl_c1 = val;
+                        else if(lk.includes('carbon 2 pressure')) mapped.press_c2 = extractNum(val);
+                        else if(lk.includes('carbon 2 clock')) mapped.clk_c2 = val;
+                        else if(lk.includes('carbon 2 chlorine')) mapped.cl_c2 = val;
+                        else if(lk.includes('cartridge filter')) mapped.press_cart = extractNum(val);
+                        else if(lk.includes('raw cond')) mapped.cond_raw = extractNum(val);
+                        else if(lk.includes('temp')) mapped.temp = extractNum(val);
+                        else if(lk.includes('ro pressure')) mapped.press_ro_pump = extractNum(val);
+                        else if(lk.includes('concentrate pressure')) mapped.press_conc = extractNum(val);
+                        else if(lk.includes('permeate pressure')) mapped.press_perm = extractNum(val);
+                        else if(lk.includes('permeate flow')) mapped.flow_perm = extractNum(val);
+                        else if(lk.includes('concentrate flow')) mapped.flow_conc = extractNum(val);
+                        else if(lk.includes('cond') && lk.includes('ro')) mapped.cond_ro = extractNum(val);
+                        else if(lk.includes('rejection')) mapped.rej = extractNum(val);
+                        else if(lk.includes('recovery')) mapped.rec = extractNum(val);
+                        else if(lk.includes('ชื่อ-สกุล')) mapped.operator = val;
                     }
-                },
-                error: function(xhr, status, error) {
-                    showError('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error);
+                    let dateInfo = parseRobustDate(mapped.timestamp_raw);
+                    if(dateInfo) {
+                        mapped.dateStr = dateInfo.dateStr; mapped.monthStr = dateInfo.monthStr;
+                        mapped.dayNum = dateInfo.dayNum; mapped.timeDisplay = dateInfo.timeDisplay;
+                    } else { mapped.dateStr = ""; }
+                    return mapped;
+                });
+                
+                globalData = globalData.filter(d => d.dateStr !== "");
+                
+                if (globalData.length > 0) {
+                    availableDates = [...new Set(globalData.map(d => d.dateStr))];
+                    availableDates.sort((a,b) => a.localeCompare(b));
+                    initCalendar();
+                }
+            } catch (e) { console.error(e); alert("พบปัญหาในการดึงข้อมูล RO โปรดรีเฟรชหน้าจอ"); } 
+            finally { 
+                document.getElementById('loadingOverlay').style.display = 'none'; 
+            }
+        }
+
+        function initCalendar() {
+            flatpickr("#dateFilter", {
+                locale: "th", dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", enable: availableDates,
+                defaultDate: availableDates[availableDates.length - 1],
+                onChange: function(selectedDates, dateStr) { if(dateStr) applyFilter(dateStr); },
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    let dateStrFormat = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
+                    let today = new Date(); today.setHours(0,0,0,0);
+                    if (availableDates.includes(dateStrFormat)) { dayElem.classList.add('has-data'); } 
+                    else if (dayElem.dateObj < today) { dayElem.classList.add('no-data-past'); }
                 }
             });
+            applyFilter(availableDates[availableDates.length - 1]);
         }
 
-        // Process the loaded data
-        function processData() {
-            // Sort data by date (newest first)
-            allData.sort((a, b) => new Date(b.date) - new Date(a.date));
+        function analyzeWaterSystem(data) {
+            let alerts = []; let normals = [];
+            let condRO = parseFloat(data.cond_ro) || 0;
+            if (condRO >= 10) alerts.push(`<b>Cond RO สูงเกินเกณฑ์ (${condRO}):</b> ตรวจสอบการอุดตันของ RO Membrane`);
+            else normals.push(`Conductivity RO ผ่านเกณฑ์ TRT`);
 
-            // Update KPI cards with latest values
-            if (allData.length > 0) {
-                const latestData = allData[0];
-                $('#orp-value').text(latestData.orp);
-                $('#chlorine-value').text(latestData.chlorine);
-                $('#salt-rejection-value').text(latestData.saltRejection + '%');
-                $('#recovery-value').text(latestData.recovery + '%');
+            let rec = parseFloat(data.rec) || 0;
+            if (rec > 0 && rec < 45) alerts.push(`<b>% Recovery ต่ำ (${rec}%):</b> อาจเกิดจาก Membrane ตัน`);
+            else if (rec > 55) alerts.push(`<b>% Recovery สูง (${rec}%):</b> ระบบทำงานหนัก ระวังอายุเมมเบรนสั้นลง`);
+            else if (rec >= 45 && rec <= 55) normals.push(`% Recovery อยู่ในเกณฑ์มาตรฐาน (${rec}%)`);
 
-                // Apply status colors based on values
-                applyStatusColor('orp-value', latestData.orp, 200, 300);
-                applyStatusColor('chlorine-value', latestData.chlorine, 0.2, 0.5);
-                applyStatusColor('salt-rejection-value', latestData.saltRejection, 90, 95);
-                applyStatusColor('recovery-value', latestData.recovery, 70, 80);
-            }
-
-            // Display all data initially
-            filterAndDisplayData();
-        }
-
-        // Apply color status based on value thresholds
-        function applyStatusColor(elementId, value, warningThreshold, goodThreshold) {
-            const element = $('#' + elementId);
-
-            if (value >= goodThreshold) {
-                element.addClass('status-good').removeClass('status-warning status-danger');
-            } else if (value >= warningThreshold) {
-                element.addClass('status-warning').removeClass('status-good status-danger');
+            let html = "";
+            if (alerts.length > 0) {
+                html += `<h6 class="text-danger mb-2"><i class="fas fa-exclamation-triangle"></i> ข้อควรระวัง:</h6><ul class="text-warning mb-3" style="font-size: 0.95rem;">`;
+                alerts.forEach(a => html += `<li>${a}</li>`); html += `</ul>`;
             } else {
-                element.addClass('status-danger').removeClass('status-good status-warning');
+                html += `<div class="alert alert-success bg-transparent border-success text-success p-2 mb-3"><i class="fas fa-check-circle"></i> ผลการตรวจเบื้องต้น: ระบบสมบูรณ์ปกติ</div>`;
+            }
+            document.getElementById('analysisResult').innerHTML = html;
+        }
+
+        async function callAI() {
+            if(!currentDayData) return;
+            let aiBox = document.getElementById('aiResultBox');
+            let aiText = document.getElementById('aiText');
+            aiBox.style.display = 'block';
+            aiText.innerHTML = `<span class="spinner-border spinner-border-sm text-info me-2"></span> กำลังส่งข้อมูลให้ AI วิเคราะห์...`;
+
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'analyze', data: currentDayData })
+                });
+                const responseData = await res.json();
+                if(responseData.result) {
+                    aiText.innerHTML = marked.parse(responseData.result);
+                } else {
+                    aiText.innerHTML = `<span class="text-danger">เกิดข้อผิดพลาด: ${responseData.error}</span>`;
+                }
+            } catch(e) {
+                aiText.innerHTML = `<span class="text-danger">การเชื่อมต่อล้มเหลว โปรดลองอีกครั้ง</span>`;
             }
         }
 
-        // Filter and display data based on selected month and year
-        function filterAndDisplayData() {
-            const selectedMonth = $('#month-select').val();
-            const selectedYear = $('#year-select').val();
+        function applyFilter(selectedDate) {
+            if(!selectedDate) return;
+            let targetDataList = globalData.filter(d => d.dateStr === selectedDate);
+            if(targetDataList.length > 0) {
+                currentDayData = targetDataList[targetDataList.length - 1];
+                updateDashboard(currentDayData); 
+                analyzeWaterSystem(currentDayData);
+                document.getElementById('aiResultBox').style.display = 'none';
+            }
+            let selectedMonth = selectedDate.substring(0, 7); 
+            let monthData = globalData.filter(d => d.monthStr === selectedMonth);
+            renderChart(monthData);
+            updateHistoryTable(monthData);
+        }
 
-            // Filter data
-            filteredData = allData.filter(item => {
-                const itemDate = new Date(item.date);
-                const itemYear = itemDate.getFullYear();
+        function updateDashboard(data) {
+            document.getElementById('valOperator').innerText = data.operator || "-";
+            document.getElementById('valOrp').innerText = data.orp || 0;
+            document.getElementById('valCl').innerText = data.cl_raw || "-";
+            document.getElementById('valCondRaw').innerText = data.cond_raw || 0;
+            document.getElementById('valCondRo').innerText = data.cond_ro || 0;
+            document.getElementById('valTemp').innerText = data.temp || 0;
+            document.getElementById('valPermFlow').innerText = data.flow_perm || 0;
+            document.getElementById('valConcFlow').innerText = data.flow_conc || 0;
+            document.getElementById('valRej').innerText = data.rej || "0.00"; 
+            document.getElementById('valRec').innerText = data.rec || "0.00"; 
 
-                if (selectedMonth === 'all') {
-                    return itemYear.toString() === selectedYear;
-                } else {
-                    const itemMonth = itemDate.getMonth() + 1; // JavaScript months are 0-indexed
-                    return itemYear.toString() === selectedYear && itemMonth.toString() === selectedMonth;
+            let perm = data.flow_perm || 0; let conc = data.flow_conc || 0; let temp = data.temp || 0;
+            document.getElementById('bobPermeate').style.bottom = (perm / 40 * 100) + "%";
+            document.getElementById('bobReject').style.bottom = (conc / 40 * 100) + "%";
+            document.getElementById('thermoFluid').style.height = (temp / 40 * 100) + "%";
+
+            const setBadge = (id, val) => {
+                let el = document.getElementById(id);
+                if(val === "Yes" || val === "yes" || val === "YES") { el.className = "badge bg-success"; el.innerText = "Yes"; }
+                else if(val === "-" || val === "" || val === undefined) { el.className = "text-secondary"; el.innerText = "-"; }
+                else { el.className = "badge bg-warning text-dark"; el.innerText = val; }
+            };
+            setBadge('valSandClk', data.clk_sand); setBadge('valC1Clk', data.clk_c1); setBadge('valC1Cl', data.cl_c1);
+            setBadge('valC2Clk', data.clk_c2); setBadge('valC2Cl', data.cl_c2); setBadge('valSoftClk', data.clk_soft);
+            setBadge('valAqua', data.aqua); document.getElementById('valBrine').innerText = data.brine || "-";
+
+            gauges['gFeed'].setOption({ series: [{ data: [{ value: data.press_feed || 0 }] }] });
+            gauges['gSand'].setOption({ series: [{ data: [{ value: data.press_sand || 0 }] }] });
+            gauges['gC1'].setOption({ series: [{ data: [{ value: data.press_c1 || 0 }] }] });
+            gauges['gC2'].setOption({ series: [{ data: [{ value: data.press_c2 || 0 }] }] });
+            gauges['gSoft'].setOption({ series: [{ data: [{ value: data.press_soft || 0 }] }] });
+            gauges['gCart'].setOption({ series: [{ data: [{ value: data.press_cart || 0 }] }] });
+            gauges['gRoPump'].setOption({ series: [{ data: [{ value: data.press_ro_pump || 0 }] }] });
+            gauges['gConcPress'].setOption({ series: [{ data: [{ value: data.press_conc || 0 }] }] });
+            gauges['gPermPress'].setOption({ series: [{ data: [{ value: data.press_perm || 0 }] }] });
+        }
+
+        function renderChart(monthData) {
+            if(!monthlyChart) monthlyChart = echarts.init(document.getElementById('monthlyChart'));
+            let dailyMap = {};
+            monthData.forEach(d => { dailyMap[d.dateStr] = d; });
+            let sortedDates = Object.keys(dailyMap).sort((a,b) => a.localeCompare(b));
+            let datesLabels = sortedDates.map(d => dailyMap[d].dayNum);
+            let condData = sortedDates.map(d => dailyMap[d].cond_ro || 0);
+
+            monthlyChart.setOption({
+                tooltip: { trigger: 'axis', formatter: 'วันที่ {b} : {c} µS/cm' },
+                grid: { left: '3%', right: '4%', bottom: '5%', top: '10%', containLabel: true },
+                xAxis: { type: 'category', boundaryGap: false, data: datesLabels, axisLabel: { color: '#94a3b8' } },
+                yAxis: { type: 'value', axisLabel: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#334155' } } },
+                series: [{ name: 'Cond RO', type: 'line', smooth: true, itemStyle: { color: '#38bdf8' }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(56,189,248,0.5)' }, { offset: 1, color: 'rgba(56,189,248,0)' }]) }, data: condData }]
+            });
+        }
+
+        function updateHistoryTable(monthData) {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = "";
+            let sorted = [...monthData].sort((a,b) => b.dateStr.localeCompare(a.dateStr));
+            
+            sorted.forEach(row => {
+                let tr = document.createElement('tr');
+                let condClass = (row.cond_ro && row.cond_ro < 10) ? 'text-success' : 'text-danger';
+                let recVal = parseFloat(row.rec) || 0;
+                let recClass = (recVal >= 45 && recVal <= 55) ? 'text-info' : 'text-warning fw-bold';
+
+                tr.innerHTML = `
+                    <td><small class="text-secondary">${row.timeDisplay || '-'}</small></td>
+                    <td class="${condClass} fw-bold">${row.cond_ro || 0}</td>
+                    <td class="text-info">${row.rej || "-"}</td>
+                    <td class="${recClass}">${row.rec || "-"}</td>
+                    <td><span class="text-info">${row.flow_perm || 0}</span> / <span class="text-warning">${row.flow_conc || 0}</span></td>
+                    <td>${row.operator || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // ฟังก์ชันจัดการผลเพาะเชื้อ C/S (แบบกะทัดรัด + ฟิลเตอร์เดือนปี)
+        // ==========================================
+        async function loadCSFoldersViaFetch() {
+            document.getElementById('csLoader').style.display = 'block';
+            try {
+                const response = await fetch(CS_SCRIPT_URL + "?action=getFolders");
+                const folders = await response.json();
+                document.getElementById('csLoader').style.display = 'none';
+                
+                if(folders && folders.error) throw new Error(folders.error);
+                
+                // เรียงลำดับโฟลเดอร์จากใหม่ไปเก่าตามชื่อ
+                allCSFolders = (folders || []).sort((a, b) => b.name.localeCompare(a.name, 'th'));
+                
+                populateMonthFilter(allCSFolders);
+                renderCSGroups(allCSFolders);
+            } catch (err) {
+                document.getElementById('csLoader').style.display = 'none';
+                document.getElementById('csFolderGroups').innerHTML = `<div class="text-danger text-center small">เกิดข้อผิดพลาด: ${err.message}</div>`;
+            }
+        }
+
+        function extractYM(name) {
+            let m = name.match(/(20\d{2}|25\d{2})[-\/\. ]?(0[1-9]|1[0-2])/);
+            if (m) return {year: m[1], month: m[2], key: `${m[1]}-${m.length>2?m[2]:''}`};
+            m = name.match(/(0[1-9]|1[0-2])[-\/\. ]?(20\d{2}|25\d{2})/);
+            if (m) return {year: m[2], month: m[1], key: `${m[2]}-${m[1]}`};
+            m = name.match(/(มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม)[ ]?(20\d{2}|25\d{2})/);
+            if (m) {
+                let monthNum = String(csMonthNamesFull.indexOf(m[1])+1).padStart(2,'0');
+                return {year: m[2], month: monthNum, key: `${m[2]}-${monthNum}`};
+            }
+            return {year:'อื่นๆ', month:'อื่นๆ', key: 'อื่นๆ'};
+        }
+
+        function populateMonthFilter(folders) {
+            const selectEl = document.getElementById('csMonthFilter');
+            let monthSet = new Set();
+            
+            folders.forEach(f => {
+                let ym = extractYM(f.name);
+                if (ym.key !== 'อื่นๆ') {
+                    monthSet.add(ym.key);
                 }
             });
 
-            // Update table
-            updateDataTable();
-
-            // Update charts
-            updateCharts();
+            let sortedKeys = Array.from(monthSet).sort((a,b) => b.localeCompare(a));
+            let optionsHtml = `<option value="all">-- ทุกเดือน/ปี --</option>`;
+            
+            sortedKeys.forEach(key => {
+                let [year, month] = key.split('-');
+                let mName = csMonthNamesFull[parseInt(month, 10) - 1] || month;
+                let yLabel = year.startsWith('25') ? `พ.ศ. ${year}` : year;
+                optionsHtml += `<option value="${key}">${mName} ${yLabel}</option>`;
+            });
+            selectEl.innerHTML = optionsHtml;
         }
 
-        // Update the data table with filtered data
-        function updateDataTable() {
-            const tableBody = $('#data-table tbody');
-            tableBody.empty();
+        function renderCSGroups(folders) {
+            const container = document.getElementById('csFolderGroups');
+            const keyword = document.getElementById('csSearchInput').value.trim().toLowerCase();
+            const selectedMonthKey = document.getElementById('csMonthFilter').value;
+            
+            let filtered = folders.filter(f => {
+                let ym = extractYM(f.name);
+                let matchKeyword = f.name.toLowerCase().includes(keyword);
+                let matchMonth = (selectedMonthKey === 'all' || ym.key === selectedMonthKey);
+                return matchKeyword && matchMonth;
+            });
 
-            if (filteredData.length === 0) {
-                tableBody.append('<tr><td colspan="7" class="text-center">ไม่พบข้อมูล</td></tr>');
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center text-muted py-3 small">ไม่พบโฟลเดอร์ผลเพาะเชื้อ</div>`;
                 return;
             }
 
-            filteredData.forEach((item, index) => {
-                const date = formatDate(item.date);
-
-                const row = `
-                    <tr data-index="${index}">
-                        <td>${date}</td>
-                        <td>${item.orp}</td>
-                        <td>${item.chlorine}</td>
-                        <td>${item.saltRejection}%</td>
-                        <td>${item.recovery}%</td>
-                        <td>${item.name || '-'}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-info action-btn view-btn" data-index="${index}">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger action-btn delete-btn" data-index="${index}" data-row="${item.rowIndex}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+            let html = '';
+            filtered.forEach(folder => {
+                html += `
+                    <div class="col-auto">
+                        <div class="px-3 py-2 rounded-2 border border-secondary bg-dark bg-opacity-75 d-flex align-items-center gap-2 shadow-sm" 
+                             style="cursor: pointer; transition: all 0.2s; font-size: 0.85rem;" 
+                             onmouseover="this.style.borderColor='#198754'; this.style.backgroundColor='#19875422';" 
+                             onmouseout="this.style.borderColor='#6c757d'; this.style.backgroundColor='rgba(15, 23, 42, 0.75)';"
+                             onclick="openCSModal('${folder.id}', '${folder.name}')">
+                            <i class="fa-solid fa-folder text-success"></i>
+                            <span class="text-white fw-medium">${folder.name}</span>
+                        </div>
+                    </div>
                 `;
-
-                tableBody.append(row);
             });
-
-            // Add event listeners for view and delete buttons
-            $('.view-btn').click(function() {
-                const index = $(this).data('index');
-                viewDataDetails(filteredData[index]);
-            });
-
-            $('.delete-btn').click(function() {
-                const index = $(this).data('index');
-                const rowIndex = $(this).data('row');
-                confirmDelete(rowIndex, index);
-            });
+            container.innerHTML = html;
         }
 
-        // Format date from MM/DD/YYYY HH:MM:SS to DD/MM/YYYY
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
+        async function openCSModal(folderId, folderName) {
+            const modal = new bootstrap.Modal(document.getElementById('csFileModal'));
+            document.getElementById('csModalTitle').innerHTML = `<i class="fa-solid fa-folder-open me-2"></i>${folderName}`;
+            document.getElementById('csModalLoading').style.display = 'block';
+            document.getElementById('csFileList').innerHTML = '';
+            document.getElementById('csNoFiles').classList.add('hidden');
+            modal.show();
 
-            return `${day}/${month}/${year}`;
-        }
-
-        // View data details in a modal
-        function viewDataDetails(data) {
-            const date = formatDate(data.date);
-
-            let detailsHtml = `
-                <div class="text-start" style="font-size: 0.85rem;">
-                    <p><strong><i class="bi bi-calendar-date cute-icon"></i>วันที่:</strong> ${date}</p>
-                    <p><strong><i class="bi bi-lightning cute-icon"></i>ORP:</strong> ${data.orp} mV</p>
-                    <p><strong><i class="bi bi-droplet cute-icon"></i>Chlorine:</strong> ${data.chlorine} ppm</p>
-                    <p><strong><i class="bi bi-arrow-up-circle cute-icon"></i>Feed Pump Pressure:</strong> ${data.feedPumpPressure || '-'}</p>
-                    <p><strong><i class="bi bi-hourglass cute-icon"></i>Sand Pressure:</strong> ${data.sandPressure || '-'}</p>
-                    <p><strong><i class="bi bi-clock cute-icon"></i>Sand Clock:</strong> ${data.sandClock || '-'}</p>
-                    <p><strong><i class="bi bi-water cute-icon"></i>Softener Pressure:</strong> ${data.softenerPressure || '-'}</p>
-                    <p><strong><i class="bi bi-clock cute-icon"></i>Softener Clock:</strong> ${data.softenerClock || '-'}</p>
-                    <p><strong><i class="bi bi-droplet-half cute-icon"></i>Softener Brine:</strong> ${data.softenerBrine || '-'}</p>
-                    <p><strong><i class="bi bi-thermometer cute-icon"></i>Softener Aquadur:</strong> ${data.softenerAquadur || '-'}</p>
-                    <p><strong><i class="bi bi-filter cute-icon"></i>Carbon 1 Pressure:</strong> ${data.carbon1Pressure || '-'}</p>
-                    <p><strong><i class="bi bi-clock cute-icon"></i>Carbon 1 Clock:</strong> ${data.carbon1Clock || '-'}</p>
-                    <p><strong><i class="bi bi-droplet cute-icon"></i>Carbon 1 Chlorine:</strong> ${data.carbon1Chlorine || '-'}</p>
-                    <p><strong><i class="bi bi-filter cute-icon"></i>Carbon 2 Pressure:</strong> ${data.carbon2Pressure || '-'}</p>
-                    <p><strong><i class="bi bi-clock cute-icon"></i>Carbon 2 Clock:</strong> ${data.carbon2Clock || '-'}</p>
-                    <p><strong><i class="bi bi-droplet cute-icon"></i>Carbon 2 Chlorine:</strong> ${data.carbon2Chlorine || '-'}</p>
-                    <p><strong><i class="bi bi-funnel cute-icon"></i>Cartridge Filter:</strong> ${data.cartridgeFilter || '-'}</p>
-                    <p><strong><i class="bi bi-activity cute-icon"></i>RAW Conductivity:</strong> ${data.rawConductivity || '-'}</p>
-                    <p><strong><i class="bi bi-thermometer-half cute-icon"></i>TEMP. B/T:</strong> ${data.btTemp || '-'}</p>
-                    <p><strong><i class="bi bi-arrow-up-circle cute-icon"></i>RO Pressure Pump:</strong> ${data.roPressurePump || '-'}</p>
-                    <p><strong><i class="bi bi-arrow-down-circle cute-icon"></i>Concentrate Pressure:</strong> ${data.concentratePressure || '-'}</p>
-                    <p><strong><i class="bi bi-arrow-left-circle cute-icon"></i>Permeate Pressure:</strong> ${data.permeatePressure || '-'}</p>
-                    <p><strong><i class="bi bi-arrow-right-circle cute-icon"></i>Permeate Flow:</strong> ${data.permeateFlow || '-'}</p>
-                    <p><strong><i class="bi bi-arrow-repeat cute-icon"></i>Concentrate Flow:</strong> ${data.concentrateFlow || '-'}</p>
-                    <p><strong><i class="bi bi-activity cute-icon"></i>Conductivity RO:</strong> ${data.roConductivity || '-'}</p>
-                    <p><strong><i class="bi bi-filter-square cute-icon"></i>% Salt Rejection:</strong> ${data.saltRejection}%</p>
-                    <p><strong><i class="bi bi-recycle cute-icon"></i>% Recovery:</strong> ${data.recovery}%</p>
-                    <p><strong><i class="bi bi-person cute-icon"></i>ผู้ตรวจสอบ:</strong> ${data.name || '-'}</p>
-                </div>
-            `;
-
-            Swal.fire({
-                title: 'รายละเอียดข้อมูล',
-                html: detailsHtml,
-                confirmButtonText: 'ปิด',
-                confirmButtonColor: '#9b7fd4',
-                width: '90%',
-                customClass: {
-                    container: 'swal-wide',
-                    title: 'fs-5'
-                }
-            });
-        }
-
-        // Confirm delete with password
-        function confirmDelete(rowIndex, index) {
-            Swal.fire({
-                title: 'ยืนยันการลบข้อมูล',
-                text: 'กรุณากรอกรหัสยืนยันเพื่อลบข้อมูล',
-                input: 'password',
-                inputPlaceholder: 'กรอกรหัสยืนยัน',
-                inputAttributes: {
-                    autocapitalize: 'off',
-                    autocorrect: 'off'
-                },
-                showCancelButton: true,
-                confirmButtonText: 'ลบข้อมูล',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                showLoaderOnConfirm: true,
-                preConfirm: (password) => {
-                    if (password !== '1234') {
-                        Swal.showValidationMessage('รหัสยืนยันไม่ถูกต้อง');
-                        return false;
-                    }
-
-                    return deleteData(rowIndex);
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-            }).then((result) => {
-                if (result.isConfirmed && result.value.success) {
-                    Swal.fire({
-                        title: 'ลบข้อมูลสำเร็จ',
-                        icon: 'success',
-                        confirmButtonColor: '#9b7fd4'
-                    }).then(() => {
-                        // Reload data
-                        loadData();
+            try {
+                const response = await fetch(`${CS_SCRIPT_URL}?action=getFiles&folderId=${folderId}`);
+                const files = await response.json();
+                document.getElementById('csModalLoading').style.display = 'none';
+                
+                const fileListEl = document.getElementById('csFileList');
+                if (!files || files.length === 0) {
+                    document.getElementById('csNoFiles').classList.remove('hidden');
+                } else {
+                    let fHtml = '';
+                    files.forEach(file => {
+                        fHtml += `
+                            <div class="d-flex align-items-center justify-content-between p-2 mb-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
+                                <div class="d-flex align-items-center gap-2 text-truncate me-2">
+                                    <i class="fa-solid fa-file-pdf text-danger fa-lg"></i>
+                                    <span class="text-light text-truncate" style="font-size: 0.85rem;">${file.name}</span>
+                                </div>
+                                <a href="${file.url}" target="_blank" class="btn btn-sm btn-success px-3 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-download me-1"></i> เปิดดู / ดาวน์โหลด
+                                </a>
+                            </div>
+                        `;
                     });
-                } else if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'เกิดข้อผิดพลาด',
-                        text: result.value.message || 'ไม่สามารถลบข้อมูลได้',
-                        icon: 'error',
-                        confirmButtonColor: '#9b7fd4'
-                    });
+                    fileListEl.innerHTML = fHtml;
                 }
-            });
-        }
-
-        // Delete data via API
-        function deleteData(rowIndex) {
-            return new Promise((resolve) => {
-                $.ajax({
-                    url: SCRIPT_URL,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        action: 'deleteData',
-                        rowIndex: rowIndex
-                    },
-                    success: function(response) {
-                        resolve(response);
-                    },
-                    error: function(xhr, status, error) {
-                        resolve({
-                            success: false,
-                            message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error
-                        });
-                    }
-                });
-            });
-        }
-
-        // Update charts with filtered data
-        function updateCharts() {
-            // Prepare data for charts
-            const dates = filteredData.map(item => formatDate(item.date)).reverse();
-            const orpValues = filteredData.map(item => item.orp).reverse();
-            const chlorineValues = filteredData.map(item => item.chlorine).reverse();
-            const saltRejectionValues = filteredData.map(item => item.saltRejection).reverse();
-            const recoveryValues = filteredData.map(item => item.recovery).reverse();
-
-            // Create or update charts
-            createOrUpdateChart('orp-chart', 'ORP (mV)', dates, orpValues, '#9b7fd4');
-            createOrUpdateChart('chlorine-chart', 'Chlorine (ppm)', dates, chlorineValues, '#7e57c2');
-            createOrUpdateChart('salt-rejection-chart', '% Salt Rejection', dates, saltRejectionValues, '#9b7fd4');
-            createOrUpdateChart('recovery-chart', '% Recovery', dates, recoveryValues, '#7e57c2');
-        }
-
-        // Create or update a chart
-        function createOrUpdateChart(chartId, label, labels, data, color) {
-            const ctx = document.getElementById(chartId).getContext('2d');
-
-            // Destroy existing chart if it exists
-            if (charts[chartId]) {
-                charts[chartId].destroy();
+            } catch (err) {
+                document.getElementById('csModalLoading').style.display = 'none';
+                document.getElementById('csFileList').innerHTML = `<div class="text-danger text-center small">เกิดข้อผิดพลาด: ${err.message}</div>`;
             }
-
-            // Create new chart
-            charts[chartId] = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: label,
-                        data: data,
-                        backgroundColor: color + '20',
-                        borderColor: color,
-                        borderWidth: 2,
-                        pointBackgroundColor: color,
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        },
-                        tooltip: {
-                            titleFont: {
-                                size: 10
-                            },
-                            bodyFont: {
-                                size: 10
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: {
-                                color: '#f0f0f0'
-                            },
-                            ticks: {
-                                font: {
-                                    size: 9
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                maxRotation: 45,
-                                minRotation: 45,
-                                font: {
-                                    size: 9
-                                }
-                            }
-                        }
-                    }
-                }
-            });
         }
 
-        // Show loading indicator
-        function showLoading(message) {
-            Swal.fire({
-                title: message || 'กำลังดำเนินการ...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        }
+        // Event สำหรับตัวกรอง
+        document.getElementById('csSearchInput').addEventListener('input', () => renderCSGroups(allCSFolders));
+        document.getElementById('csMonthFilter').addEventListener('change', () => renderCSGroups(allCSFolders));
 
-        // Hide loading indicator
-        function hideLoading() {
-            Swal.close();
-        }
+        window.onload = () => {
+            ['gFeed', 'gSand', 'gC1', 'gC2', 'gSoft', 'gCart'].forEach(id => createGauge(id, 100, false));
+            ['gRoPump', 'gConcPress', 'gPermPress'].forEach(id => createGauge(id, 200, true));
+            
+            loadData();
+            setTimeout(() => { loadCSFoldersViaFetch(); }, 500);
 
-        // Show error message
-        function showError(message) {
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: message,
-                confirmButtonColor: '#9b7fd4'
-            });
-        }
+            window.addEventListener('resize', () => { Object.values(gauges).forEach(g => g.resize()); if(monthlyChart) monthlyChart.resize(); });
+        };
     </script>
 </body>
 </html>
