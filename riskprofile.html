@@ -772,16 +772,18 @@ async function api(action, payload){
   if (!API_URL || !API_URL.startsWith('https://')) throw new Error('ยังไม่ได้ตั้งค่า URL ของ Apps Script');
   let res, lastErr;
   const tries = action === 'list' ? 3 : 1;
+  let data;
   for (let i=0; i<tries; i++){
     try {
       if (action === 'list') res = await fetch(API_URL + '?action=list&t=' + Date.now(), {redirect:'follow', cache:'no-store'});
       else res = await fetch(API_URL, {method:'POST', redirect:'follow', body: JSON.stringify(Object.assign({action}, payload||{}))});
-      lastErr = null; break;
-    } catch(e){ lastErr = e; if (i < tries-1) await new Promise(r=>setTimeout(r, 1500*(i+1))); }
+      const txt = await res.text();
+      try { data = JSON.parse(txt); lastErr = null; break; }
+      catch(x){ lastErr = new Error('Apps Script ตอบกลับไม่ถูกต้อง (เซิร์ฟเวอร์ Google ไม่ว่างหรือหมดเวลา กด "โหลดข้อมูลใหม่" อีกครั้ง)'); }
+    } catch(e){ lastErr = new Error('ติดต่อ Apps Script ไม่ได้ (ตรวจสอบอินเทอร์เน็ต หรือเครือข่ายที่บล็อก script.google.com)'); }
+    if (i < tries-1) await new Promise(r=>setTimeout(r, 2000*(i+1)));
   }
-  if (lastErr) throw new Error('ติดต่อ Apps Script ไม่ได้ (ตรวจสอบอินเทอร์เน็ต หรือเครือข่ายที่บล็อก script.google.com)');
-  let data;
-  try { data = await res.json(); } catch(e){ throw new Error('Apps Script ตอบกลับไม่ถูกต้อง (อาจต้อง Deploy ใหม่แบบ "ทุกคน")'); }
+  if (lastErr) throw lastErr;
   if (!data.ok) throw new Error(data.error || 'บันทึกไม่สำเร็จ');
   return data;
 }
