@@ -295,7 +295,7 @@ table.reg{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;f
 /* ---------- compact table + detail modal ---------- */
 .reg-wrap{overflow:visible;max-height:none;background:var(--surface);border:1px solid var(--line);border-radius:10px}
 table.reg{min-width:0;width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:.8rem}
-col.w-no{width:4%} col.w-topic{width:17%} col.w-meas{width:25%} col.w-kpi{width:20%} col.w-freq{width:8%} col.w-lv{width:5.5%} col.w-res{width:5%} col.w-act{width:5.5%}
+col.w-no{width:4%} col.w-topic{width:16.5%} col.w-meas{width:24%} col.w-kpi{width:20%} col.w-freq{width:6%} col.w-lv{width:9%} col.w-res{width:5%} col.w-act{width:5.5%}
 .reg thead th{position:sticky;top:0;z-index:3;background:var(--accent);color:#fff;font-weight:600;padding:7px 3px;font-size:.78rem;text-align:center;white-space:normal;line-height:1.25;height:34px;border-right:1px solid rgba(255,255,255,.2);border-bottom:1px solid rgba(255,255,255,.2)}
 .reg thead tr+tr th{top:34px;height:auto;padding:4px 2px}
 .reg tbody tr{cursor:pointer}
@@ -315,14 +315,21 @@ col.w-no{width:4%} col.w-topic{width:17%} col.w-meas{width:25%} col.w-kpi{width:
 .eyebtn:hover{background:var(--accent);color:#fff}
 .eyebtn:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
 .eyebtn svg{width:17px;height:17px}
-@media (max-width:1000px){ .c-freq{display:none} col.w-freq{width:0} col.w-meas{width:27%} col.w-kpi{width:22%} }
+@media (max-width:1000px){ .c-freq{display:none} col.w-freq{width:0} col.w-meas{width:25%} col.w-kpi{width:20%} }
 @media (max-width:640px){
   .c-meas,.c-kpi,.c-freq{display:none}
-  col.w-meas,col.w-kpi,col.w-freq{width:0} col.w-no{width:9%} col.w-topic{width:37%} col.w-lv{width:11%} col.w-res{width:11%} col.w-act{width:10%}
+  col.w-meas,col.w-kpi,col.w-freq{width:0} col.w-no{width:9%} col.w-topic{width:37%} col.w-lv{width:15%} col.w-res{width:9%} col.w-act{width:10%}
   table.reg{font-size:.78rem}
   .reg thead th{font-size:.72rem;padding:6px 2px}
   .eyebtn{width:28px;height:28px}
 }
+.reg td.freq{text-align:center;vertical-align:middle}
+.reg td.freq b{display:block;font-size:1.05rem;color:var(--accent);line-height:1.1}
+.reg td.freq small{font-size:.7rem;color:var(--muted)}
+.cnts{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.sevchip i{font-style:normal;font-weight:600;font-size:.7rem;margin-left:1px;opacity:.9}
+.autofreq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;background:var(--surface-2);min-height:42px}
+.autofreq b{font-size:1.2rem;color:var(--accent)}
 /* modal card */
 dialog#dlg{width:min(760px,calc(100vw - 24px))}
 .dlg .content{gap:12px}
@@ -349,17 +356,23 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
 .inc .sec-title{display:flex;align-items:center;gap:8px;margin:18px 2px 10px;font-size:1.05rem;color:var(--ink);font-family:'Prompt','Sarabun',sans-serif;font-weight:600}
 .inc .sec-title:first-child{margin-top:0}
 .inc .sec-title small{color:var(--muted);font-weight:400;font-family:'Sarabun'}
-.inc .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.inc .stat{position:relative;border-radius:var(--r);padding:14px 14px 12px;background:var(--c);box-shadow:var(--shadow);cursor:pointer;transition:transform .15s,box-shadow .15s;overflow:hidden;border:2px solid transparent;min-height:118px}
-.inc .stat:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(15,23,42,.1)}
-.inc .stat.on{border-color:var(--d)}
-.inc .stat .ic{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,.75);display:grid;place-items:center;color:var(--d);font-size:19px}
-.inc .stat .num{font-family:'Prompt';font-size:1.9rem;line-height:1;color:var(--d);margin-top:10px}
-.inc .stat .num span{font-size:.85rem;font-family:'Sarabun';color:#475569;margin-left:4px}
-.inc .stat .lb{font-weight:700;color:#334155;margin-top:4px}
-.inc .stat .ds{font-size:.8rem;color:#475569}
-.inc .stat .lv{position:absolute;right:10px;top:6px;font-family:'Prompt';font-size:2.4rem;color:var(--d);opacity:.14}
-@media(max-width:480px){.inc .stats{grid-template-columns:repeat(2,1fr);gap:10px}.inc .stat{min-height:108px;padding:12px}.inc .stat .num{font-size:1.6rem}}
+.inc .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.inc .sec-title .tot{font-family:'Sarabun';font-size:.85rem;font-weight:700;background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:1px 10px}
+.inc .sec-title.sub{font-size:.98rem;margin-top:14px}
+.inc .stat{position:relative;border-radius:14px;padding:12px 14px 11px;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0) 60%),var(--c);cursor:pointer;overflow:hidden;
+  border:1px solid rgba(15,23,42,.06);border-bottom:3px solid var(--d);
+  box-shadow:0 1px 2px rgba(15,23,42,.08),0 6px 14px -4px rgba(15,23,42,.14),inset 0 1px 0 rgba(255,255,255,.8);
+  transition:transform .15s,box-shadow .15s;min-height:0}
+.inc .stat:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(15,23,42,.08),0 14px 26px -6px rgba(15,23,42,.22),inset 0 1px 0 rgba(255,255,255,.8)}
+.inc .stat.on{outline:2px solid var(--d);outline-offset:2px}
+.inc .stat .top{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.inc .stat .ic{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.85);display:grid;place-items:center;color:var(--d);font-size:17px;flex:none;box-shadow:0 2px 6px rgba(15,23,42,.1)}
+.inc .stat .num{font-family:'Prompt';font-size:1.7rem;line-height:1;color:var(--d)}
+.inc .stat .num span{font-size:.82rem;font-family:'Sarabun';color:#475569;margin-left:4px}
+.inc .stat .lb{font-weight:700;color:#334155;margin-top:8px;font-size:.92rem;position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inc .stat .lb small{font-weight:500;color:#475569}
+.inc .stat .lv{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'Prompt';font-size:2.8rem;color:var(--d);opacity:.13;line-height:1}
+@media(max-width:480px){.inc .stats{grid-template-columns:repeat(2,1fr);gap:10px}.inc .stat{padding:10px 11px 9px}.inc .stat .num{font-size:1.45rem}.inc .stat .ic{width:32px;height:32px;font-size:15px}}
 
 .inc .card{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
 .inc .card + .card{margin-top:18px}
@@ -374,6 +387,8 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
 .inc label{display:block;font-weight:600;margin-bottom:5px;font-size:.95rem}
 .inc label .no{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--pri-soft);color:var(--pri2);font-size:.78rem;margin-right:6px}
 .inc label .req{color:var(--err)}
+.inc label .no.rp{width:auto;border-radius:8px;padding:0 6px;background:#0f5f7a;color:#fff}
+.inc td.det .rptag{display:inline-block;margin-top:4px;font-size:.78rem;font-weight:600;color:#0f5f7a;background:#dcebf1;border-radius:6px;padding:1px 7px}
 .inc input,.inc select,.inc textarea{width:100%;max-width:100%;padding:10px 12px;border:1.5px solid var(--iline);border-radius:12px;font:inherit;background:#fff;color:var(--txt)}
 .inc textarea{min-height:92px;resize:vertical}
 .inc input:focus,.inc select:focus,.inc textarea:focus,.inc input:focus-visible,.inc select:focus-visible,.inc textarea:focus-visible{outline:none;border-color:#5eead4;box-shadow:0 0 0 4px #ccfbf1}
@@ -477,11 +492,10 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
   </header>
 
   <section id="incStats" class="inc" aria-label="สถิติความเสี่ยง">
-    <div class="sec-title"><i class="fa-solid fa-chart-simple" style="color:#0f766e"></i> สถิติตามระดับความรุนแรง <small>(แตะการ์ดเพื่อกรองตารางทะเบียนความเสี่ยง)</small></div>
-    <div class="stats" id="statsTotal"></div>
-    <div class="sec-title"><i class="fa-solid fa-user-nurse" style="color:#0369a1"></i> ด้านคลินิก <small>ระดับ A–I</small></div>
+    <div class="sec-title"><i class="fa-solid fa-chart-simple" style="color:#0f766e"></i> สถิติตามระดับความรุนแรง <span class="tot" id="statTotal">0 เรื่อง</span> <small>(แตะการ์ดเพื่อกรองตารางทะเบียนความเสี่ยง)</small></div>
+    <div class="sec-title sub"><i class="fa-solid fa-user-nurse" style="color:#0369a1"></i> ด้านคลินิก <small>ระดับ A–I</small> <span class="tot" id="statClinN">0 เรื่อง</span></div>
     <div class="stats" id="statsClin"></div>
-    <div class="sec-title"><i class="fa-solid fa-building-shield" style="color:#7c3aed"></i> ด้านทั่วไป <small>ระดับ 1–5</small></div>
+    <div class="sec-title sub"><i class="fa-solid fa-building-shield" style="color:#7c3aed"></i> ด้านทั่วไป <small>ระดับ 1–5</small> <span class="tot" id="statGenN">0 เรื่อง</span></div>
     <div class="stats" id="statsGen"></div>
   </section>
 
@@ -537,6 +551,9 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
       <div class="full"><label><span class="no">6</span>เป็นอุบัติการณ์เรื่องใด <span class="req">*</span></label>
         <input name="topic" id="inTopic" list="dlTopic" required placeholder="พิมพ์รหัสหรือคำค้น เช่น CPP405, ตกเตียง, เข็ม, ยา">
         <datalist id="dlTopic"></datalist></div>
+      <div class="full"><label><span class="no rp">RP</span>หัวข้อใน Risk Profile <span class="req">*</span></label>
+        <select name="rpNo" id="selRP" required></select>
+        <div class="hint">ใช้นับความถี่และระดับที่เกิดในตาราง Risk Profile (ไม่ส่งไป HRMS)</div></div>
       <div><label><span class="no">7</span>ระดับความรุนแรง <span class="req">*</span></label>
         <select name="severity" id="selSev" required></select>
         <div class="hint" id="sevHint"></div></div>
@@ -680,8 +697,8 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
         <div class="field"><label for="fKpi">ตัวชี้วัด</label><textarea id="fKpi"></textarea></div>
       </div>
       <div class="dgrid">
-        <div class="field"><label for="fFreq">ความถี่</label><input type="text" id="fFreq"></div>
-        <div class="field"><label for="fSev">ระดับ (A–I)</label><select id="fSev"></select></div>
+        <div class="field"><label>ความถี่ (นับอัตโนมัติจากทะเบียนความเสี่ยง รวมทุกปี)</label><div class="autofreq" id="fFreq"></div></div>
+        <div class="field"><label for="fSev">ระดับที่ประเมิน (A–I) ใช้คำนวณผลกระทบ</label><select id="fSev"></select></div>
       </div>
       <fieldset class="resset"><legend>ผลลัพธ์รายปีงบประมาณ</legend>
         <div id="resFields" class="resgrid"></div>
@@ -773,8 +790,22 @@ async function api(action, payload){
 }
 function setStatus(kind, text){ $("status").innerHTML = `<span class="dot ${kind}"></span><span>${esc(text)}</span>`; }
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 2600); }
+let LINKS = {};
+function setLinks(list){ LINKS = {}; (list||[]).forEach(l=>{ if(l.key) LINKS[l.key]=String(l.no); }); }
+function incKey(r){ return String(r.reportDateIso||r.reportDate||'').trim() + '|' + String(r.details||'').trim().slice(0,120); }
+const SEV_ORDER = "ABCDEFGHI12345";
+/** นับอุบัติการณ์จากทะเบียนความเสี่ยงที่เชื่อมกับหัวข้อ Risk Profile (รวมทุกปี) */
+function incCounts(no){
+  const rows = (window.INC && INC.rows()) || [];
+  const by = {}; let total = 0;
+  rows.forEach(r=>{ if (LINKS[incKey(r)] === String(no)) { const k=String(r.severity||'?').trim().toUpperCase(); by[k]=(by[k]||0)+1; total++; } });
+  return {total, by};
+}
+function chipClass(k){ return /^[A-I]$/.test(k) ? sevClass(k) : (/^[1-5]$/.test(k) ? "s"+k : ""); }
 function applyData(d, rerender){
   ROWS = d.rows || []; ONLINE = true; CUR_FY = d.fy || curFyLocal(); YEARS = d.years || [];
+  if (d.links) setLinks(d.links);
+  if (window.INC) INC.fillRP();
   const t = new Date();
   setStatus("ok", `เชื่อมต่อชีตแล้ว · ${ROWS.length} หัวข้อ · ปีงบปัจจุบัน ${CUR_FY} · อัปเดต ${t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`);
   if (rerender !== false) renderRegister();
@@ -787,6 +818,7 @@ async function load(){
     document.querySelector(".reg-wrap").classList.remove("loading");
     ONLINE = false;
     if (!ROWS.length) ROWS = DEFAULT_TOPICS.map((t,i)=>({"ลำดับที่":String(i+1),"หัวข้อ":t}));
+    if (window.INC) INC.fillRP();
     setStatus("err", "เชื่อมต่อชีตไม่สำเร็จ: " + e.message + " (แก้ไขไม่ได้จนกว่าจะเชื่อมต่อ)");
     renderRegister();
   }
@@ -870,14 +902,15 @@ function renderRegister(){
   const ys = years3();
   $("resYears").innerHTML = ys.map(y=>`<th title="ผลลัพธ์ ปีงบประมาณ ${y}">${String(y).slice(-2)}</th>`).join("");
   $("regBody").innerHTML = ROWS.map(r=>{
-    const no = esc(r["ลำดับที่"]), sev = String(r["ระดับ"]||"").trim().toUpperCase();
+    const no = esc(r["ลำดับที่"]);
+    const cnt = incCounts(r["ลำดับที่"]), keys = Object.keys(cnt.by).sort((a,b)=>SEV_ORDER.indexOf(a)-SEV_ORDER.indexOf(b));
     return `<tr data-open="${no}">
       <td class="no">${no}</td>
       <td class="topic">${txt(r["หัวข้อ"])}</td>
       <td class="c-meas">${txt(r["มาตรการป้องกัน"])}</td>
       <td class="c-kpi">${txt(r["ตัวชี้วัด"])}</td>
-      <td class="c-freq">${txt(r["ความถี่"])}</td>
-      <td class="lv">${sev?`<span class="sevchip ${sevClass(sev)}" title="${esc((SEV.find(x=>x[0]===sev)||["",""])[1])}">${sev}</span>`:`<span class="empty">—</span>`}</td>
+      <td class="c-freq freq">${cnt.total ? `<b>${cnt.total}</b><small>ครั้ง</small>` : `<span class="empty">0</span>`}</td>
+      <td class="lv">${keys.length ? `<div class="cnts">${keys.map(k=>`<span class="sevchip ${chipClass(k)}" title="ระดับ ${k} เกิด ${cnt.by[k]} ครั้ง">${k}<i>×${cnt.by[k]}</i></span>`).join("")}</div>` : `<span class="empty">—</span>`}</td>
       ${ys.map(y=>`<td class="res">${txt(r[RES+y])}</td>`).join("")}
       <td class="act"><button type="button" class="eyebtn" data-open="${no}" aria-label="แก้ไขลำดับที่ ${no}" title="แก้ไข">${EYE}</button></td>
     </tr>`;
@@ -902,7 +935,10 @@ function openEdit(no){
   editingNo = no==null ? null : String(no);
   $("dlgTitle").textContent = editingNo ? `แก้ไข ลำดับที่ ${no}` : "เพิ่มหัวข้อใหม่";
   $("fTopic").value = r["หัวข้อ"]||""; $("fMeasure").value = r["มาตรการป้องกัน"]||"";
-  $("fKpi").value = r["ตัวชี้วัด"]||""; $("fFreq").value = r["ความถี่"]||"";
+  $("fKpi").value = r["ตัวชี้วัด"]||"";
+  { const c = editingNo ? incCounts(editingNo) : {total:0, by:{}};
+    const ks = Object.keys(c.by).sort((a,b)=>SEV_ORDER.indexOf(a)-SEV_ORDER.indexOf(b));
+    $("fFreq").innerHTML = `<b>${c.total}</b> ครั้ง ` + ks.map(k=>`<span class="sevchip ${chipClass(k)}">${k}<i>×${c.by[k]}</i></span>`).join(" "); }
   $("fSev").innerHTML = `<option value="">— ไม่ระบุ —</option>` + SEV.map(([c,t])=>`<option value="${c}">${c} — ${esc(t)}</option>`).join("");
   $("fSev").value = String(r["ระดับ"]||"").trim().toUpperCase();
   const ys = allYears(r);
@@ -934,7 +970,7 @@ $("frm").addEventListener("submit", async e=>{
   e.preventDefault();
   const topic = $("fTopic").value.trim(); if(!topic){ toast("กรุณาระบุหัวข้อ"); $("fTopic").focus(); return; }
   const sev = $("fSev").value;
-  const row = {"หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(), "ความถี่": $("fFreq").value.trim(), "ระดับ": sev, "ผลกระทบ (C)": sev ? SEV2C[sev] : ""};
+  const row = {"หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(), "ความถี่": editingNo ? String(incCounts(editingNo).total) : "0", "ระดับ": sev, "ผลกระทบ (C)": sev ? SEV2C[sev] : ""};
   document.querySelectorAll("#resFields textarea").forEach(t=>row[RES+t.dataset.y]=t.value.trim());
   const btn = $("btnSave"); btn.disabled = true; btn.textContent = "กำลังบันทึก…";
   try{
@@ -949,6 +985,8 @@ $("btnClose").addEventListener("click", ()=>$("dlg").close());
 $("btnAdd").addEventListener("click", ()=>openEdit(null));
 $("btnReload").addEventListener("click", load);
 $("sevLegend").innerHTML = "ระดับ: " + [["A–B","var(--low)"],["C–D","var(--mod)"],["E","var(--high)"],["F–I","var(--ext)"]].map(([t,c])=>`<span><i style="background:${c}"></i>${t}</span>`).join("") + ` · ความหมายของระดับ A–I ดูที่ “เกณฑ์การให้คะแนน” ด้านล่าง`;
+
+window.RP = { api, render: ()=>renderRegister(), rows: ()=>ROWS, links: ()=>LINKS, setLinks, incKey };
 
 /* ---------- init ---------- */
 buildMatrix(); buildSelects(); buildRefs(); buildLevels(); sync();
@@ -1080,6 +1118,9 @@ load();
   async function send(e){
     e.preventDefault();
     const data = Object.fromEntries(new FormData(f).entries());
+    const rpNo = data.rpNo; delete data.rpNo;
+    const oldKey = editing ? RP.incKey(editing) : null;
+    const newKey = RP.incKey({reportDateIso: data.reportDate, details: data.details});
     data.images = images.map(({name, mimeType, data}) => ({name, mimeType, data}));
     data.attachments = files;
     if (editing) { data._row = editing._row; data._sig = editing.details; }
@@ -1087,6 +1128,8 @@ load();
     btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> <span>กำลังบันทึก...</span>';
     try {
       const r = await api(editing ? 'update' : 'submit', data);
+      try { const d = await RP.api('link', {key: newKey, no: rpNo, oldKey}); RP.setLinks(d.links); }
+      catch (x) { toast('บันทึกแล้ว แต่เชื่อมหัวข้อ Risk Profile ไม่สำเร็จ: ' + x.message, false); }
       toast(editing ? 'แก้ไขเรียบร้อยแล้ว' : `บันทึกเรียบร้อย · รูป ${r.images} · ไฟล์ ${r.files}`);
       highlightRow = r.row;
       resetForm();
@@ -1107,6 +1150,18 @@ load();
     inTopic.setCustomValidity(''); renderThumbs();
   }
   const cancelEdit = () => resetForm();
+  function fillRP(){
+    const sel = $('selRP'), cur = sel.value;
+    const rows = (window.RP && RP.rows()) || [];
+    sel.innerHTML = '<option value="">-- เลือกหัวข้อ Risk Profile --</option>' +
+      rows.map(r => `<option value="${esc(r['ลำดับที่'])}">${esc(r['ลำดับที่'])}. ${esc(r['หัวข้อ'])}</option>`).join('') +
+      '<option value="0">อื่น ๆ (ไม่อยู่ในหัวข้อ Risk Profile)</option>';
+    sel.value = cur;
+    if (editing && !cur) sel.value = linkOf(editing) || '';
+    if (DATA.rows.length) renderTable();
+  }
+  const linkOf = r => (window.RP && RP.links()[RP.incKey(r)]) || '';
+  const rpTitle = no => { if (no === '0') return 'อื่น ๆ'; const x = ((window.RP && RP.rows()) || []).find(r => String(r['ลำดับที่']) === String(no)); return x ? no + '. ' + x['หัวข้อ'] : ''; };
 
   function fillForm(r){
     const setv = (n, v) => { if (f[n]) f[n].value = v || ''; };
@@ -1117,6 +1172,7 @@ load();
     });
     ['reportDate','eventDate','foundDate'].forEach(k => setv(k, r[k + 'Iso']));
     setv('time', (r.time || '').slice(0,5));
+    $('selRP').value = linkOf(r);
     $('sevHint').textContent = ((OPT && OPT.severityNotes) || {})[r.severity] || '';
   }
   function startEdit(row){
@@ -1134,28 +1190,24 @@ load();
   // ---------- ข้อมูล / สถิติ / ตาราง ----------
   async function loadData(){
     $('reloadIc').classList.add('spin');
-    try { DATA = await api('data'); renderStats(); renderTable(); }
+    try { DATA = await api('data'); renderStats(); renderTable(); if (window.RP) RP.render(); }
     catch (e) { $('tableBox').className = 'empty'; $('tableBox').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; }
     finally { $('reloadIc').classList.remove('spin'); }
   }
   function statCard(key, count){
     const L = LEVELS[key];
-    return `<div class="stat ${filterSev === key ? 'on' : ''}" style="--c:${L.c};--d:${L.d}" onclick="INC.setFilter('${key}')">
-      <div class="lv">${key}</div><div class="ic"><i class="fa-solid ${L.i}"></i></div>
-      <div class="num">${count}<span>เรื่อง</span></div>
-      <div class="lb">ระดับ ${key}</div><div class="ds">${L.t}</div></div>`;
+    return `<div class="stat ${filterSev === key ? 'on' : ''}" style="--c:${L.c};--d:${L.d}" onclick="INC.setFilter('${key}')" role="button" tabindex="0" aria-label="ระดับ ${key} ${count} เรื่อง">
+      <div class="lv">${key}</div>
+      <div class="top"><div class="ic"><i class="fa-solid ${L.i}"></i></div><div class="num">${count}<span>เรื่อง</span></div></div>
+      <div class="lb">ระดับ ${key} <small>· ${L.t}</small></div></div>`;
   }
   function renderStats(){
     const cnt = {}; DATA.rows.forEach(r => { const k = String(r.severity || '').trim().toUpperCase(); cnt[k] = (cnt[k] || 0) + 1; });
     const clin = 'ABCDEFGHI'.split('').reduce((s,k) => s + (cnt[k] || 0), 0);
     const gen = '12345'.split('').reduce((s,k) => s + (cnt[k] || 0), 0);
-    const mini = (icon, label, n, bg, fg, key) => `<div class="stat ${filterSev === key ? 'on' : ''}" style="--c:${bg};--d:${fg}" onclick="INC.setFilter('${key}')">
-      <div class="ic"><i class="fa-solid ${icon}"></i></div><div class="num">${n}<span>เรื่อง</span></div><div class="lb">${label}</div></div>`;
-    $('statsTotal').innerHTML =
-      mini('fa-layer-group', 'ทั้งหมด', DATA.rows.length, 'linear-gradient(135deg,#ccfbf1,#e0f2fe)', '#0f766e', '') +
-      mini('fa-user-nurse', 'ด้านคลินิก (A–I)', clin, 'linear-gradient(135deg,#e0f2fe,#e0e7ff)', '#0369a1', 'CLIN') +
-      mini('fa-building-shield', 'ด้านทั่วไป (1–5)', gen, 'linear-gradient(135deg,#f3e8ff,#fce7f3)', '#7e22ce', 'GEN') +
-      mini('fa-triangle-exclamation', 'รุนแรง (E–I, 3–5)', 'EFGHI345'.split('').reduce((s,k) => s + (cnt[k] || 0), 0), 'linear-gradient(135deg,#ffe4e6,#ffedd5)', '#be123c', 'HIGH');
+    $('statTotal').textContent = 'ทั้งหมด ' + DATA.rows.length + ' เรื่อง';
+    $('statClinN').textContent = clin + ' เรื่อง';
+    $('statGenN').textContent = gen + ' เรื่อง';
     $('statsClin').innerHTML = 'ABCDEFGHI'.split('').map(k => statCard(k, cnt[k] || 0)).join('');
     $('statsGen').innerHTML = '12345'.split('').map(k => statCard(k, cnt[k] || 0)).join('');
   }
@@ -1195,7 +1247,7 @@ load();
         return `<tr class="${r._row === highlightRow ? 'new' : ''}">
           <td class="date">${esc(thDate(r.reportDateIso) || r.reportDate)}</td>
           <td class="unit">${esc(r.unit)}</td>
-          <td class="det"><div class="txt">${sev}${esc(r.details)}</div>${r.topic ? `<div class="topic">${esc(r.topic)}</div>` : ''}</td>
+          <td class="det"><div class="txt">${sev}${esc(r.details)}</div>${r.topic ? `<div class="topic">${esc(r.topic)}</div>` : ''}${linkOf(r) ? `<span class="rptag">RP ${esc(rpTitle(linkOf(r)))}</span>` : ''}</td>
           <td class="act">
             <button type="button" class="ib v" title="ดู" onclick="INC.viewRow(${r._row})"><i class="fa-solid fa-eye"></i></button>
             <button type="button" class="ib e" title="แก้ไข" onclick="INC.startEdit(${r._row})"><i class="fa-solid fa-pen"></i></button>
@@ -1219,7 +1271,7 @@ load();
       else if (/Date$/.test(c.key)) v = esc(thDate(r[c.key + 'Iso']) || r[c.key]) || '-';
       else if (c.key === 'severity' && r.severity) { const L = LEVELS[String(r.severity).toUpperCase()]; v = `<span class="sev" style="${L ? `--c:${L.c};--d:${L.d}` : ''}">${esc(r.severity)}</span>${L ? esc(L.t) : ''}`; }
       return `<div class="k">${esc(c.title)}</div><div class="v">${v || '-'}</div>`;
-    }).join('');
+    }).join('') + `<div class="k">หัวข้อใน Risk Profile</div><div class="v">${esc(rpTitle(linkOf(r))) || '- (ยังไม่ระบุ กดแก้ไขเพื่อเลือก)'}</div>`;
     $('viewEdit').onclick = () => startEdit(row);
     openM('mView');
   }
@@ -1240,6 +1292,7 @@ load();
     try {
       await api('delete', {_row: delTarget._row, _sig: delTarget.details, password: pw});
       closeM('mDel'); toast('ลบรายการเรียบร้อยแล้ว');
+      try { const d = await RP.api('unlink', {key: RP.incKey(delTarget)}); RP.setLinks(d.links); } catch (x) {}
       if (editing && editing._row === delTarget._row) resetForm();
       await loadData();
     } catch (e) {
@@ -1250,11 +1303,12 @@ load();
   }
 
   window.INC = {
-    send, cancelEdit, addImages, addFiles, loadData, closeM, doDelete, setFilter, viewRow, startEdit, askDelete,
+    send, cancelEdit, fillRP, rows: () => DATA.rows, addImages, addFiles, loadData, closeM, doDelete, setFilter, viewRow, startEdit, askDelete,
     rmImg: i => { images.splice(i,1); renderThumbs(); },
     rmFile: i => { files.splice(i,1); renderThumbs(); },
     more: () => { page++; renderTable(); }
   };
+  fillRP();
   loadData();
 })();
 </script>
