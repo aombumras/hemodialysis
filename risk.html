@@ -492,7 +492,7 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
   </header>
 
   <section id="incStats" class="inc" aria-label="สถิติความเสี่ยง">
-    <div class="sec-title"><i class="fa-solid fa-chart-simple" style="color:#0f766e"></i> สถิติตามระดับความรุนแรง <span class="tot" id="statTotal">0 เรื่อง</span> <small>(แตะการ์ดเพื่อกรองตารางทะเบียนความเสี่ยง)</small></div>
+    <div class="sec-title"><i class="fa-solid fa-chart-simple" style="color:#0f766e"></i> สถิติตามระดับความรุนแรง <span class="tot" id="statTotal">0 เรื่อง</span> <small id="statSrc">(แตะการ์ดเพื่อกรองตารางทะเบียนความเสี่ยง)</small></div>
     <div class="sec-title sub"><i class="fa-solid fa-user-nurse" style="color:#0369a1"></i> ด้านคลินิก <small>ระดับ A–I</small> <span class="tot" id="statClinN">0 เรื่อง</span></div>
     <div class="stats" id="statsClin"></div>
     <div class="sec-title sub"><i class="fa-solid fa-building-shield" style="color:#7c3aed"></i> ด้านทั่วไป <small>ระดับ 1–5</small> <span class="tot" id="statGenN">0 เรื่อง</span></div>
@@ -551,9 +551,6 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
       <div class="full"><label><span class="no">6</span>เป็นอุบัติการณ์เรื่องใด <span class="req">*</span></label>
         <input name="topic" id="inTopic" list="dlTopic" required placeholder="พิมพ์รหัสหรือคำค้น เช่น CPP405, ตกเตียง, เข็ม, ยา">
         <datalist id="dlTopic"></datalist></div>
-      <div class="full"><label><span class="no rp">RP</span>หัวข้อใน Risk Profile <span class="req">*</span></label>
-        <select name="rpNo" id="selRP" required></select>
-        <div class="hint">ใช้นับความถี่และระดับที่เกิดในตาราง Risk Profile (ไม่ส่งไป HRMS)</div></div>
       <div><label><span class="no">7</span>ระดับความรุนแรง <span class="req">*</span></label>
         <select name="severity" id="selSev" required></select>
         <div class="hint" id="sevHint"></div></div>
@@ -697,7 +694,7 @@ dialog#dlg{width:min(760px,calc(100vw - 24px))}
         <div class="field"><label for="fKpi">ตัวชี้วัด</label><textarea id="fKpi"></textarea></div>
       </div>
       <div class="dgrid">
-        <div class="field"><label>ความถี่ (นับอัตโนมัติจากทะเบียนความเสี่ยง รวมทุกปี)</label><div class="autofreq" id="fFreq"></div></div>
+        <div class="field"><label>ความถี่ (รวมผลลัพธ์ทุกปีงบอัตโนมัติ)</label><div class="autofreq" id="fFreq"></div></div>
         <div class="field"><label for="fSev">ระดับที่ประเมิน (A–I) ใช้คำนวณผลกระทบ</label><select id="fSev"></select></div>
       </div>
       <fieldset class="resset"><legend>ผลลัพธ์รายปีงบประมาณ</legend>
@@ -801,11 +798,14 @@ function incCounts(no){
   rows.forEach(r=>{ if (LINKS[incKey(r)] === String(no)) { const k=String(r.severity||'?').trim().toUpperCase(); by[k]=(by[k]||0)+1; total++; } });
   return {total, by};
 }
+/** ความถี่ = ผลรวมตัวเลขในคอลัมน์ผลลัพธ์ทุกปีงบ */
+function numOf(v){ const m = String(v==null?'':v).replace(/,/g,'').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : 0; }
+function yearSum(r){ return Object.keys(r||{}).filter(k=>k.indexOf(RES)===0).reduce((s,k)=>s+numOf(r[k]),0); }
 function chipClass(k){ return /^[A-I]$/.test(k) ? sevClass(k) : (/^[1-5]$/.test(k) ? "s"+k : ""); }
 function applyData(d, rerender){
   ROWS = d.rows || []; ONLINE = true; CUR_FY = d.fy || curFyLocal(); YEARS = d.years || [];
   if (d.links) setLinks(d.links);
-  if (window.INC) INC.fillRP();
+  if (window.INC) INC.refreshStats();
   const t = new Date();
   setStatus("ok", `เชื่อมต่อชีตแล้ว · ${ROWS.length} หัวข้อ · ปีงบปัจจุบัน ${CUR_FY} · อัปเดต ${t.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})} น.`);
   if (rerender !== false) renderRegister();
@@ -818,7 +818,7 @@ async function load(){
     document.querySelector(".reg-wrap").classList.remove("loading");
     ONLINE = false;
     if (!ROWS.length) ROWS = DEFAULT_TOPICS.map((t,i)=>({"ลำดับที่":String(i+1),"หัวข้อ":t}));
-    if (window.INC) INC.fillRP();
+    if (window.INC) INC.refreshStats();
     setStatus("err", "เชื่อมต่อชีตไม่สำเร็จ: " + e.message + " (แก้ไขไม่ได้จนกว่าจะเชื่อมต่อ)");
     renderRegister();
   }
@@ -903,14 +903,14 @@ function renderRegister(){
   $("resYears").innerHTML = ys.map(y=>`<th title="ผลลัพธ์ ปีงบประมาณ ${y}">${String(y).slice(-2)}</th>`).join("");
   $("regBody").innerHTML = ROWS.map(r=>{
     const no = esc(r["ลำดับที่"]);
-    const cnt = incCounts(r["ลำดับที่"]), keys = Object.keys(cnt.by).sort((a,b)=>SEV_ORDER.indexOf(a)-SEV_ORDER.indexOf(b));
+    const sev = String(r["ระดับ"]||"").trim().toUpperCase(), tot = yearSum(r);
     return `<tr data-open="${no}">
       <td class="no">${no}</td>
       <td class="topic">${txt(r["หัวข้อ"])}</td>
       <td class="c-meas">${txt(r["มาตรการป้องกัน"])}</td>
       <td class="c-kpi">${txt(r["ตัวชี้วัด"])}</td>
-      <td class="c-freq freq">${cnt.total ? `<b>${cnt.total}</b><small>ครั้ง</small>` : `<span class="empty">0</span>`}</td>
-      <td class="lv">${keys.length ? `<div class="cnts">${keys.map(k=>`<span class="sevchip ${chipClass(k)}" title="ระดับ ${k} เกิด ${cnt.by[k]} ครั้ง">${k}<i>×${cnt.by[k]}</i></span>`).join("")}</div>` : `<span class="empty">—</span>`}</td>
+      <td class="c-freq freq">${tot ? `<b>${tot}</b><small>ครั้ง</small>` : `<span class="empty">0</span>`}</td>
+      <td class="lv">${sev ? `<span class="sevchip ${sevClass(sev)}" title="${esc((SEV.find(x=>x[0]===sev)||["",""])[1])}">${sev}</span>` : `<span class="empty">—</span>`}</td>
       ${ys.map(y=>`<td class="res">${txt(r[RES+y])}</td>`).join("")}
       <td class="act"><button type="button" class="eyebtn" data-open="${no}" aria-label="แก้ไขลำดับที่ ${no}" title="แก้ไข">${EYE}</button></td>
     </tr>`;
@@ -936,14 +936,13 @@ function openEdit(no){
   $("dlgTitle").textContent = editingNo ? `แก้ไข ลำดับที่ ${no}` : "เพิ่มหัวข้อใหม่";
   $("fTopic").value = r["หัวข้อ"]||""; $("fMeasure").value = r["มาตรการป้องกัน"]||"";
   $("fKpi").value = r["ตัวชี้วัด"]||"";
-  { const c = editingNo ? incCounts(editingNo) : {total:0, by:{}};
-    const ks = Object.keys(c.by).sort((a,b)=>SEV_ORDER.indexOf(a)-SEV_ORDER.indexOf(b));
-    $("fFreq").innerHTML = `<b>${c.total}</b> ครั้ง ` + ks.map(k=>`<span class="sevchip ${chipClass(k)}">${k}<i>×${c.by[k]}</i></span>`).join(" "); }
+
   $("fSev").innerHTML = `<option value="">— ไม่ระบุ —</option>` + SEV.map(([c,t])=>`<option value="${c}">${c} — ${esc(t)}</option>`).join("");
   $("fSev").value = String(r["ระดับ"]||"").trim().toUpperCase();
   const ys = allYears(r);
   $("resFields").innerHTML = ys.map(y=>yearField(y, r[RES+y])).join("");
   $("newYear").value = Math.max(...ys) + 1;
+  updFreq();
   $("delWrap").innerHTML = editingNo ? `<button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>` : "";
   if (editingNo) $("btnDel").onclick = askDelete;
   $("dlg").showModal();
@@ -955,9 +954,16 @@ $("btnAddYear").addEventListener("click", ()=>{
   const cur = [...document.querySelectorAll("#resFields textarea")].map(t=>({y:+t.dataset.y, v:t.value}));
   cur.push({y, v:""}); cur.sort((a,b)=>b.y-a.y);
   $("resFields").innerHTML = cur.map(o=>yearField(o.y, o.v)).join("");
-  $("fRes"+y).focus();
+  $("fRes"+y).focus(); updFreq();
   $("newYear").value = Math.max(...cur.map(o=>o.y)) + 1;
 });
+function updFreq(){
+  const parts = [...document.querySelectorAll("#resFields textarea")].map(t=>({y:t.dataset.y, n:numOf(t.value)})).sort((a,b)=>a.y-b.y);
+  const sum = parts.reduce((s,p)=>s+p.n,0);
+  $("fFreq").innerHTML = `<b>${sum}</b> ครั้ง <small style="color:var(--muted)">(${parts.map(p=>String(p.y).slice(-2)+": "+p.n).join(" + ")})</small>`;
+  return sum;
+}
+$("resFields").addEventListener("input", updFreq);
 function askDelete(){
   $("delWrap").innerHTML = `<span>ยืนยันลบ?</span><button type="button" class="btn danger small" id="delYes">ลบ</button><button type="button" class="btn small" id="delNo">ไม่ลบ</button>`;
   $("delNo").onclick = ()=>{ $("delWrap").innerHTML = `<button type="button" class="btn danger" id="btnDel">ลบหัวข้อนี้</button>`; $("btnDel").onclick = askDelete; };
@@ -970,8 +976,9 @@ $("frm").addEventListener("submit", async e=>{
   e.preventDefault();
   const topic = $("fTopic").value.trim(); if(!topic){ toast("กรุณาระบุหัวข้อ"); $("fTopic").focus(); return; }
   const sev = $("fSev").value;
-  const row = {"หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(), "ความถี่": editingNo ? String(incCounts(editingNo).total) : "0", "ระดับ": sev, "ผลกระทบ (C)": sev ? SEV2C[sev] : ""};
+  const row = {"หัวข้อ": topic, "มาตรการป้องกัน": $("fMeasure").value.trim(), "ตัวชี้วัด": $("fKpi").value.trim(), "ความถี่": "0", "ระดับ": sev, "ผลกระทบ (C)": sev ? SEV2C[sev] : ""};
   document.querySelectorAll("#resFields textarea").forEach(t=>row[RES+t.dataset.y]=t.value.trim());
+  row["ความถี่"] = String(updFreq());
   const btn = $("btnSave"); btn.disabled = true; btn.textContent = "กำลังบันทึก…";
   try{
     if (editingNo){ row["ลำดับที่"] = editingNo; applyData(await api('saveRow', {row})); }
@@ -986,7 +993,7 @@ $("btnAdd").addEventListener("click", ()=>openEdit(null));
 $("btnReload").addEventListener("click", load);
 $("sevLegend").innerHTML = "ระดับ: " + [["A–B","var(--low)"],["C–D","var(--mod)"],["E","var(--high)"],["F–I","var(--ext)"]].map(([t,c])=>`<span><i style="background:${c}"></i>${t}</span>`).join("") + ` · ความหมายของระดับ A–I ดูที่ “เกณฑ์การให้คะแนน” ด้านล่าง`;
 
-window.RP = { api, render: ()=>renderRegister(), rows: ()=>ROWS, links: ()=>LINKS, setLinks, incKey };
+window.RP = { api, render: ()=>renderRegister(), rows: ()=>ROWS, yearSum };
 
 /* ---------- init ---------- */
 buildMatrix(); buildSelects(); buildRefs(); buildLevels(); sync();
@@ -1118,9 +1125,7 @@ load();
   async function send(e){
     e.preventDefault();
     const data = Object.fromEntries(new FormData(f).entries());
-    const rpNo = data.rpNo; delete data.rpNo;
-    const oldKey = editing ? RP.incKey(editing) : null;
-    const newKey = RP.incKey({reportDateIso: data.reportDate, details: data.details});
+
     data.images = images.map(({name, mimeType, data}) => ({name, mimeType, data}));
     data.attachments = files;
     if (editing) { data._row = editing._row; data._sig = editing.details; }
@@ -1128,8 +1133,7 @@ load();
     btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> <span>กำลังบันทึก...</span>';
     try {
       const r = await api(editing ? 'update' : 'submit', data);
-      try { const d = await RP.api('link', {key: newKey, no: rpNo, oldKey}); RP.setLinks(d.links); }
-      catch (x) { toast('บันทึกแล้ว แต่เชื่อมหัวข้อ Risk Profile ไม่สำเร็จ: ' + x.message, false); }
+
       toast(editing ? 'แก้ไขเรียบร้อยแล้ว' : `บันทึกเรียบร้อย · รูป ${r.images} · ไฟล์ ${r.files}`);
       highlightRow = r.row;
       resetForm();
@@ -1150,18 +1154,6 @@ load();
     inTopic.setCustomValidity(''); renderThumbs();
   }
   const cancelEdit = () => resetForm();
-  function fillRP(){
-    const sel = $('selRP'), cur = sel.value;
-    const rows = (window.RP && RP.rows()) || [];
-    sel.innerHTML = '<option value="">-- เลือกหัวข้อ Risk Profile --</option>' +
-      rows.map(r => `<option value="${esc(r['ลำดับที่'])}">${esc(r['ลำดับที่'])}. ${esc(r['หัวข้อ'])}</option>`).join('') +
-      '<option value="0">อื่น ๆ (ไม่อยู่ในหัวข้อ Risk Profile)</option>';
-    sel.value = cur;
-    if (editing && !cur) sel.value = linkOf(editing) || '';
-    if (DATA.rows.length) renderTable();
-  }
-  const linkOf = r => (window.RP && RP.links()[RP.incKey(r)]) || '';
-  const rpTitle = no => { if (no === '0') return 'อื่น ๆ'; const x = ((window.RP && RP.rows()) || []).find(r => String(r['ลำดับที่']) === String(no)); return x ? no + '. ' + x['หัวข้อ'] : ''; };
 
   function fillForm(r){
     const setv = (n, v) => { if (f[n]) f[n].value = v || ''; };
@@ -1172,7 +1164,7 @@ load();
     });
     ['reportDate','eventDate','foundDate'].forEach(k => setv(k, r[k + 'Iso']));
     setv('time', (r.time || '').slice(0,5));
-    $('selRP').value = linkOf(r);
+
     $('sevHint').textContent = ((OPT && OPT.severityNotes) || {})[r.severity] || '';
   }
   function startEdit(row){
@@ -1202,12 +1194,18 @@ load();
       <div class="lb">ระดับ ${key} <small>· ${L.t}</small></div></div>`;
   }
   function renderStats(){
-    const cnt = {}; DATA.rows.forEach(r => { const k = String(r.severity || '').trim().toUpperCase(); cnt[k] = (cnt[k] || 0) + 1; });
-    const clin = 'ABCDEFGHI'.split('').reduce((s,k) => s + (cnt[k] || 0), 0);
-    const gen = '12345'.split('').reduce((s,k) => s + (cnt[k] || 0), 0);
-    $('statTotal').textContent = 'ทั้งหมด ' + DATA.rows.length + ' เรื่อง';
-    $('statClinN').textContent = clin + ' เรื่อง';
-    $('statGenN').textContent = gen + ' เรื่อง';
+    const cnt = {}, add = (k, n) => { k = String(k || '').trim().toUpperCase(); if (k && n) cnt[k] = (cnt[k] || 0) + n; };
+    // 1) ทะเบียนความเสี่ยง: 1 รายการ = 1 เรื่อง
+    DATA.rows.forEach(r => add(r.severity, 1));
+    const regN = DATA.rows.length;
+    // 2) ตาราง Risk Profile: ระดับ × ผลรวมผลลัพธ์ทุกปีงบ
+    let rpN = 0;
+    ((window.RP && RP.rows()) || []).forEach(r => { const n = RP.yearSum(r); if (r['ระดับ'] && n) { add(r['ระดับ'], n); rpN += n; } });
+    const sumOf = keys => keys.split('').reduce((s,k) => s + (cnt[k] || 0), 0);
+    $('statTotal').textContent = 'ทั้งหมด ' + (regN + rpN) + ' เรื่อง';
+    $('statSrc').textContent = `(ทะเบียนความเสี่ยง ${regN} + ตาราง Risk Profile ${rpN} · แตะการ์ดเพื่อกรองตารางทะเบียนความเสี่ยง)`;
+    $('statClinN').textContent = sumOf('ABCDEFGHI') + ' เรื่อง';
+    $('statGenN').textContent = sumOf('12345') + ' เรื่อง';
     $('statsClin').innerHTML = 'ABCDEFGHI'.split('').map(k => statCard(k, cnt[k] || 0)).join('');
     $('statsGen').innerHTML = '12345'.split('').map(k => statCard(k, cnt[k] || 0)).join('');
   }
@@ -1247,7 +1245,7 @@ load();
         return `<tr class="${r._row === highlightRow ? 'new' : ''}">
           <td class="date">${esc(thDate(r.reportDateIso) || r.reportDate)}</td>
           <td class="unit">${esc(r.unit)}</td>
-          <td class="det"><div class="txt">${sev}${esc(r.details)}</div>${r.topic ? `<div class="topic">${esc(r.topic)}</div>` : ''}${linkOf(r) ? `<span class="rptag">RP ${esc(rpTitle(linkOf(r)))}</span>` : ''}</td>
+          <td class="det"><div class="txt">${sev}${esc(r.details)}</div>${r.topic ? `<div class="topic">${esc(r.topic)}</div>` : ''}</td>
           <td class="act">
             <button type="button" class="ib v" title="ดู" onclick="INC.viewRow(${r._row})"><i class="fa-solid fa-eye"></i></button>
             <button type="button" class="ib e" title="แก้ไข" onclick="INC.startEdit(${r._row})"><i class="fa-solid fa-pen"></i></button>
@@ -1271,7 +1269,7 @@ load();
       else if (/Date$/.test(c.key)) v = esc(thDate(r[c.key + 'Iso']) || r[c.key]) || '-';
       else if (c.key === 'severity' && r.severity) { const L = LEVELS[String(r.severity).toUpperCase()]; v = `<span class="sev" style="${L ? `--c:${L.c};--d:${L.d}` : ''}">${esc(r.severity)}</span>${L ? esc(L.t) : ''}`; }
       return `<div class="k">${esc(c.title)}</div><div class="v">${v || '-'}</div>`;
-    }).join('') + `<div class="k">หัวข้อใน Risk Profile</div><div class="v">${esc(rpTitle(linkOf(r))) || '- (ยังไม่ระบุ กดแก้ไขเพื่อเลือก)'}</div>`;
+    }).join('');
     $('viewEdit').onclick = () => startEdit(row);
     openM('mView');
   }
@@ -1292,7 +1290,7 @@ load();
     try {
       await api('delete', {_row: delTarget._row, _sig: delTarget.details, password: pw});
       closeM('mDel'); toast('ลบรายการเรียบร้อยแล้ว');
-      try { const d = await RP.api('unlink', {key: RP.incKey(delTarget)}); RP.setLinks(d.links); } catch (x) {}
+
       if (editing && editing._row === delTarget._row) resetForm();
       await loadData();
     } catch (e) {
@@ -1303,12 +1301,11 @@ load();
   }
 
   window.INC = {
-    send, cancelEdit, fillRP, rows: () => DATA.rows, addImages, addFiles, loadData, closeM, doDelete, setFilter, viewRow, startEdit, askDelete,
+    send, cancelEdit, rows: () => DATA.rows, refreshStats: () => renderStats(), addImages, addFiles, loadData, closeM, doDelete, setFilter, viewRow, startEdit, askDelete,
     rmImg: i => { images.splice(i,1); renderThumbs(); },
     rmFile: i => { files.splice(i,1); renderThumbs(); },
     more: () => { page++; renderTable(); }
   };
-  fillRP();
   loadData();
 })();
 </script>
